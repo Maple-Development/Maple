@@ -10,7 +10,7 @@
 </script>
 <div class="flex justify-between">
     <div class="flex">
-        <Button class="px-1 bg-transparent hover:bg-secondary ml-2 my-1 h-10 w-10"><Music size={20} color="white" /></Button> 
+        <Button class="px-1 bg-transparent hover:bg-secondary ml-2 my-1 h-10 w-10" href="/tracks"><Music size={20} color="white" /></Button> 
         <Button class="px-1 bg-transparent hover:bg-secondary ml-2 my-1 h-10 w-10"><ListMusic size={20} color="white" /></Button>
         <Button class="px-1 bg-transparent hover:bg-secondary ml-2 my-1 h-10 w-10"><DiscAlbum size={20} color="white" /></Button>
         <Button class="px-1 bg-transparent hover:bg-secondary ml-2 my-1 h-10 w-10"><SquareUser size={20} color="white" /></Button>
@@ -19,9 +19,9 @@
         <Button on:click={() => open = !open} class="my-2 h-8 max-w-xs text-primary" variant="outline"> Commands </Button>
     </div>
 </div>
+ 
 
-
-<Command.Dialog class="bg-background outline-secondary" bind:open>
+<Command.Dialog class="bg-background" bind:open>
     <Command.Input placeholder="Search for recent items, or type a page name." />
     <Command.List>
       <Command.Empty>No results found.</Command.Empty>
