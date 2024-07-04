@@ -1,6 +1,6 @@
 <script>
-	import Command from "./command.svelte";
-	import * as Dialog from "$lib/components/ui/dialog/index.js";
+	import Command from './command.svelte';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	export let open = false;
 	export let value = undefined;
 </script>
