@@ -35,8 +35,11 @@
 	"type": "module",
 	"dependencies": {
 		"bits-ui": "^0.21.11",
+		"browser-fs-access": "^0.35.0",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
+		"comlink": "^4.4.1",
+		"idb-keyval": "^6.2.1",
 		"lucide-svelte": "^0.368.0",
 		"svelte-radix": "^1.1.0",
 		"tailwind-merge": "^2.2.2",
