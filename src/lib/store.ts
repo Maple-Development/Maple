@@ -1,0 +1,22 @@
+import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
+import type { Song } from './song';
+
+export const sources = writable([{}]);
+export const currentSongs = writable([] as Song[]);
+
+if (browser) {
+	// @ts-ignore
+	sources.set(JSON.parse(localStorage.getItem('sources')) || []);
+
+	sources.subscribe((value) => {
+		localStorage.setItem('sources', JSON.stringify(value));
+	});
+
+	currentSongs.subscribe((value) => {
+		localStorage.setItem('currentSongs', JSON.stringify(value));
+	});
+
+	// @ts-ignore
+	currentSongs.set(JSON.parse(localStorage.getItem('currentSongs')) || []);
+}

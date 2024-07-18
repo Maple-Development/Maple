@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { sources } from '$lib/store';
+	import { sources, currentSongs } from '$lib/store.js';
+	import MusicTile from '$lib/components/MusicTile.svelte';
 	import { loadScript } from './document.js';
 	import * as Comlink from 'comlink';
 	import { onMount } from 'svelte';
+	import type { Song } from '$lib/song';
 	import {
 		fileOpen,
 		directoryOpen,
@@ -74,6 +74,7 @@
 			worker.onmessage = async function(e) {
 				let file = e.data.content;
 				let tags = await processTags(file);
+				addCurrentSongsToStore(tags);
 				worker.postMessage(tags);
 			};
 
@@ -81,6 +82,7 @@
 		await fileHandler.processFiles(files);
 		importLog.push('Finished!');
 		importLog = [...importLog];
+		
 	}
 
 	async function processTags(file: any) {
@@ -97,6 +99,34 @@
 			importLog = [...importLog];
 			console.log(error);
 		}
+	}
+
+	async function addCurrentSongsToStore(tags: any) {
+		let picture: any;
+		if (tags.tags.picture) {
+			const { data, format } = tags.tags.picture;
+			let base64String = "";
+			for (let i = 0; i < data.length; i++) {
+				base64String += String.fromCharCode(data[i]);
+			}
+			const base64Image = `data:${format};base64,${window.btoa(base64String)}`;
+			picture = base64Image;
+		}
+		importing = false;
+		let newSong: Song = {
+			title: tags.tags.title,
+			artist: tags.tags.artist,
+			album: tags.tags.album,
+			year: tags.tags.year,
+			art: "",
+			genre: tags.tags.genre,
+			onClick: () => {},
+			onContextMenu: (e: MouseEvent) => {},
+		}
+
+		$currentSongs = [...$currentSongs, newSong];
+		let test: never[] = []
+		$sources.push(test);
 	}
 </script>
 
@@ -132,5 +162,25 @@
 		</div>
 	{/if}
 {:else}
-	<p>loading...</p>
+	{#if $currentSongs.length == 0}
+		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no music found </h1>
+	{:else}
+		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
+			<div>
+				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
+					{$currentSongs.length} songs found
+				</h1>
+				{#each $currentSongs as song}
+					<MusicTile
+						image={song.art}
+						title={song.title}
+						artist={song.artist}
+						album={song.album}
+						onClick={() => {}}
+						onContextMenu={() => {}}
+					/>
+				{/each}
+			</div>
+		</div>
+	{/if}
 {/if}
