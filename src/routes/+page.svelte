@@ -185,7 +185,7 @@
 		</div>
 	{/if}
 {:else}
-	{#if $currentSongs.length == 0}
+	<!-- {#if $currentSongs.length == 0}
 		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no music found </h1>
 	{:else}
 		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
@@ -205,15 +205,15 @@
 				{/each}
 			</div>
 		</div>
-	{/if}
+	{/if} -->
 
-	{#if $currentArtTile.length == 0}
+	{#if $currentArtTile.length < 1 && $currentSongs.length == 0}
 		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no art found </h1>
 	{:else}
-		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
+		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300 px-4">		
 			<div>
 				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
-					{$currentArtTile.length} art found
+					{$currentArtTile.length} Songs Found
 				</h1>
 				<div class="flex flex-wrap -mx-4">
 					{#each $currentArtTile as art}
