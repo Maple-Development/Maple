@@ -1,9 +1,11 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './song';
+import type { Art } from './art';
 
 export const sources = writable([{}]);
 export const currentSongs = writable([] as Song[]);
+export const currentArtTile = writable([] as Art[]);
 
 if (browser) {
 	// @ts-ignore

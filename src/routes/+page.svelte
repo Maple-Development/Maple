@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { sources, currentSongs } from '$lib/store.js';
+	import { sources, currentSongs, currentArtTile } from '$lib/store.js';
 	import MusicTile from '$lib/components/MusicTile.svelte';
 	import { loadScript } from './document.js';
 	import * as Comlink from 'comlink';
 	import { onMount } from 'svelte';
 	import type { Song } from '$lib/song';
+	import type { Art } from '$lib/art';
+	import ArtTile from '$lib/components/ArtTile.svelte';
 	import {
 		fileOpen,
 		directoryOpen,
@@ -74,7 +76,7 @@
 			worker.onmessage = async function(e) {
 				let file = e.data.content;
 				let tags = await processTags(file);
-				addCurrentSongsToStore(tags);
+				createArtTile(tags);
 				worker.postMessage(tags);
 			};
 
@@ -99,6 +101,27 @@
 			importLog = [...importLog];
 			console.log(error);
 		}
+	}
+
+	async function createArtTile(tags: any) {
+		let picture: any;
+			const { data, format } = tags.tags.picture;
+			let base64String = "";
+			for (let i = 0; i < data.length; i++) {
+				base64String += String.fromCharCode(data[i]);
+			}
+			const base64Image = `data:${format};base64,${window.btoa(base64String)}`;
+			picture = base64Image;
+			console.log(picture);
+		let newArt: Art = {
+			image: picture,
+			onClick: () => {},
+			onContextMenu: (e: MouseEvent) => {},
+		};
+		
+		$currentArtTile = [...$currentArtTile, newArt];
+		let test: never[] = []
+		$sources.push(test);
 	}
 
 	async function addCurrentSongsToStore(tags: any) {
@@ -151,7 +174,7 @@
 	</div>
 
 	{#if importing}
-		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
+		<div class="mx-24 mt-6 flex justify-center rounded-lg">
 			<div>
 				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">Log</h1>
 				<p class="mt-3 text-center text-muted-foreground">Importing...</p>
@@ -180,6 +203,29 @@
 						onContextMenu={() => {}}
 					/>
 				{/each}
+			</div>
+		</div>
+	{/if}
+
+	{#if $currentArtTile.length == 0}
+		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no art found </h1>
+	{:else}
+		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
+			<div>
+				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
+					{$currentArtTile.length} art found
+				</h1>
+				<div class="flex flex-wrap -mx-4">
+					{#each $currentArtTile as art}
+							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4 px-4 mb-4">
+								<ArtTile
+									art={art.image}
+									onClick={() => {}}
+									onContextMenu={() => {}}
+								/>
+							</div>
+					{/each}
+				</div>
 			</div>
 		</div>
 	{/if}
