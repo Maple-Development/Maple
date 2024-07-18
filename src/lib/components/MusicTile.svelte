@@ -10,11 +10,13 @@ export let onContextMenu: (e: MouseEvent) => void;
 
 <div class="flex flex-col" on:click={onClick} on:contextmenu|preventDefault={onContextMenu}>
     <img
-        class="h-64 w-64 rounded-lg object-cover"  
+        class="h-64 w-64 rounded-lg object-cover hidden"  
         src={image}
         alt={title}
     />
-    <p class="text-center text-xl">{title}</p>
-    <p class="text-center text-xl">{artist}</p>
-    <p class="text-center text-xl">{album}</p>
+    <div class="flex flex-col border border-gray-300">
+        <p class="text-center text-xl font-bold">{title}</p>
+        <p class="text-center text-md text-red-400">{artist}</p>
+        <p class="text-center text-md text-blue-400">{album}</p>
+    </div>
 </div>
