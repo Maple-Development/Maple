@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { sources, currentSongs, currentArtTile } from '$lib/store.js';
+	import { sources, currentSongs, currentArtTile, activeSong, activeArt } from '$lib/store.js';
 	import MusicTile from '$lib/components/MusicTile.svelte';
 	import { loadScript } from './document.js';
 	import * as Comlink from 'comlink';
@@ -78,6 +78,7 @@
 				let file = e.data.content;
 				let tags = await processTags(file);
 				createArtTile(tags);
+				addCurrentSongsToStore(tags);
 				worker.postMessage(tags);
 			};
 
@@ -127,23 +128,14 @@
 	}
 
 	async function addCurrentSongsToStore(tags: any) {
-		let picture: any;
-		if (tags.tags.picture) {
-			const { data, format } = tags.tags.picture;
-			let base64String = "";
-			for (let i = 0; i < data.length; i++) {
-				base64String += String.fromCharCode(data[i]);
-			}
-			const base64Image = `data:${format};base64,${window.btoa(base64String)}`;
-			picture = base64Image;
-		}
+		const uniqueID = `${tags.tags.year}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
 		importing = false;
 		let newSong: Song = {
+			id: uniqueID,
 			title: tags.tags.title,
 			artist: tags.tags.artist,
 			album: tags.tags.album,
 			year: tags.tags.year,
-			art: "",
 			genre: tags.tags.genre,
 			onClick: () => {},
 			onContextMenu: (e: MouseEvent) => {},
@@ -156,6 +148,11 @@
 
 	function removeArt(art: any) {
    		$currentArtTile = $currentArtTile.filter((a) => a.id !== art);
+	}
+
+	function setActive(art: any) {
+		$activeSong = $currentSongs.filter((a) => a.id === art)[0];
+		$activeArt = $currentArtTile.filter((a) => a.id === art)[0];
 	}
 </script>
 
@@ -231,6 +228,7 @@
 										onClick={() => {}}
 									/></ContextMenu.Trigger>
 									<ContextMenu.Content>
+									  <ContextMenu.Item on:click={() => setActive(art.id)}>Set Active</ContextMenu.Item>
 									  <ContextMenu.Item>More Info</ContextMenu.Item>
 									  <ContextMenu.Item on:click={() => removeArt(art.id)}>Remove</ContextMenu.Item>
 									</ContextMenu.Content>
