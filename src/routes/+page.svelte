@@ -7,6 +7,7 @@
 	import type { Song } from '$lib/song';
 	import type { Art } from '$lib/art';
 	import ArtTile from '$lib/components/ArtTile.svelte';
+	import * as ContextMenu from "$lib/components/ui/context-menu";
 	import {
 		fileOpen,
 		directoryOpen,
@@ -116,7 +117,6 @@
 		let newArt: Art = {
 			image: picture,
 			onClick: () => {},
-			onContextMenu: (e: MouseEvent) => {},
 		};
 		
 		$currentArtTile = [...$currentArtTile, newArt];
@@ -216,17 +216,28 @@
 					{$currentArtTile.length} Songs Found
 				</h1>
 				<div class="flex flex-wrap -mx-4">
+					<ContextMenu.Root>
 					{#each $currentArtTile as art}
 							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4 px-4 mb-4">
-								<ArtTile
-									art={art.image}
-									onClick={() => {}}
-									onContextMenu={() => {}}
-								/>
+								
+									<ContextMenu.Trigger><ArtTile
+										art={art.image}
+										onClick={() => {}}
+									/></ContextMenu.Trigger>
+									<ContextMenu.Content>
+									  <ContextMenu.Item>Profile</ContextMenu.Item>
+									  <ContextMenu.Item>Billing</ContextMenu.Item>
+									  <ContextMenu.Item>Team</ContextMenu.Item>
+									  <ContextMenu.Item>Subscription</ContextMenu.Item>
+									</ContextMenu.Content>
+								 
 							</div>
 					{/each}
+				 </ContextMenu.Root>
 				</div>
 			</div>
 		</div>
 	{/if}
 {/if}
+
+

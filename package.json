@@ -34,7 +34,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"bits-ui": "^0.21.11",
+		"bits-ui": "^0.21.12",
 		"browser-fs-access": "^0.35.0",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
