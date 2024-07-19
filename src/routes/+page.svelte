@@ -119,6 +119,8 @@
 		let newArt: Art = {
 			id: uniqueID,
 			image: picture,
+			title: tags.tags.title,
+			artist: tags.tags.artist,
 			onClick: () => {},
 		};
 		
@@ -213,7 +215,7 @@
 	{#if $currentArtTile.length < 1 && $currentSongs.length == 0}
 		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no art found </h1>
 	{:else}
-		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300 px-4">		
+		<div class="mx-10 mt-6 flex justify-center rounded-lg">		
 			<div>
 				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
 					{$currentArtTile.length} Songs Found
@@ -221,11 +223,12 @@
 				<div class="flex flex-wrap -mx-4">
 					
 					{#each $currentArtTile as art}
-							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4 px-4 mb-4">
+							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4">
 								<ContextMenu.Root>
 									<ContextMenu.Trigger><ArtTile
 										art={art.image}
 										onClick={() => {}}
+										title={art.title}
 									/></ContextMenu.Trigger>
 									<ContextMenu.Content>
 									  <ContextMenu.Item on:click={() => setActive(art.id)}>Set Active</ContextMenu.Item>

@@ -10,7 +10,7 @@
 		<TopBar />
 	</div>
 	<div class="mt-1/10 flex flex-1">
-		<div class="w-3/5">
+		<div class="w-3/5 max-h-screen overflow-y-auto scrollbar">
 			<slot />
 		</div>
 		<div class="w-2/5 border-l border-gray-300">
