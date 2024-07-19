@@ -114,7 +114,9 @@
 			const base64Image = `data:${format};base64,${window.btoa(base64String)}`;
 			picture = base64Image;
 			console.log(picture);
+		const uniqueID = `${tags.tags.year}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
 		let newArt: Art = {
+			id: uniqueID,
 			image: picture,
 			onClick: () => {},
 		};
@@ -150,6 +152,10 @@
 		$currentSongs = [...$currentSongs, newSong];
 		let test: never[] = []
 		$sources.push(test);
+	}
+
+	function removeArt(art: any) {
+   		$currentArtTile = $currentArtTile.filter((a) => a.id !== art);
 	}
 </script>
 
@@ -216,24 +222,22 @@
 					{$currentArtTile.length} Songs Found
 				</h1>
 				<div class="flex flex-wrap -mx-4">
-					<ContextMenu.Root>
+					
 					{#each $currentArtTile as art}
 							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4 px-4 mb-4">
-								
+								<ContextMenu.Root>
 									<ContextMenu.Trigger><ArtTile
 										art={art.image}
 										onClick={() => {}}
 									/></ContextMenu.Trigger>
 									<ContextMenu.Content>
-									  <ContextMenu.Item>Profile</ContextMenu.Item>
-									  <ContextMenu.Item>Billing</ContextMenu.Item>
-									  <ContextMenu.Item>Team</ContextMenu.Item>
-									  <ContextMenu.Item>Subscription</ContextMenu.Item>
+									  <ContextMenu.Item>More Info</ContextMenu.Item>
+									  <ContextMenu.Item on:click={() => removeArt(art.id)}>Remove</ContextMenu.Item>
 									</ContextMenu.Content>
-								 
+								</ContextMenu.Root>
 							</div>
 					{/each}
-				 </ContextMenu.Root>
+				 
 				</div>
 			</div>
 		</div>
