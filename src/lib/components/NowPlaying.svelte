@@ -4,14 +4,15 @@
 	import Button from './ui/button/button.svelte';
 	import { Play, Pause, SkipForward, SkipBack } from 'lucide-svelte';
 
-	let playing = false;
+	let playing = true;
 
 	async function play() {
 
 	}
 
 	async function pause() {
-
+		let messageData = 'pause';
+		window.postMessage(messageData, window.location.href);
 	}
 
 	async function next() {
@@ -48,6 +49,7 @@
 			<SkipBack size={16} color="white" />
 		</Button>
 		<Button
+			on:click={() => pause()}
 			variant="outline"
 			class="w-12 h-12 rounded-full mr-4"
 			on:click={() => {

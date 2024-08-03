@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { sources, currentSongs, currentArtTile, activeSong, activeArt } from '$lib/store.js';
+	import { sources, currentSongs, currentArtTile, activeSong, activeArt, recentlyPlayed } from '$lib/store.js';
 	import MusicTile from '$lib/components/MusicTile.svelte';
 	import { loadScript } from './document.js';
 	import * as Comlink from 'comlink';
@@ -250,59 +250,38 @@
 		</div>
 	{/if}
 {:else}
-	<!-- {#if $currentSongs.length == 0}
-		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no music found </h1>
-	{:else}
-		<div class="mx-24 mt-6 flex justify-center rounded-lg border border-gray-300">
-			<div>
-				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
-					{$currentSongs.length} songs found
-				</h1>
-				{#each $currentSongs as song}
-					<MusicTile
-						image={song.art}
-						title={song.title}
-						artist={song.artist}
-						album={song.album}
-						onClick={() => {}}
-						onContextMenu={() => {}}
-					/>
-				{/each}
-			</div>
-		</div>
-	{/if} -->
+<div class="mx-24 mt-6 flex justify-center rounded-lg">
+	<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">Welcome back!</h1>
+</div>
 
-	{#if $currentArtTile.length < 1 && $currentSongs.length == 0}
-		<h1 class="mt-4 scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl"> Error, no art found </h1>
-	{:else}
-		<div class="mx-10 mt-6 flex justify-center rounded-lg">		
-			<div>
-				<h1 class="scroll-m-20 text-center text-3xl font-bold tracking-tight lg:text-3xl">
-					{$currentArtTile.length} Songs Found
-				</h1>
-				<div class="flex flex-wrap -mx-4">
-					
-					{#each $currentArtTile as art}
-							<div class="flex-shrink-0 md:w-1/2 lg:w-1/4">
-								<ContextMenu.Root>
-									<ContextMenu.Trigger><ArtTile
-										art={art.image}
-										onClick={() => {}}
-										title={art.title}
-									/></ContextMenu.Trigger>
-									<ContextMenu.Content>
-									  <ContextMenu.Item on:click={() => setActive(art.id)}>Set Active</ContextMenu.Item>
-									  <ContextMenu.Item>More Info</ContextMenu.Item>
-									  <ContextMenu.Item on:click={() => removeArt(art.id)}>Remove</ContextMenu.Item>
-									</ContextMenu.Content>
-								</ContextMenu.Root>
-							</div>
-					{/each}
-				 
+<div class="mx-24 mt-6">
+	<h1 class="scroll-m-20 text-left text-3xl font-black tracking-tight lg:text-xl">Recently Played</h1>
+
+	<div class="flex overflow-x-auto space-x-4 scrollbar">
+		{#if $recentlyPlayed.length > 0}
+			{#each $recentlyPlayed as art}
+				<div class="flex-shrink-0 md:w-1/2 lg:w-1/4">
+					<ContextMenu.Root>
+						<ContextMenu.Trigger>
+							<ArtTile
+								art={art.image}
+								onClick={() => {}}
+								title={art.title}
+								fileName={art.fileName}
+								id={art.id}
+							/>
+						</ContextMenu.Trigger>
+						<ContextMenu.Content>
+							<ContextMenu.Item>Set Active</ContextMenu.Item>
+						</ContextMenu.Content>
+					</ContextMenu.Root>
 				</div>
-			</div>
-		</div>
-	{/if}
+			{/each}
+		{:else}
+			<div>No recently played items.</div>
+		{/if}
+	</div>
+</div>
 {/if}
 
 

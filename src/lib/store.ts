@@ -8,6 +8,8 @@ export const currentSongs = writable([] as Song[]);
 export const currentArtTile = writable([] as Art[]);
 export const activeSong = writable({} as Song);
 export const activeArt = writable({} as Art);
+export const audio = writable();
+export const recentlyPlayed = writable([] as Art[]);
 
 if (browser) {
 	// @ts-ignore
@@ -16,4 +18,24 @@ if (browser) {
 	sources.subscribe((value) => {
 		localStorage.setItem('sources', JSON.stringify(value));
 	});
+
+	// @ts-ignore
+	recentlyPlayed.set(JSON.parse(localStorage.getItem('recentlyPlayed')) || []);
+
+	recentlyPlayed.subscribe((value) => {
+		localStorage.setItem('recentlyPlayed', JSON.stringify(value));
+	});
 }
+
+if (browser) {
+	audio.subscribe((value) => {
+	  if (value) {
+		var audioElement = document.getElementsByTagName('audio')[0];
+		// @ts-ignore
+		audioElement.src = value;
+		audioElement.play().catch((err) => {
+		  console.log(err);
+		});
+	  }
+	});
+  	}

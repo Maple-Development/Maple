@@ -11,6 +11,7 @@
 		CreditCard,
 		Settings,
 		Smile,
+		Home,
 		User
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -24,6 +25,9 @@
 
 <div class="flex justify-between">
 	<div class="flex">
+		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" href="/"
+			><Home size={20} color="white" /></Button
+		>
 		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" href="/tracks"
 			><Music size={20} color="white" /></Button
 		>
