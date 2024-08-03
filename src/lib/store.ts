@@ -16,11 +16,4 @@ if (browser) {
 	sources.subscribe((value) => {
 		localStorage.setItem('sources', JSON.stringify(value));
 	});
-
-	currentSongs.subscribe((value) => {
-		localStorage.setItem('currentSongs', JSON.stringify(value));
-	});
-
-	// @ts-ignore
-	currentSongs.set(JSON.parse(localStorage.getItem('currentSongs')) || []);
 }

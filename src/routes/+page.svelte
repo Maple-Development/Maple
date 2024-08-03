@@ -16,27 +16,20 @@
   	} from 'browser-fs-access';
 	onMount(() => {
 		loadScript('/libraries/jsmediatags.min.js');	
+		getExistingFiles();
 	})
 	import { get, set } from 'idb-keyval';
 	
 
 	let importing = false;
 	let importLog: any[] = [];
+	let mdJson: any[] = [];
 
 	interface FileHandler {
   		processFiles(files: File[]): Promise<void>;
 	}
 
-	async function getFiles() {
-		importing = true;
-		const files = await directoryOpen();
-		importLog.push('Done!');
-		importLog = [...importLog];
-		await createDataFolder();
-		await handleFiles(files);
-	}
-
-	async function createDataFolder() {
+	async function getExistingFiles() {
 		const fileHandleOrUndefined = await get('file');
     	let d;
 		if (fileHandleOrUndefined) {
@@ -48,21 +41,44 @@
 			await set('file', d);
 		}
 
-		const dataFolder = await d.getDirectoryHandle('maple.data', {
-      		create: true,
-    	});
-		const playlistFolder = await dataFolder.getDirectoryHandle(
-			'playlist.data',
-			{
-				create: true,
-			}
-    	);
-		const playlistData = await playlistFolder.getFileHandle('playlist.md', {
-      		create: true,
-    	});
-		
-		importLog.push('Creating Data Folder...');
-		return;
+		const dataFolder = await d.getDirectoryHandle('maple.data');
+		if (!dataFolder) {
+			return;
+		}
+		const playlistFolder = await dataFolder.getDirectoryHandle('playlist.data');
+		const playlistData = await playlistFolder.getFileHandle('playlist.md');
+		const artFolder = await dataFolder.getDirectoryHandle('art.data');
+		const artData = await artFolder.getFileHandle('art.md');
+
+		if (!playlistData || !artData) {
+			return;
+		}
+		const contents1 = await playlistData.getFile();
+		if (!contents1) {
+			return;
+		}
+		const contents = await contents1.text();
+		const json = JSON.parse(contents);
+		$currentSongs = json;
+		console.log($currentSongs);
+
+
+		const contents2 = await artData.getFile();
+		const contents3 = await contents2.text();
+		const json2 = JSON.parse(contents3);
+		$currentArtTile = json2;
+
+		console.log($activeArt);
+		let test: never[] = []
+		$sources.push(test);
+	}
+
+	async function getFiles() {
+		importing = true;
+		const files = await directoryOpen();
+		importLog.push('Done!');
+		importLog = [...importLog];
+		await handleFiles(files);
 	}
 
 	async function handleFiles(files: any) {
@@ -77,13 +93,14 @@
 			worker.onmessage = async function(e) {
 				let file = e.data.content;
 				let tags = await processTags(file);
-				createArtTile(tags);
-				addCurrentSongsToStore(tags);
+				createArtTile(tags, file.name);
+				addCurrentSongsToStore(tags, file.name);
 				worker.postMessage(tags);
 			};
 
 			
 		await fileHandler.processFiles(files);
+		await processLocalFile();
 		importLog.push('Finished!');
 		importLog = [...importLog];
 		
@@ -105,7 +122,7 @@
 		}
 	}
 
-	async function createArtTile(tags: any) {
+	async function createArtTile(tags: any, fileName: string) {
 		let picture: any;
 			const { data, format } = tags.tags.picture;
 			let base64String = "";
@@ -114,13 +131,13 @@
 			}
 			const base64Image = `data:${format};base64,${window.btoa(base64String)}`;
 			picture = base64Image;
-			console.log(picture);
-		const uniqueID = `${tags.tags.year}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
+		const uniqueID = `${tags.tags.genre.replace(/\s+/g, '-')}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
 		let newArt: Art = {
 			id: uniqueID,
 			image: picture,
 			title: tags.tags.title,
 			artist: tags.tags.artist,
+			fileName: fileName,
 			onClick: () => {},
 		};
 		
@@ -129,8 +146,8 @@
 		$sources.push(test);
 	}
 
-	async function addCurrentSongsToStore(tags: any) {
-		const uniqueID = `${tags.tags.year}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
+	async function addCurrentSongsToStore(tags: any, fileName: string) {
+		const uniqueID = `${tags.tags.genre.replace(/\s+/g, '-')}-${tags.tags.track}-${tags.tags.title.replace(/\s+/g, '-')}`;
 		importing = false;
 		let newSong: Song = {
 			id: uniqueID,
@@ -139,6 +156,7 @@
 			album: tags.tags.album,
 			year: tags.tags.year,
 			genre: tags.tags.genre,
+			fileName: fileName,
 			onClick: () => {},
 			onContextMenu: (e: MouseEvent) => {},
 		}
@@ -155,6 +173,48 @@
 	function setActive(art: any) {
 		$activeSong = $currentSongs.filter((a) => a.id === art)[0];
 		$activeArt = $currentArtTile.filter((a) => a.id === art)[0];
+	}
+
+	async function processLocalFile() {
+		const fileHandleOrUndefined = await get('file');
+    	let d;
+		if (fileHandleOrUndefined) {
+			console.log(fileHandleOrUndefined);
+			d = fileHandleOrUndefined;
+		} else {
+			// @ts-ignore
+			d = await window.showDirectoryPicker();
+			await set('file', d);
+		}
+
+		const dataFolder = await d.getDirectoryHandle('maple.data', {
+      		create: true,
+    	});
+
+		const artFolder = await dataFolder.getDirectoryHandle('art.data', {
+	  		create: true,
+		});
+
+		const playlistFolder = await dataFolder.getDirectoryHandle('playlist.data', {
+				create: true,
+		});
+		const playlistData = await playlistFolder.getFileHandle('playlist.md', {
+      		create: true,
+    	});
+
+		playlistData.createWritable().then((writable: { write: (arg0: string) => void; close: () => void; }) => {
+			writable.write(JSON.stringify($currentSongs));
+			writable.close();
+		});
+
+		const artData = await artFolder.getFileHandle('art.md', {
+	  		create: true,
+		});
+
+		artData.createWritable().then((writable: { write: (arg0: string) => void; close: () => void; }) => {
+			writable.write(JSON.stringify($currentArtTile));
+			writable.close();
+		});
 	}
 </script>
 

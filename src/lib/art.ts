@@ -3,5 +3,6 @@ export type Art = {
     image: string;
     title: string;
     artist: string;
+    fileName: string;
     onClick: () => void;
 }

@@ -5,6 +5,7 @@ export type Song = {
     album: string;
     year: number;
     genre: string;
+    fileName: string;
     onClick: () => void;
     onContextMenu: (e: MouseEvent) => void;
 }
