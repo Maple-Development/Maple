@@ -10,6 +10,7 @@ export const activeSong = writable({} as Song);
 export const activeArt = writable({} as Art);
 export const audio = writable();
 export const recentlyPlayed = writable([] as Art[]);
+export const collapsed = writable(false);
 
 if (browser) {
 	// @ts-ignore

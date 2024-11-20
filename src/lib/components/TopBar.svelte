@@ -1,53 +1,32 @@
 <script type="ts">
 	import {
 		Music,
-		Library,
+		PanelRightOpen,
 		DiscAlbum,
 		ListMusic,
 		SquareUser,
-		Search,
-		Calculator,
-		Calendar,
-		CreditCard,
-		Settings,
-		Smile,
-		Home,
-		User
+		Search
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-
-	import { onMount } from 'svelte';
 	import * as Command from '$lib/components/ui/command/index.js';
-
+	import { collapsed } from '$lib/store';
 	let open = false;
 </script>
 
 <div class="flex justify-between">
 	<div class="flex">
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" href="/"
-			><Home size={20} color="white" /></Button
-		>
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" href="/tracks"
-			><Music size={20} color="white" /></Button
-		>
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			><ListMusic size={20} color="white" /></Button
-		>
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			><DiscAlbum size={20} color="white" /></Button
-		>
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			><SquareUser size={20} color="white" /></Button
+		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => ($collapsed = !$collapsed)}
+			><PanelRightOpen size={20} color="white" /></Button
 		>
 	</div>
-	<div class="mr-48 flex flex-grow justify-center">
+	<div class="flex flex-grow justify-center">
 		<Button
 			on:click={() => (open = !open)}
 			class="my-2 h-8 max-w-xs text-primary"
 			variant="outline"
 		>
-			Commands
+			<Search size={20} color="white" />
+			<span class="ml-2">Search</span>
 		</Button>
 	</div>
 </div>
