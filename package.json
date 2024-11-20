@@ -39,6 +39,7 @@
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
 		"comlink": "^4.4.1",
+		"idb": "^8.0.0",
 		"idb-keyval": "^6.2.1",
 		"lucide-svelte": "^0.368.0",
 		"svelte-radix": "^1.1.0",
