@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
     import { browser } from '$app/environment';
-    let e;
+    let e: any;
     let duration;
-    let paused;
+    let paused: any;
     let time;
-    export let volume;
-    export function setVolume(e) {
+    export let volume: any;
+    export function setVolume(e: any) {
         volume = e
         console.log(volume)
     }

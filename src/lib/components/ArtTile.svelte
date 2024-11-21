@@ -57,6 +57,7 @@ let audioComponent: any;
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="flex flex-col p-4" on:click={onClick}>
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <img
         class="h-full w-full rounded-lg object-cover max-h-64 max-w-64 sm:max-h-80 sm:max-w-80 md:max-h-96 md:max-w-96 lg:max-h-[30rem] lg:max-w-[30rem] xl:max-h-[35rem] xl:max-w-[35rem] hover:opacity-50 focus:opacity-50" 
         src={art}
