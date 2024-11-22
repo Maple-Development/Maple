@@ -1,6 +1,9 @@
 <script lang="ts">
-	import * as ContextMenu from "$lib/components/ui/context-menu";
+	
 
 </script>
 
 
+<div class="w-20 h-full bg-red-500"></div>
+<div class="w-20 h-full bg-blue-500"></div>
+<div class="w-20 h-full bg-red-500"></div>
