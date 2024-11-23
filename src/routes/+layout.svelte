@@ -3,6 +3,7 @@
 	import '../app.pcss';
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
+	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { collapsed } from '$lib/store';
 
 </script>
@@ -24,6 +25,9 @@
 		<div class="overflow-auto w-full h-full scrollbar">
 			<slot />
 		</div>
+	</div>
+	<div class="border-1 border h-20">
+		<BottomBar />
 	</div>
 </div>
 

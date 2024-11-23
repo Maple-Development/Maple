@@ -51,7 +51,7 @@
 			<h1 class="text-foreground px-1 md:block hidden text-xs">New Playlist</h1>
 		{/if}
 	</Button>
-	<Button class="my-1 w-fit flex flex-row items-center justify-start bg-transparent pr-2 pl-4 mr-5 hover:bg-secondary">
+	<Button class="my-1 w-fit flex flex-row items-center justify-start bg-transparent pr-2 pl-4 mr-5 hover:bg-secondary" href="/settings">
 		<Settings size={20} class="text-foreground mr-2" />
 		{#if $collapsed}
 			<h1 class="text-foreground px-1 md:block hidden">Settings</h1>
