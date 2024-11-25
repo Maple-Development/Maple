@@ -6,6 +6,6 @@ export type Song = {
     year: number;
     genre: string;
     fileName: string;
-    onClick: () => void;
-    onContextMenu: (e: MouseEvent) => void;
+    duration: number;
+    image: Blob;
 }

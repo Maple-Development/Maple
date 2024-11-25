@@ -1,15 +1,11 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Song } from './song';
-import type { Art } from './art';
+import type { Song } from './types/song';
 
 export const sources = writable([{}]);
 export const currentSongs = writable([] as Song[]);
-export const currentArtTile = writable([] as Art[]);
 export const activeSong = writable({} as Song);
-export const activeArt = writable({} as Art);
 export const audio = writable();
-export const recentlyPlayed = writable([] as Art[]);
 export const collapsed = writable(false);
 
 if (browser) {
@@ -18,13 +14,6 @@ if (browser) {
 
 	sources.subscribe((value) => {
 		localStorage.setItem('sources', JSON.stringify(value));
-	});
-
-	// @ts-ignore
-	recentlyPlayed.set(JSON.parse(localStorage.getItem('recentlyPlayed')) || []);
-
-	recentlyPlayed.subscribe((value) => {
-		localStorage.setItem('recentlyPlayed', JSON.stringify(value));
 	});
 }
 
@@ -39,4 +28,4 @@ if (browser) {
 		});
 	  }
 	});
-  	}
+}

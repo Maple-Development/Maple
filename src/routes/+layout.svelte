@@ -5,6 +5,12 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { collapsed } from '$lib/store';
+	import { loadScript } from '$lib/document.js';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		loadScript('/libraries/jsmediatags.min.js');
+	});
 
 </script>
 
