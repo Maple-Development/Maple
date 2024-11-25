@@ -4,8 +4,9 @@ export type Song = {
     artist: string;
     album: string;
     year: number;
-    genre: string;
+    genre?: string;
     fileName: string;
     duration: number;
-    image: Blob;
+    image?: any;
+    trackNumber?: number;
 }

@@ -1,7 +1,9 @@
 export type Album = {
-    id: string;
-    name: string;
-    image: Blob;
+    id: String;
+    name: String;
+    artist: String;
+    image: any;
     year: number;
-    tracks: [];
+    genre?: String
+    tracks?: String[];
 };

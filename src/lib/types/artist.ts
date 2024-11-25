@@ -1,5 +1,7 @@
 export type Artist = {
     id: string;
     name: string;
-    image?: Blob;
+    image?: any;
+    tracks?: String[];
+    albums?: String[];
 };
