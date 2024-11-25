@@ -6,9 +6,9 @@
 // File Index
 
 import { file, dir, write } from 'opfs-tools';
-import type { Song } from './types/song';
-import type { Album } from './types/album';
-import type { Artist } from './types/artist';
+import type { Song } from '$lib/types/song';
+import type { Album } from '$lib/types/album';
+import type { Artist } from '$lib/types/artist';
 
 export class OPFS {
     private static albumsCache: Album[] | null = null;
@@ -67,7 +67,7 @@ export class OPFS {
     }
     album.tracks.push(id);
   
-    if (!this.albumsCache.some((a) => a.id === album.id)) {
+    if (!this.albumsCache.some((a) => a.name === album.name)) {
       this.albumsCache.push(album);
       await this.writeCache('/albums/albums.json', this.albumsCache);
     }
@@ -122,6 +122,13 @@ export class OPFS {
           this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
         }
         return this.tracksCache;
+      },
+
+      albums: async () => {
+        if (!this.albumsCache) {
+          this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
+        }
+        return this.albumsCache;
       },
 
       image: async (image: string) => {

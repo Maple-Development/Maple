@@ -24,15 +24,15 @@
     <div class="flex flex-col items-start">
         {#await getImageUrl(track.image) then image}
             <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-        {:catch error}
-            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
-        {/await}
         <div class="flex flex-row items-start">
             <div class="flex flex-col items-start h-full mt-4">
                 <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
                 <h1 class="text-slate-400 text-base font-light leading-none p">{track.artist}</h1>
             </div>
         </div>
+        {:catch error}
+        <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+        {/await}
     </div>
 {/each}
 </div>

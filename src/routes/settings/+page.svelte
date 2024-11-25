@@ -11,51 +11,77 @@
 
 
     async function createLibrary() {
-    await OPFS.initializeLibrary();
-    console.log(await OPFS.ls('/'));
+        await OPFS.initializeLibrary();
+        console.log(await OPFS.ls('/'));
 
-     // Prompt Folder Selection
-     const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
-     
-     for await (const entry of dirHandle.values()) {
-         if (entry.kind === 'file') {
-             const file: File = await entry.getFile();
-             console.log(`Found file: ${file.name}`);
-             if (file.type === 'audio/mpeg') {
-                 const metadata = await parseBlob(file);
-                 const track: Song = {
-                     id: uuidv4(),
-                     title: metadata.common.title,
-                     artist: metadata.common.artist,
-                     album: metadata.common.album,
-                     year: metadata.common.year,
-                     genre: metadata.common.genre,
-                     duration: metadata.format.duration,
-                     image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
-                     trackNumber: metadata.common.track
-                 }
+        let entries: FileSystemHandle[] = [];
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = 'audio/*';
+        
+        const handleFiles = async (files: FileList) => {
+            for (const file of Array.from(files)) {
+                if (file.type.startsWith('audio/')) {
+                    console.log(file.name);
+                    const metadata = await parseBlob(file);
+                    const track: Song = {
+                        id: uuidv4(),
+                        title: metadata.common.title,
+                        artist: metadata.common.artist,
+                        album: metadata.common.album,
+                        year: metadata.common.year,
+                        genre: metadata.common.genre,
+                        duration: metadata.format.duration,
+                        image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
+                        trackNumber: metadata.common.track
+                    }
 
-                 const album: Album = {
-                     id: uuidv4(),
-                     title: metadata.common.album,
-                     artist: metadata.common.artist,
-                     year: metadata.common.year,
-                     genre: metadata.common.genre,
-                     image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
-                 }
+                    const album: Album = {
+                        id: uuidv4(),
+                        name: metadata.common.album,
+                        artist: metadata.common.artist,
+                        year: metadata.common.year,
+                        genre: metadata.common.genre,
+                        image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
+                    }
 
-                 const artist: Artist = {
-                     id: uuidv4(),
-                     name: metadata.common.artist,
-                 }
+                    const artist: Artist = {
+                        id: uuidv4(),
+                        name: metadata.common.artist,
+                    }
 
-                 await OPFS.addAlbum(album, track.id);
-                 await OPFS.addArtist(artist, track.id, track.album);
-                 await OPFS.addTrack(track);
-                 await OPFS.addFile(track.id, file);
-             }
-         }
-     }
+                    await OPFS.addAlbum(album, track.id);
+                    await OPFS.addArtist(artist, track.id, track.album);
+                    await OPFS.addTrack(track);
+                    await OPFS.addFile(track.id, file);
+                }
+            }
+        }
+
+        if (window.showDirectoryPicker) {
+            // Chrome only
+            const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
+            const files: File[] = [];
+            
+            for await (const entry of dirHandle.values()) {
+                if (entry.kind === 'file') {
+                    const file: File = await entry.getFile();
+                    files.push(file);
+                }
+            }
+            
+            handleFiles(files);
+        } else {
+            // Non-Chrome (Safari, Firefox, mobile devices)
+            input.addEventListener('change', (e) => {
+                const files = input.files;
+                if (files) {
+                    handleFiles(files);
+                }
+            });
+            input.click();
+        }
     }
 
     let length = 0;

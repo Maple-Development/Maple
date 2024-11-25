@@ -11,7 +11,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { collapsed } from '$lib/store';
 </script>
-<div class="sm:flex sm:flex-col sm:items-center justify-between md:w-full w-full ml-3 h-full">
+<div class="sm:flex sm:flex-col sm:items-center justify-between md:w-full w-full ml-2 h-full">
 	<div class="sm:flex sm:flex-col sm:items-center sm:justify-between md:w-full w-full">
 	<Button class="my-1 w-fit flex flex-row items-center justify-start bg-transparent pr-2 pl-4 mr-5 hover:bg-secondary" href="/">
 		<Home size={20} class="text-foreground mr-2" />
@@ -31,7 +31,7 @@
 		<h1 class="text-foreground px-1 md:block hidden">Playlists</h1>
 		{/if}
 	</Button>
-	<Button class="my-1 w-fit flex flex-row items-center justify-start bg-transparent pr-2 pl-4 mr-5 hover:bg-secondary">
+	<Button class="my-1 w-fit flex flex-row items-center justify-start bg-transparent pr-2 pl-4 mr-5 hover:bg-secondary" href="/albums">
 		<DiscAlbum size={20} class="text-foreground mr-2" />
 		{#if $collapsed}
 		<h1 class="text-foreground px-1 md:block hidden">Albums</h1>

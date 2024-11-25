@@ -15,7 +15,7 @@
 
 <div class="flex justify-between">
 	<div class="flex">
-		<Button class="my-1 ml-2 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => ($collapsed = !$collapsed)}
+		<Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => ($collapsed = !$collapsed)}
 			><PanelRightOpen size={20} color="white" /></Button
 		>
 	</div>
