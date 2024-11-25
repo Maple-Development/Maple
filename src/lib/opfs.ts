@@ -51,10 +51,6 @@ export class OPFS {
       return files;
     }
 
-    public static async libraryLength() {
-      const tracks = await dir('/tracks').children();
-      return tracks.length - 1;
-    }
   
   public static async addAlbum(album: Album, id: string) {
     if (!this.albumsCache) {
@@ -119,4 +115,18 @@ export class OPFS {
         await this.writeCache('/tracks/tracks.json', this.tracksCache);
       }
     }
+
+    public static get = () => ({
+      tracks: async () => { 
+        if (!this.tracksCache) {
+          this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
+        }
+        return this.tracksCache;
+      },
+
+      image: async (image: string) => {
+        const imageArrayBuffer = await file(`${image}`).arrayBuffer();
+        return new Response(imageArrayBuffer);
+      }
+    });
   }

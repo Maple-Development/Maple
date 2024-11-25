@@ -1,6 +1,5 @@
 <script lang="ts">
-// @ts-nocheck
-
+//@ts-nocheck
     import { OPFS } from "$lib/opfs";
     import Button from "$lib/components/ui/button/button.svelte";
     import { parseBlob } from 'music-metadata';
@@ -26,19 +25,19 @@
                  const metadata = await parseBlob(file);
                  const track: Song = {
                      id: uuidv4(),
-                     name: metadata.common.title,
+                     title: metadata.common.title,
                      artist: metadata.common.artist,
                      album: metadata.common.album,
                      year: metadata.common.year,
                      genre: metadata.common.genre,
                      duration: metadata.format.duration,
-                     image: metadata.common.picture || undefined,
+                     image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
                      trackNumber: metadata.common.track
                  }
 
                  const album: Album = {
                      id: uuidv4(),
-                     name: metadata.common.album,
+                     title: metadata.common.album,
                      artist: metadata.common.artist,
                      year: metadata.common.year,
                      genre: metadata.common.genre,
@@ -61,7 +60,7 @@
 
     let length = 0;
     async function getLength() {
-        length = await OPFS.libraryLength();
+        length = (await OPFS.ls('/tracks')).length - 1;
     }
 
     onMount(() => {

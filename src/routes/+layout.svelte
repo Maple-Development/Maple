@@ -8,25 +8,25 @@
 
 </script>
 
-<div class="flex h-screen flex-col">
-	<div class="border-1 border sticky">
+<div class="h-screen flex flex-col">
+	<div class="sticky top-0 z-10 border-b">
 		<TopBar />
 	</div>
-	<div class="mt-1/10 flex flex-1">
+	<div class="flex-1 flex overflow-hidden">
 		{#if $collapsed}
-		<div class="md:w-36 sm:w-16 w-16 max-h-screen sticky border border-1">
-			<SideBar />
-		</div>
+			<div class="flex-none w-16 md:w-36 sm:w-36 transition-all duration-500">
+				<SideBar />
+			</div>
 		{:else}
-		<div class="md:w-16 sm:w-16 w-16 max-h-screen sticky border border-1">
-			<SideBar />
-		</div>
+			<div class="flex-none w-16 md:w-16 sm:w-16 transition-all duration-500">
+				<SideBar />
+			</div>
 		{/if}
-		<div class="overflow-auto w-full h-full scrollbar">
+		<div class="flex-1 overflow-auto scrollbar">
 			<slot />
 		</div>
 	</div>
-	<div class="border-1 border h-20">
+	<div class="sticky bottom-0 z-10 border-t">
 		<BottomBar />
 	</div>
 </div>
