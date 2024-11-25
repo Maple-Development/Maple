@@ -1,13 +1,59 @@
 <script lang="ts">
+    import Button from "./ui/button/button.svelte";
+    import { Slider } from "$lib/components/ui/slider/index.js";
 
+    import { Play,
+        SkipForward,
+        SkipBack,
+        Shuffle,
+        Repeat,
+        Repeat1,
+        Pause,
+     } from 'lucide-svelte';
+	import type { Value } from "svelte-radix";
+
+     let one = false;
+     let paused = false;
+     let volume = 100;
 </script>
 
 
-<div class="flex justify-between items-center h-full">
-    <div class="flex">
-        <h1 class="self-center">real</h1>
+<div class="w-full border-1 h-[2%] border border-blue-400"></div> <!-- scrub bar -->
+<div class="flex justify-between items-center h-[98%] relative">
+  <div class="flex">
+    <img src="/temp/gnx_album.png" alt="gnx" class="h-20 p-2 self-center rounded-xl" />
+    <div class="flex flex-col items-start">
+      <Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">GNX</Button>
+      <Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">Kendrick Lamar</Button>
     </div>
-    <div class="flex">
-        <h1 class="self-center">fake</h1>
-    </div>
+  </div>
+  <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      <Shuffle size={15} class="text-foreground" />
+    </Button>
+    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      <SkipBack size={25} class="text-foreground" />
+    </Button>
+    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      {#if paused}
+      <Pause size={25} class="text-foreground" />
+      {:else}
+      <Play size={25} class="text-foreground" />
+      {/if}
+    </Button>
+    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      <SkipForward size={25} class="text-foreground" />
+    </Button>
+    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      {#if one}
+      <Repeat1 size={15} class="text-foreground" />
+      {:else}
+      <Repeat size={15} class="text-foreground" />
+      {/if}
+    </Button>
+  </div>
+  
+  <div class="flex justify-end flex-grow mr-5">
+    <Slider value={[volume]} max={100} step={1} class="w-40" />
+  </div>
 </div>
