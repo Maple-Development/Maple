@@ -8,7 +8,7 @@
     let albums: Album[] = [];
 
     onMount(async () => {
-        albums = await OPFS.get().albums();
+        albums = (await OPFS.get().albums()).sort((a, b) => a.name.localeCompare(b.name));
     });
 
    async function getImageUrl(imagePath: string): Promise<string> {
@@ -20,7 +20,7 @@
    }
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 mx-5 my-5">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
     {#each albums as album}
         <div class="flex flex-col items-start">
             {#await getImageUrl(album.image) then image}

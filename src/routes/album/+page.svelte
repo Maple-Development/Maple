@@ -18,15 +18,18 @@
     async function sortTracks() {
         if (album && album.tracks) {
             console.log(album.tracks);
+            const newTracks: Song[] = [];
             for (const track of album.tracks) {
                 const trackData = await OPFS.get().track(track as string);
                 console.log(trackData);
                 if (trackData) {
-                    tracks.push(trackData);
+                    newTracks.push(trackData);
+                    console.log(trackData.trackNumber);
                 }
             }
-            tracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));
-            console.log(tracks);
+            newTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));
+            console.log(newTracks);
+            tracks = newTracks; // trigger re-render
         }
     }
 
@@ -39,7 +42,7 @@
    }
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 mx-5 my-5">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
     {#each tracks as track}
         <div class="flex flex-col items-start">
             {#await getImageUrl(track.image) then image}
