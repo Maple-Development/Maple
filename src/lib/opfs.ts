@@ -10,6 +10,7 @@ import type { Song } from '$lib/types/song';
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
 import { toast } from "svelte-sonner";
+import { activeSong } from './store';
 
 export class OPFS {
     private static albumsCache: Album[] | null = null;
@@ -135,6 +136,10 @@ export class OPFS {
         this.tracksCache.push(trackWithImagePath);
         await this.writeCache('/tracks/tracks.json', this.tracksCache);
       }
+    }
+
+    public static async play(track: Song) {
+      activeSong.set(track);
     }
 
     public static get = () => ({

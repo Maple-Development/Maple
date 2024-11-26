@@ -1,6 +1,9 @@
 <script lang="ts">
     import Button from "./ui/button/button.svelte";
     import { Slider } from "$lib/components/ui/slider/index.js";
+    import { OPFS } from "$lib/opfs";
+    import { activeSong } from "$lib/store";
+    import type { Song } from "$lib/types/song";
 
     import { Play,
         SkipForward,
@@ -10,22 +13,49 @@
         Repeat1,
         Pause,
      } from 'lucide-svelte';
-	import type { Value } from "svelte-radix";
+     
+     $: {
+         if ($activeSong) {
+             console.log($activeSong);
+         }
+     }
 
      let one = false;
      let paused = false;
      let volume = 100;
+
+     async function getImageUrl(imagePath: string): Promise<string> {
+      const response = await OPFS.get().image(imagePath);
+      const arrayBuffer = await response.arrayBuffer();
+      const blob = new Blob([arrayBuffer]);
+      console.log(blob);
+      return URL.createObjectURL(blob);
+    }
 </script>
 
 
 <div class="w-full border-1 h-[2%] border border-blue-400"></div> <!-- scrub bar -->
 <div class="flex justify-between items-center h-[98%] relative">
   <div class="flex">
+    {#if $activeSong.title}
+    {#await getImageUrl($activeSong.image)}
+        <div class="h-20 w-20 ml-1 self-center rounded-xl bg-gray-500"></div>
+    {:then image}
+        <img src={image} alt="{$activeSong.title}" class="h-20 p-2 self-center rounded-xl" />
+    {:catch error}
+        <img src="/temp/gnx_album.png" alt="{$activeSong.title}" class="h-20 p-2 self-center rounded-xl" />
+    {/await}
+    <div class="flex flex-col items-start">
+      <Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">{$activeSong.title || "Unknown"}</Button>
+      <Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">{$activeSong.artist || "Unknown"}</Button>
+    </div>
+    {:else}
     <img src="/temp/gnx_album.png" alt="gnx" class="h-20 p-2 self-center rounded-xl" />
     <div class="flex flex-col items-start">
       <Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">GNX</Button>
       <Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">Kendrick Lamar</Button>
     </div>
+    {/if}
   </div>
   <div class="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
     <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">

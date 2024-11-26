@@ -11,15 +11,12 @@
     import { toast } from "svelte-sonner";
 
 
-    async function createLibrary() {
+    async function createLibrary(mobileFiles: FileList) {
         await OPFS.initializeLibrary();
         console.log(await OPFS.ls('/'));
 
         let entries: FileSystemHandle[] = [];
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.multiple = true;
-        input.accept = 'audio/*';
+        const input = document.getElementById('files') as HTMLInputElement;
         
         const handleFiles = async (files: FileList) => {
             let i = 0;
@@ -64,7 +61,7 @@
             getLength();
         }
 
-        if (window.showDirectoryPicker) {
+        if (window.showDirectoryPicker && !mobileFiles) {
             // Chrome only
             const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
             const files: File[] = [];
@@ -78,14 +75,9 @@
             
             handleFiles(files);
         } else {
-            // Non-Chrome (Safari, Firefox, mobile devices)
-            input.addEventListener('change', (e) => {
-                const files = input.files;
-                if (files) {
-                    handleFiles(files);
-                }
-            });
-            input.click();
+            if(mobileFiles) {
+                handleFiles(input.files);   
+            }
         }
     }
 
@@ -99,13 +91,25 @@
 
     onMount(() => {
         getLength();
+        findDevice();
     })
+
+    let device = "chrome";
+    function findDevice() {
+        if (!window.showDirectoryPicker) {
+            device = "ew";
+        }
+    }
 </script>
 
 <div class="flex flex-col justify-center items-center mt-16">
     <h2>You currently have {length} tracks imported</h2>
-    <div class="p-10 px-20 rounded-sm mt-4 border border-1">
-        <Button variant="secondary" on:click={() => createLibrary() }>Import Music</Button>
+    <div class="p-10 px-20 rounded-sm mt-4 border border-1 justify-center items-center">
+        {#if device == "ew"}
+            <input type="file" id="files" class="block w-full px-2 py-1 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500" accept="audio/*" multiple on:change={(e) => createLibrary(e) } />
+        {:else}
+            <Button variant="secondary" on:click={() => createLibrary() }>Import Music</Button>
+        {/if}
         <Button variant="destructive" on:click={() => OPFS.clearLibrary() }>Clear Library</Button>
     </div>
 </div>
