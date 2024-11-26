@@ -82,6 +82,15 @@ export class OPFS {
     if (!this.albumsCache.some((a) => a.name === album.name)) {
       this.albumsCache.push(album);
       await this.writeCache('/albums/albums.json', this.albumsCache);
+    } else {
+      const existingAlbum = this.albumsCache.find((a) => a.name === album.name);
+      if (existingAlbum) {
+        if (!existingAlbum.tracks) {
+          existingAlbum.tracks = [];
+        }
+        existingAlbum.tracks.push(id);
+        await this.writeCache('/albums/albums.json', this.albumsCache);
+      }
     }
   }
    
@@ -136,11 +145,32 @@ export class OPFS {
         return this.tracksCache;
       },
 
+      track: async (id: string) => {
+        if (!this.tracksCache) {
+          this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
+        }
+        return this.tracksCache.find((t) => t.id === id);
+      },
+
       albums: async () => {
         if (!this.albumsCache) {
           this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
         }
         return this.albumsCache;
+      },
+
+      album: async (id: string) => {
+        if (!this.albumsCache) {
+          this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
+        }
+        return this.albumsCache.find((a) => a.id === id);
+      },
+
+      artists: async () => {
+        if (!this.artistsCache) {
+          this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
+        }
+        return this.artistsCache;
       },
 
       image: async (image: string) => {
