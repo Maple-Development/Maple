@@ -19,7 +19,7 @@
 			><PanelRightOpen size={20} color="white" /></Button
 		>
 	</div>
-	<div class="flex flex-grow justify-center">
+	<div class="flex flex-grow justify-center mr-14">
 		<Button
 			on:click={() => (open = !open)}
 			class="my-2 h-8 max-w-xs text-primary"

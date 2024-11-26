@@ -5,8 +5,10 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { collapsed } from '$lib/store';
+	import { Toaster } from "$lib/components/ui/sonner";
 
 </script>
+<Toaster position="top-right" />
 
 <div class="h-screen flex flex-col">
 	<div class="sticky top-0 z-10 border-b bg-background">

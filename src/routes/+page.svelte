@@ -1,9 +1,21 @@
 <script lang="ts">
-	
-
+	import { OPFS } from "$lib/opfs";
+    import { onMount } from "svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    let onboard = false;
+    onMount(async () => {
+        onboard = await OPFS.ifExists('tracks');
+        console.log(onboard);
+    });
 </script>
 
+{#if !onboard}
+<div class="flex flex-col justify-center items-center mt-5">
+    <h1 class="text-lg font-bold">Welcome!</h1>
 
-<div class="w-20 h-full bg-red-500"></div>
-<div class="w-20 h-full bg-blue-500"></div>
-<div class="w-20 h-full bg-red-500"></div>
+    <p>It seems like you are missing a library, head to <Button class="m-0 p-1" variant="link" href="/settings">Settings</Button> to add music!</p>
+</div>
+{:else}
+<h1>Home</h1>
+{/if}
+

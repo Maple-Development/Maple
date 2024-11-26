@@ -9,6 +9,7 @@ import { file, dir, write } from 'opfs-tools';
 import type { Song } from '$lib/types/song';
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
+import { toast } from "svelte-sonner";
 
 export class OPFS {
     private static albumsCache: Album[] | null = null;
@@ -45,12 +46,23 @@ export class OPFS {
         ...files.map(f => file(f.path).exists().then(exists => exists ? Promise.resolve() : write(f.path, f.content))),
       ]);
     }
+
+    public static async ifExists(path: string) {
+      const exists = await dir(path).exists();
+      return exists;
+    }
   
     public static async ls(path: string) {
       const files = await dir(path).children();
       return files;
     }
 
+    public static async clearLibrary() {
+      toast("Clearing library...");
+      const paths = ['albums', 'artists', 'tracks', 'playlists', 'config', 'images'].map(p => `/${p}`);
+      await Promise.all(paths.map(p => dir(p).remove().then(() => Promise.resolve())));
+      toast('Library cleared');
+    }
   
   public static async addAlbum(album: Album, id: string) {
     if (!this.albumsCache) {
@@ -88,13 +100,13 @@ export class OPFS {
        artist.albums?.push(album);
      } */
    
-     if (!this.artistsCache.some((a) => a.id === artist.id)) {
+     if (!this.artistsCache.some((a) => a.name === artist.name)) {
        this.artistsCache.push(artist);
        await this.writeCache('/artists/artists.json', this.artistsCache);
      }
    }
   
-    public static async addFile(id: string, file: File) {
+    public static async addFile(id: string, file: File, track: Song) {
       const fileContent = await file.arrayBuffer();
       const extension = file.name.split('.').pop();
       await write(`/tracks/${id}.${extension}`, fileContent);
@@ -110,7 +122,7 @@ export class OPFS {
       await write(`/images/${imageFileName}`, imageArrayBuffer);
       const trackWithImagePath = { ...track, image: `/images/${imageFileName}` };
   
-      if (!this.tracksCache.find((t) => t.id === track.id)) {
+      if (!this.tracksCache.find((t) => t.title === track.title && t.artist === track.artist)) {
         this.tracksCache.push(trackWithImagePath);
         await this.writeCache('/tracks/tracks.json', this.tracksCache);
       }

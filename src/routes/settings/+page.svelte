@@ -8,6 +8,7 @@
     import type { Artist } from "$lib/types/artist";
     import { v4 as uuidv4 } from 'uuid';
     import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
 
 
     async function createLibrary() {
@@ -21,9 +22,11 @@
         input.accept = 'audio/*';
         
         const handleFiles = async (files: FileList) => {
+            let i = 0;
             for (const file of Array.from(files)) {
                 if (file.type.startsWith('audio/')) {
-                    console.log(file.name);
+                    i++;
+                    toast(`${i} of ${files.length} | Processing ${file.name}`);
                     const metadata = await parseBlob(file);
                     const track: Song = {
                         id: uuidv4(),
@@ -54,9 +57,11 @@
                     await OPFS.addAlbum(album, track.id);
                     await OPFS.addArtist(artist, track.id, track.album);
                     await OPFS.addTrack(track);
-                    await OPFS.addFile(track.id, file);
+                    await OPFS.addFile(track.id, file, track);
                 }
             }
+            toast.success(`Library added successfully!`);
+            getLength();
         }
 
         if (window.showDirectoryPicker) {
@@ -87,6 +92,9 @@
     let length = 0;
     async function getLength() {
         length = (await OPFS.ls('/tracks')).length - 1;
+        if (length < 0) {
+            length = 0;
+        }
     }
 
     onMount(() => {
@@ -98,5 +106,6 @@
     <h2>You currently have {length} tracks imported</h2>
     <div class="p-10 px-20 rounded-sm mt-4 border border-1">
         <Button variant="secondary" on:click={() => createLibrary() }>Import Music</Button>
+        <Button variant="destructive" on:click={() => OPFS.clearLibrary() }>Clear Library</Button>
     </div>
 </div>
