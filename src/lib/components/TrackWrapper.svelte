@@ -1,31 +1,21 @@
 <script lang="ts">
-    import { OPFS } from "$lib/opfs";
     import type { Song } from "$lib/types/song";
-    import { context, activeSong, audioPlayer } from "$lib/store";
+    import { context } from "$lib/store";
+    import Controls from "./controls.svelte";
     export let track: Song;
     export let tracks: Song[];
 
-    let audioUrl: string = "";
-    async function play() {
+    let controls: Controls;
+
+    async function playSong(song: Song) {
         context.set(tracks);
-        activeSong.set(track);
-        const buffer = await OPFS.getSong(track);
-        if (buffer) {
-            const arrayBuffer = await buffer.arrayBuffer();
-            const blob = new Blob([arrayBuffer], { type: `audio/${track.ext}` });
-            audioUrl = URL.createObjectURL(blob);
-        }
-        audioPlayer.update((state) => {
-          if (state.audio instanceof HTMLAudioElement) {
-            state.audio.src = audioUrl;
-            state.audio.play();
-          }
-          return { ...state, playing: true };
-        });
+        controls.playSong(song);
     } 
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div on:click={() => play()}>
+<div on:click={() => playSong(track)}>
   <slot />
 </div>
+
+<Controls bind:this={controls}/>

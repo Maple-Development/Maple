@@ -20,7 +20,6 @@
         let params = new URLSearchParams(document.location.search);
         albumName = params.get('album') ?? '';
         album = await OPFS.get().album(albumName);  
-        console.log(album);
         await sortTracks();
         // sort disks
         const diskMap: { [disk: number]: Song[] } = {};
@@ -41,14 +40,11 @@
 
     async function sortTracks() {
         if (album && album.tracks) {
-            console.log(album.tracks);
             const newTracks: Song[] = [];
             for (const track of album.tracks) {
                 const trackData = await OPFS.get().track(track as string);
-                console.log(trackData);
                 if (trackData) {
                     newTracks.push(trackData);
-                    console.log(trackData.trackNumber);
                 }
             }
             newTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));

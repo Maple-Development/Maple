@@ -2,9 +2,9 @@
     import Button from "./ui/button/button.svelte";
     import { Slider } from "$lib/components/ui/slider/index.js";
     import { OPFS } from "$lib/opfs";
-    import { activeSong, audioPlayer, context } from "$lib/store";
-    import type { Song } from "$lib/types/song";
-
+    import { activeSong, audioPlayer } from "$lib/store";
+    import Controls from "./controls.svelte";
+    
     import { Play,
         SkipForward,
         SkipBack,
@@ -17,13 +17,9 @@
      let one = false;
      let paused = false;
      let volume = 100;
-     let audioUrl: string = "";
-
+     let controls: Controls;
 
      $: {
-         if ($activeSong) {
-             console.log($activeSong);
-         }
          if ($audioPlayer) {
             paused = !$audioPlayer.playing;
          }
@@ -54,33 +50,12 @@
       });
     }
 
-    async function playSong(song: Song) {
-        activeSong.set(song);
-        const buffer = await OPFS.getSong(song);
-        if (buffer) {
-            const arrayBuffer = await buffer.arrayBuffer();
-            const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
-            audioUrl = URL.createObjectURL(blob);
-        }
-        audioPlayer.update((state) => {
-          if (state.audio instanceof HTMLAudioElement) {
-            state.audio.src = audioUrl;
-            state.audio.play();
-          }
-          return { ...state, playing: true };
-        });
-    } 
-
     function nextSong() {
-        const index = $context.indexOf($activeSong);
-        const nextIndex = (index + 1) % $context.length;
-        playSong($context[nextIndex]);
+        controls.nextSong();
     }
 
     function prevSong() {
-        const index = $context.indexOf($activeSong);
-        const prevIndex = (index - 1 + $context.length) % $context.length;
-        playSong($context[prevIndex]);
+        controls.prevSong();
     }
 </script>
 
@@ -138,3 +113,5 @@
     <Slider value={[volume]} max={100} step={1} class="w-40" />
   </div>
 </div>
+
+<Controls bind:this={controls}/>
