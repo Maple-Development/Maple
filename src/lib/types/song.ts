@@ -8,5 +8,6 @@ export type Song = {
     fileName: string;
     duration: number;
     image?: any;
-    trackNumber?: number;
+    trackNumber: number;
+    disk: number
 }

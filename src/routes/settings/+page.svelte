@@ -34,7 +34,8 @@
                         genre: metadata.common.genre,
                         duration: metadata.format.duration,
                         image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
-                        trackNumber: metadata.common.track.no
+                        trackNumber: metadata.common.track.no,
+                        disk: metadata.common.disk.no
                     }
 
                     const album: Album = {

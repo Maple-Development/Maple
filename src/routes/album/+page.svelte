@@ -3,19 +3,37 @@
     import { onMount } from "svelte";
     import type { Album } from "$lib/types/album";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, SeparatorVertical } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import { Separator } from "$lib/components/ui/separator/index.js";
+
     let albumName: string;
     let album: Album | undefined;
     let tracks: Song[] = [];
+    let disks: number = 0;
+    let alldisks: Song[][] = [];
 
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
         albumName = params.get('album') ?? '';
         album = await OPFS.get().album(albumName);  
         console.log(album);
-        sortTracks();
+        await sortTracks();
+        // sort disks
+        const diskMap: { [disk: number]: Song[] } = {};
+        for (const track of tracks) {
+            const disk = track.disk ?? 1;
+            if (!diskMap[disk]) {
+                diskMap[disk] = [];
+            }
+            diskMap[disk].push(track);
+        }
+        alldisks = Object.values(diskMap).map(diskTracks => 
+            diskTracks.sort((a, b) => a.trackNumber - b.trackNumber)
+        );
+
+        disks = alldisks.length;
     })
 
     async function sortTracks() {
@@ -40,7 +58,6 @@
      const response = await OPFS.get().image(imagePath);
      const arrayBuffer = await response.arrayBuffer();
      const blob = new Blob([arrayBuffer]);
-     console.log(blob);
      return URL.createObjectURL(blob);
    }
 
@@ -54,7 +71,11 @@
         } else if (s === "duration") {
             tracks = tracks.sort((a, b) => ascending ? a.duration - b.duration : b.duration - a.duration);
         } else if (s === "track") {
+            if (alldisks.length > 1) {
+                alldisks = alldisks.reverse().map(diskTracks => diskTracks.slice().reverse());
+            } else {
             tracks = tracks.sort((a, b) => ascending ? (a.trackNumber ?? 0) - (b.trackNumber ?? 0) : (b.trackNumber ?? 0) - (a.trackNumber ?? 0));
+            }
         }
     }
 
@@ -92,21 +113,46 @@
         </DropdownMenu.Root>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
-    {#each tracks as track}
-        <div class="flex flex-col items-start">
-            {#await getImageUrl(track.image) then image}
-                <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-            <div class="flex flex-row items-start">
-                <div class="flex flex-col items-start h-full mt-4">
-                    <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
-                    <h1 class="text-slate-400 text-base font-light leading-none p">{track.artist}</h1>
+<div class="flex flex-col gap-y-8 ml-16 my-5">
+    {#if alldisks.length > 1 && sort === "track"}
+        {#each alldisks as disk, diskIndex}
+            {#if diskIndex > 0}
+                <div class="flex flex-col items-start">
+                    <Separator class="w-[95%] mb-4 mt-1 pr-20"></Separator>
                 </div>
+            {/if}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12">
+                {#each disk as track}
+                    <div class="flex flex-col items-start">
+                        {#await getImageUrl(track.image) then image}
+                            <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                            <div class="flex flex-col items-start mt-4">
+                                <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>
+                                <p class="text-slate-400 text-base font-light leading-none">{track.artist}</p>
+                            </div>
+                        {:catch error}
+                            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+                        {/await}
+                    </div>
+                {/each}
             </div>
-            {:catch error}
-            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
-            {/await}
+        {/each}
+    {:else}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12">
+            {#each tracks as track}
+                <div class="flex flex-col items-start">
+                    {#await getImageUrl(track.image) then image}
+                        <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                        <div class="flex flex-col items-start mt-4">
+                            <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>
+                            <p class="text-slate-400 text-base font-light leading-none">{track.artist}</p>
+                        </div>
+                    {:catch error}
+                        <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+                    {/await}
+                </div>
+            {/each}
         </div>
-    {/each}
+    {/if}
 </div>
 
