@@ -6,19 +6,19 @@
     import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-    import { context } from "$lib/store";
+    import { context, title } from "$lib/store";
 
     let artists: Artist[] = [];
 
     onMount(async () => {
         artists = (await OPFS.get().artists()).sort((a, b) => a.name.localeCompare(b.name));
+        title.set("Artists");
     });
 
    async function getImageUrl(imagePath: string): Promise<string> {
      const response = await OPFS.get().image(imagePath);
      const arrayBuffer = await response.arrayBuffer();
      const blob = new Blob([arrayBuffer]);
-     console.log(blob);
      return URL.createObjectURL(blob);
    }
 

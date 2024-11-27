@@ -8,13 +8,14 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
-    import { context } from "$lib/store";
+    import { context, title } from "$lib/store";
 
     let albumName: string;
     let album: Album | undefined;
     let tracks: Song[] = [];
     let disks: number = 0;
     let alldisks: Song[][] = [];
+    let listType = "list";
 
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
@@ -36,6 +37,8 @@
 
         disks = alldisks.length;
         tracks = alldisks.flat();
+
+        title.set(album?.name ?? "Unknown Album");
     })
 
     async function sortTracks() {

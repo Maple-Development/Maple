@@ -2,10 +2,12 @@
 	import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
     import Button from "$lib/components/ui/button/button.svelte";
+    import { title } from "$lib/store";
     let onboard = false;
     onMount(async () => {
         onboard = await OPFS.ifExists('tracks');
         console.log(onboard);
+        title.set('Home');
     });
 </script>
 

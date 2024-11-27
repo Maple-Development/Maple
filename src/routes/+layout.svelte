@@ -6,8 +6,12 @@
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { collapsed } from '$lib/store';
 	import { Toaster } from "$lib/components/ui/sonner";
+	import { title } from '$lib/store';
 
 </script>
+<svelte:head>
+	<title>{$title}</title>
+</svelte:head>
 <Toaster position="top-right" />
 
 <div class="h-screen flex flex-col">

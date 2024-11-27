@@ -39,4 +39,11 @@ export function prevSong() {
         const prevIndex = (index - 1 + $context.length) % $context.length;
         playSong($context[prevIndex]);
 }
+
+export function volume(volume: number) {
+    audioPlayer.update((store) => ({
+      ...store,
+      volume: volume,
+    }));
+}
 </script>

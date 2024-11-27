@@ -16,7 +16,7 @@
 
      let one = false;
      let paused = false;
-     let volume = 100;
+     $: volume = [100];
      let controls: Controls;
 
      $: {
@@ -28,7 +28,6 @@
       const response = await OPFS.get().image(imagePath);
       const arrayBuffer = await response.arrayBuffer();
       const blob = new Blob([arrayBuffer]);
-      console.log(blob);
       return URL.createObjectURL(blob);
     }
 
@@ -56,6 +55,12 @@
 
     function prevSong() {
         controls.prevSong();
+    }
+
+    function changeVolume() {
+        //volume is an [], should only take number, who knows why this works rn but it does so ima just ignore warning :skull:
+        //@ts-ignore
+        controls.volume(volume);
     }
 </script>
 
@@ -110,7 +115,7 @@
   </div>
   
   <div class="flex justify-end flex-grow mr-5">
-    <Slider value={[volume]} max={100} step={1} class="w-40" />
+    <Slider onValueChange={changeVolume} bind:value={volume} max={100} step={2} class="w-40" />
   </div>
 </div>
 

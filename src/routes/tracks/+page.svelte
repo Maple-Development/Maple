@@ -2,28 +2,29 @@
     import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, List } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
-    import { context } from "$lib/store";
+    import { context, title } from "$lib/store";
 
     let tracks: Song[] = [];
 
     onMount(async () => {
         tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+        title.set("Tracks");
     });
 
     async function getImageUrl(imagePath: string): Promise<string> {
         const response = await OPFS.get().image(imagePath);
         const arrayBuffer = await response.arrayBuffer();
         const blob = new Blob([arrayBuffer]);
-        console.log(blob);
         return URL.createObjectURL(blob);
     }
 
     let sort = "title";
     let ascending = true;
+    let listType = "grid";
 
     async function sortTracks(s: string) {
         sort = s;
@@ -51,6 +52,21 @@
     function swapAscending() {
         ascending = !ascending;
         sortTracks(sort);
+    }
+
+    function formatDuration(duration: number): string {
+      const roundedDuration = Math.round(duration);
+      const minutes = Math.floor(roundedDuration / 60);
+      const seconds = roundedDuration % 60;
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function swapListType() {
+        if (listType === "list") {
+            listType = "grid";
+        } else {
+            listType = "list";
+        }
     }
 </script>
 
@@ -82,8 +98,12 @@
                 </DropdownMenu.RadioGroup>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapListType()}>
+            <List size={20} color="white" />
+        </Button>
 </div>
     
+    {#if listType === "grid"}
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
         {#each tracks as track (track.id)}
         <div class="flex flex-col items-start">
@@ -105,4 +125,27 @@
         </div>
         {/each}
     </div>
+    {:else}
+    <div class="flex flex-col mx-4 mb-5 mt-2" >
+      {#each tracks as track}
+      <TrackWrapper track={track} tracks={tracks}>
+        <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm">
+          {#await getImageUrl(track.image) then image}
+            <img class="h-24 w-24 mr-4" src={image} alt={track.title} />
+          {:catch error}
+            <div class="h-24 w-24 bg-gray-500 mr-4"></div>
+          {/await}
+          <div class="flex flex-col items-start flex-grow">
+            <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
+            <h1 class="text-slate-400 text-base font-light leading-none">{track.artist}</h1>
+          </div>
+          <div class="flex flex-col items-end text-right ml-4">
+            <h1 class="text-slate-400 text-base font-light leading-none">{formatDuration(track.duration)}</h1>
+            <h1 class="text-slate-400 text-base font-light leading-none">{track.album}</h1>
+          </div>
+        </div>
+    </TrackWrapper>
+      {/each}
+    </div>
+  {/if}
  
