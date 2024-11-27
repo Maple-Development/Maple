@@ -3,6 +3,9 @@
     import { onMount } from "svelte";
     import type { Album } from "$lib/types/album";
     import type { Song } from "$lib/types/song";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     let albumName: string;
     let album: Album | undefined;
     let tracks: Song[] = [];
@@ -40,7 +43,54 @@
      console.log(blob);
      return URL.createObjectURL(blob);
    }
+
+    let sort = "track";
+    let ascending = true;
+
+    async function orderTracks(s: string) {
+        sort = s;
+        if (s === "title") {
+            tracks = tracks.sort((a, b) => ascending ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+        } else if (s === "duration") {
+            tracks = tracks.sort((a, b) => ascending ? a.duration - b.duration : b.duration - a.duration);
+        } else if (s === "track") {
+            tracks = tracks.sort((a, b) => ascending ? (a.trackNumber ?? 0) - (b.trackNumber ?? 0) : (b.trackNumber ?? 0) - (a.trackNumber ?? 0));
+        }
+    }
+
+    function swapAscending() {
+        ascending = !ascending;
+        orderTracks(sort);
+    }
 </script>
+
+<div class="w-full mt-4 h-10 px-10 flex justify-end">
+    {#if ascending}
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+            <ArrowUpAZ size={20} color="white" />
+        </Button>
+    {:else}
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+            <ArrowDownZA size={20} color="white" />
+        </Button>
+    {/if}
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+                <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+                    <ListFilter size={20} color="white" />
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-56">
+              <DropdownMenu.Label>Sort By</DropdownMenu.Label>
+              <DropdownMenu.Separator />
+              <DropdownMenu.RadioGroup bind:value={sort}>
+                  <DropdownMenu.RadioItem value="track" on:click={() => orderTracks("track")}>Track #</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="title" on:click={() => orderTracks("title")}>Title</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="duration" on:click={() => orderTracks("duration")}>Duration</DropdownMenu.RadioItem>
+                </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
+</div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
     {#each tracks as track}

@@ -2,9 +2,9 @@
     import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
-    import { fade } from 'svelte/transition'; // Import the flip transition
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
     let tracks: Song[] = [];
 
@@ -20,33 +20,62 @@
         return URL.createObjectURL(blob);
     }
 
-    let atoZ = true;
+    let sort = "title";
+    let ascending = true;
 
-    async function sortTracks(a: boolean) {
-        if (a) {
-            tracks = tracks.sort((a, b) => a.title.localeCompare(b.title));
-            atoZ = true;
-        } else {
-            tracks = tracks.sort((a, b) => b.title.localeCompare(a.title));
-            atoZ = false;
+    async function sortTracks(s: string) {
+        sort = s;
+        if (s === "title") {
+            tracks = tracks.sort((a, b) => ascending ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+        } else if (s === "artist") {
+            tracks = tracks.sort((a, b) => ascending ? a.artist.localeCompare(b.artist) : b.artist.localeCompare(a.artist));
+        } else if (s === "album") {
+            tracks = tracks.sort((a, b) => ascending ? a.album.localeCompare(b.album) : b.album.localeCompare(a.album));
+        } else if (s === "year") {
+            tracks = tracks.sort((a, b) => ascending ? a.year - b.year : b.year - a.year);
+        } else if (s === "duration") {
+            tracks = tracks.sort((a, b) => ascending ? a.duration - b.duration : b.duration - a.duration);
         }
+    }
+
+    function swapAscending() {
+        ascending = !ascending;
+        sortTracks(sort);
     }
 </script>
 
 <div class="w-full mt-4 h-10 px-10 flex justify-end">
-    {#if atoZ}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => sortTracks(false)}>
+    {#if ascending}
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
             <ArrowUpAZ size={20} color="white" />
         </Button>
     {:else}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => sortTracks(true)}>
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
             <ArrowDownZA size={20} color="white" />
         </Button>
     {/if}
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+                <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+                    <ListFilter size={20} color="white" />
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-56">
+              <DropdownMenu.Label>Sort By</DropdownMenu.Label>
+              <DropdownMenu.Separator />
+              <DropdownMenu.RadioGroup bind:value={sort}>
+                  <DropdownMenu.RadioItem value="title" on:click={() => sortTracks("title")}>Title</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="artist" on:click={() => sortTracks("artist")}>Artist</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="album" on:click={() => sortTracks("album")}>Album</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="year" on:click={() => sortTracks("year")}>Year</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="duration" on:click={() => sortTracks("duration")}>Duration</DropdownMenu.RadioItem>
+                </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
 </div>
-
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
-    {#each tracks as track (track.id)}
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
+        {#each tracks as track (track.id)}
         <div class="flex flex-col items-start">
             {#await getImageUrl(track.image) then image}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -54,15 +83,16 @@
             <a on:click={() => OPFS.play(track)}>
                 <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
             </a>
-                <div class="flex flex-row items-start">
-                    <div class="flex flex-col items-start h-full mt-4">
-                        <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
-                        <h1 class="text-slate-400 text-base font-light leading-none p">{track.artist}</h1>
-                    </div>
+            <div class="flex flex-row items-start">
+                <div class="flex flex-col items-start h-full mt-4">
+                    <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
+                    <h1 class="text-slate-400 text-base font-light leading-none p">{track.artist}</h1>
                 </div>
+            </div>
             {:catch error}
-                <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
             {/await}
         </div>
-    {/each}
-</div>
+        {/each}
+    </div>
+ 
