@@ -6,6 +6,7 @@
     import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import { context } from "$lib/store";
 
     let artists: Artist[] = [];
 
@@ -21,7 +22,7 @@
      return URL.createObjectURL(blob);
    }
 
-   let sort = "title";
+   let sort = "name";
     let ascending = true;
 
     async function sortArtists(s: string) {

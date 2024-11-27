@@ -3,19 +3,9 @@ import { browser } from '$app/environment';
 import type { Song } from './types/song';
 
 export const activeSong = writable({} as Song);
-export const audio = writable();
+export const context = writable([] as Song[]);
 export const collapsed = writable(false);
-
-
-if (browser) {
-	audio.subscribe((value) => {
-	  if (value) {
-		var audioElement = document.getElementsByTagName('audio')[0];
-		// @ts-ignore
-		audioElement.src = value;
-		audioElement.play().catch((err) => {
-		  console.log(err);
-		});
-	  }
-	});
-}
+export const audioPlayer = writable({
+	audio: browser ? new Audio() : null,
+	playing: false,
+});

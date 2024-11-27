@@ -7,6 +7,8 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
+    import TrackWrapper from "$lib/components/TrackWrapper.svelte";
+    import { context } from "$lib/store";
 
     let albumName: string;
     let album: Album | undefined;
@@ -34,6 +36,7 @@
         );
 
         disks = alldisks.length;
+        tracks = alldisks.flat();
     })
 
     async function sortTracks() {
@@ -73,9 +76,18 @@
         } else if (s === "track") {
             if (alldisks.length > 1) {
                 alldisks = alldisks.reverse().map(diskTracks => diskTracks.slice().reverse());
+                tracks = alldisks.flat();
             } else {
             tracks = tracks.sort((a, b) => ascending ? (a.trackNumber ?? 0) - (b.trackNumber ?? 0) : (b.trackNumber ?? 0) - (a.trackNumber ?? 0));
             }
+        }
+        if ($context.length === tracks.length) {
+            const contextIds = new Set($context.map(song => song.id));
+            const tracksIds = new Set(tracks.map(song => song.id));
+            if ([...contextIds].every(id => tracksIds.has(id)) && [...tracksIds].every(id => contextIds.has(id))) {
+                context.set(tracks);
+            }
+
         }
     }
 
@@ -125,7 +137,9 @@
                 {#each disk as track}
                     <div class="flex flex-col items-start">
                         {#await getImageUrl(track.image) then image}
-                            <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                            <TrackWrapper track={track} tracks={tracks}>
+                                <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                            </TrackWrapper>
                             <div class="flex flex-col items-start mt-4">
                                 <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>
                                 <p class="text-slate-400 text-base font-light leading-none">{track.artist}</p>
@@ -142,7 +156,9 @@
             {#each tracks as track}
                 <div class="flex flex-col items-start">
                     {#await getImageUrl(track.image) then image}
-                        <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                        <TrackWrapper track={track} tracks={tracks}>
+                            <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                        </TrackWrapper>
                         <div class="flex flex-col items-start mt-4">
                             <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>
                             <p class="text-slate-400 text-base font-light leading-none">{track.artist}</p>

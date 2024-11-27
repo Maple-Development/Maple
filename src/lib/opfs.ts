@@ -151,8 +151,9 @@ export class OPFS {
       }
     }
 
-    public static async play(track: Song) {
-      activeSong.set(track);
+    public static async getSong(track: Song) {
+        const audioArrayBuffer = await file(`/tracks/${track.id}.${track.ext}`).arrayBuffer();
+        return new Response(audioArrayBuffer);
     }
 
     public static get = () => ({

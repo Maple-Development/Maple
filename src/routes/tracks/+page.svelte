@@ -5,6 +5,8 @@
     import { ArrowUpAZ, ArrowDownZA, ListFilter } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import TrackWrapper from "$lib/components/TrackWrapper.svelte";
+    import { context } from "$lib/store";
 
     let tracks: Song[] = [];
 
@@ -35,6 +37,14 @@
             tracks = tracks.sort((a, b) => ascending ? a.year - b.year : b.year - a.year);
         } else if (s === "duration") {
             tracks = tracks.sort((a, b) => ascending ? a.duration - b.duration : b.duration - a.duration);
+        }
+        if ($context.length === tracks.length) {
+            const contextIds = new Set($context.map(song => song.id));
+            const tracksIds = new Set(tracks.map(song => song.id));
+            if ([...contextIds].every(id => tracksIds.has(id)) && [...tracksIds].every(id => contextIds.has(id))) {
+                context.set(tracks);
+            }
+
         }
     }
 
@@ -80,9 +90,9 @@
             {#await getImageUrl(track.image) then image}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-missing-attribute -->
-            <a on:click={() => OPFS.play(track)}>
+            <TrackWrapper track={track} tracks={tracks}>
                 <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-            </a>
+            </TrackWrapper>
             <div class="flex flex-row items-start">
                 <div class="flex flex-col items-start h-full mt-4">
                     <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>

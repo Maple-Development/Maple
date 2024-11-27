@@ -9,5 +9,6 @@ export type Song = {
     duration: number;
     image?: any;
     trackNumber: number;
-    disk: number
+    disk: number;
+    ext: string;
 }

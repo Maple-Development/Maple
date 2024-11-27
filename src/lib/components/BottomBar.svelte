@@ -2,7 +2,7 @@
     import Button from "./ui/button/button.svelte";
     import { Slider } from "$lib/components/ui/slider/index.js";
     import { OPFS } from "$lib/opfs";
-    import { activeSong } from "$lib/store";
+    import { activeSong, audioPlayer, context } from "$lib/store";
     import type { Song } from "$lib/types/song";
 
     import { Play,
@@ -13,23 +13,74 @@
         Repeat1,
         Pause,
      } from 'lucide-svelte';
-     
-     $: {
-         if ($activeSong) {
-             console.log($activeSong);
-         }
-     }
 
      let one = false;
      let paused = false;
      let volume = 100;
+     let audioUrl: string = "";
 
+
+     $: {
+         if ($activeSong) {
+             console.log($activeSong);
+         }
+         if ($audioPlayer) {
+            paused = !$audioPlayer.playing;
+         }
+     }
      async function getImageUrl(imagePath: string): Promise<string> {
       const response = await OPFS.get().image(imagePath);
       const arrayBuffer = await response.arrayBuffer();
       const blob = new Blob([arrayBuffer]);
       console.log(blob);
       return URL.createObjectURL(blob);
+    }
+
+    function pausePlay() {
+      audioPlayer.update((state) => {
+        if (state.audio instanceof HTMLAudioElement) {
+          if (state.playing) {
+            state.audio.pause();
+            paused = true;
+            return { ...state, playing: false };
+          } else {
+            state.audio.play();
+            paused = false;
+            return { ...state, playing: true };
+          }
+        } else {
+          return state;
+        }
+      });
+    }
+
+    async function playSong(song: Song) {
+        activeSong.set(song);
+        const buffer = await OPFS.getSong(song);
+        if (buffer) {
+            const arrayBuffer = await buffer.arrayBuffer();
+            const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
+            audioUrl = URL.createObjectURL(blob);
+        }
+        audioPlayer.update((state) => {
+          if (state.audio instanceof HTMLAudioElement) {
+            state.audio.src = audioUrl;
+            state.audio.play();
+          }
+          return { ...state, playing: true };
+        });
+    } 
+
+    function nextSong() {
+        const index = $context.indexOf($activeSong);
+        const nextIndex = (index + 1) % $context.length;
+        playSong($context[nextIndex]);
+    }
+
+    function prevSong() {
+        const index = $context.indexOf($activeSong);
+        const prevIndex = (index - 1 + $context.length) % $context.length;
+        playSong($context[prevIndex]);
     }
 </script>
 
@@ -61,17 +112,17 @@
     <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
       <Shuffle size={15} class="text-foreground" />
     </Button>
-    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+    <Button on:click={prevSong} class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
       <SkipBack size={25} class="text-foreground" />
     </Button>
-    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
-      {#if paused}
+    <Button on:click={pausePlay} class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+      {#if !paused}
       <Pause size={25} class="text-foreground" />
       {:else}
       <Play size={25} class="text-foreground" />
       {/if}
     </Button>
-    <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
+    <Button on:click={nextSong} class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
       <SkipForward size={25} class="text-foreground" />
     </Button>
     <Button class="w-fit flex flex-row items-center justify-start bg-transparent hover:bg-secondary h-fit p-2">
