@@ -19,6 +19,9 @@
      const response = await OPFS.get().image(imagePath);
      const arrayBuffer = await response.arrayBuffer();
      const blob = new Blob([arrayBuffer]);
+     if (blob && blob.size === 0) {
+         return "";
+     }
      return URL.createObjectURL(blob);
    }
 
@@ -70,7 +73,11 @@
         <div class="flex flex-col items-start">
             {#await getImageUrl(artist.image) then image}
             <a class="pointer" href={`/artist?artist=${artist.id}`}>
+            {#if image !== ""}
+            <img class="h-52 w-52 rounded-[50%]" src={image} alt={artist.name} />
+            {:else}
             <div class="h-52 w-52 bg-gray-500 rounded-[50%] animate-pulse"></div>
+            {/if}
             </a>
             <div class="flex flex-row items-start">
                 <div class="flex flex-col items-start h-full mt-4">

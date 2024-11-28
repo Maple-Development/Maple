@@ -4,10 +4,11 @@
     import type { Artist } from "$lib/types/artist";
     import type { Song } from "$lib/types/song";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, List } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { context, title } from "$lib/store";
+    import { Separator } from "$lib/components/ui/separator/index.js";
      // @ts-ignore
      import Lazy from 'svelte-lazy';
 
@@ -15,6 +16,9 @@
     let artist: Artist | undefined;
     let tracks: Song[] = [];
     let listType = "list";
+    let editModeOn = false;
+    let changedName = "";
+    let imageFile: Blob | null = null;
 
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
@@ -26,6 +30,8 @@
         } else {
             title.set("Unknown Artist");
         }
+
+        changedName = artist?.name?.toString() ?? "";
     })
 
     async function sortTracks() {
@@ -35,10 +41,8 @@
                 const trackData = await OPFS.get().track(track as string);
                 if (trackData) {
                     newTracks.push(trackData);
-                    console.log(trackData.trackNumber);
                 }
             }
-            newTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));
             tracks = newTracks; // trigger re-render
         }
     }
@@ -47,6 +51,9 @@
      const response = await OPFS.get().image(imagePath);
      const arrayBuffer = await response.arrayBuffer();
      const blob = new Blob([arrayBuffer]);
+     if (blob && blob.size === 0) {
+         return "";
+     }
      return URL.createObjectURL(blob);
    }
 
@@ -87,42 +94,106 @@
             listType = "list";
         }
     }
+
+    async function editMode() {
+        editModeOn = !editModeOn; 
+
+        if (!editModeOn && artist) {
+            const doImage = imageFile !== null;
+            const modifiedartist: Artist = {
+                id: artist.id,
+                name: changedName,
+                image: doImage ? imageFile : artist.image,
+                tracks: artist.tracks,
+                albums: artist.albums
+            };
+            OPFS.artist().edit(modifiedartist);
+            let newartist = await OPFS.get().artist(modifiedartist.id.toString());
+            artist = newartist;
+        }
+    }
+
+    function handlePhotoChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file); 
+            reader.onload = () => {
+                const imageBlob = new Blob([reader.result as ArrayBuffer], { type: file.type });
+                imageFile = imageBlob;
+            };
+        }
+    }
 </script>
 
-<div class="w-full mt-4 h-10 px-10 flex justify-between items-center">
-    {#if artist && artist.name}
-    <div class="font-bold text-lg underline">
-        {artist.name}
+<div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
+    <div class="flex">
+        <div>
+        {#await getImageUrl(artist?.image) then image}
+            {#if editModeOn}
+            <input type="file" id="files" class="block w-full px-2 py-1 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500" accept="image/*" multiple on:change={(e) => handlePhotoChange(e) } />
+            {:else}
+            {#if image !== ""}
+              <img class="h-64 w-64 rounded-sm" src={image} alt={artist?.name?.toString() ?? ''} />
+            {:else}
+              <div class="h-52 w-52 bg-gray-500 rounded-[50%] animate-pulse"></div>
+            {/if}
+            {/if}
+        {:catch error}
+            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+        {/await}
+        </div>
+        <div class="flex flex-col items-start ml-7">
+            <div class="flex flex-col items-start">
+                {#if editModeOn}
+                <h1 bind:innerHTML={changedName} contenteditable="true" class="text-foreground text-2xl font-bold leading-none mb-1 underline border p-1 rounded-sm border-1">{artist?.name}</h1>
+                {:else}
+                <h1 class="text-foreground text-2xl font-bold leading-none mb-1">{artist?.name}</h1>
+                {/if}
+            </div>
+        </div>
     </div>
-    {/if}
-  <div class="flex items-center">
-    {#if ascending}
-      <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-        <ArrowUpAZ size={20} color="white" />
-      </Button>
-    {:else}
-      <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-        <ArrowDownZA size={20} color="white" />
-      </Button>
-    {/if}
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild let:builder>
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-          <ListFilter size={20} color="white" />
+    <div>
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => editMode()}>
+            {#if editModeOn}
+                <Check size={20} color="white" />
+            {:else}
+                <Pencil size={20} color="white" />
+            {/if}
         </Button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content class="w-56">
-        <DropdownMenu.Label>Sort By</DropdownMenu.Label>
-        <DropdownMenu.Separator />
-        <DropdownMenu.RadioGroup bind:value={sort}>
-          <DropdownMenu.RadioItem value="title" on:click={() => sortArtists("name")}>Name</DropdownMenu.RadioItem>
-        </DropdownMenu.RadioGroup>
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
-    <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapListType()}>
-        <List size={20} color="white" />
-    </Button>
-  </div>
+    </div>
+</div>
+<Separator class="w-[95%] ml-14 mb-4 mt-1 pr-20"></Separator>
+<div class="mt-4 h-10 px-5 flex justify-end border-gray-600 mx-4">
+    <div class="flex items-center">
+        {#if ascending}
+            <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+                <ArrowUpAZ size={20} color="white" />
+            </Button>
+        {:else}
+            <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+                <ArrowDownZA size={20} color="white" />
+            </Button>
+        {/if}
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+                <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+                    <ListFilter size={20} color="white" />
+                </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-56">
+                <DropdownMenu.Label>Sort By</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.RadioGroup bind:value={sort}>
+                  <DropdownMenu.RadioItem value="title" on:click={() => sortArtists("name")}>Name</DropdownMenu.RadioItem>
+                </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+        </DropdownMenu.Root>
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapListType()}>
+            <List size={20} color="white" />
+        </Button>
+    </div>
 </div>
 
 

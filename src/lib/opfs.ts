@@ -224,4 +224,24 @@ export class OPFS {
           }
         }
     });
+
+    public static artist = () => ({
+        edit: async (artist: Artist) => {
+          if (!this.artistsCache) {
+            this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
+          }
+          const index = this.artistsCache.findIndex((a) => a.id === artist.id);
+          if (index !== -1) {
+            if (artist.image instanceof Blob) {
+              const imageFileName = `${artist.id}.image`;
+              const imageArrayBuffer = await new Response(artist.image).arrayBuffer();
+              await write(`/images/${imageFileName}`, imageArrayBuffer);
+              artist.image = `/images/${imageFileName}`;
+            }
+            this.artistsCache[index] = artist;
+            await this.writeCache('/artists/artists.json', this.artistsCache);
+            console.log(artist);
+          }
+        }
+    });
   }

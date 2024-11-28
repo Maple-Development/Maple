@@ -42,7 +42,6 @@
         alldisks = Object.values(diskMap).map(diskTracks => 
             diskTracks.sort((a, b) => a.trackNumber - b.trackNumber)
         );
-        console.log(album);
 
         disks = alldisks.length;
         tracks = alldisks.flat();
@@ -64,7 +63,6 @@
                 }
             }
             newTracks.sort((a, b) => (a.trackNumber ?? 0) - (b.trackNumber ?? 0));
-            console.log(newTracks);
             tracks = newTracks; // trigger re-render
         }
     }
@@ -123,38 +121,37 @@
         }
     }
 	async function editMode() {
-    console.log(album);
-    editModeOn = !editModeOn; 
+        editModeOn = !editModeOn; 
 
-    if (!editModeOn && album) {
-        const doImage = imageFile !== null;
-        const modifiedAlbum: Album = {
-            id: album.id,
-            name: changedName,
-            artist: changedArtist,
-            year: parseInt(changedYear, 10),
-            image: doImage ? imageFile : album.image,
-            genre: album.genre,
-            tracks: album.tracks
-        };
-        OPFS.album().edit(modifiedAlbum);
-        let newAlbum = await OPFS.get().album(modifiedAlbum.id.toString());
-        album = newAlbum;
+        if (!editModeOn && album) {
+            const doImage = imageFile !== null;
+            const modifiedAlbum: Album = {
+                id: album.id,
+                name: changedName,
+                artist: changedArtist,
+                year: parseInt(changedYear, 10),
+                image: doImage ? imageFile : album.image,
+                genre: album.genre,
+                tracks: album.tracks
+            };
+            OPFS.album().edit(modifiedAlbum);
+            let newAlbum = await OPFS.get().album(modifiedAlbum.id.toString());
+            album = newAlbum;
+        }
     }
-}
 
-function handlePhotoChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(file); 
-        reader.onload = () => {
-            const imageBlob = new Blob([reader.result as ArrayBuffer], { type: file.type });
-            imageFile = imageBlob;
-        };
+    function handlePhotoChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file); 
+            reader.onload = () => {
+                const imageBlob = new Blob([reader.result as ArrayBuffer], { type: file.type });
+                imageFile = imageBlob;
+            };
+        }
     }
-}
 </script>
 
 <div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
