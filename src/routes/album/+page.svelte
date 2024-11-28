@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import type { Album } from "$lib/types/album";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, SeparatorVertical, List } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
@@ -111,18 +111,49 @@
             listType = "list";
         }
     }
+
+    function editMode() {
+        
+    }
 </script>
 
-<div class="w-full mt-4 h-10 px-10 flex justify-end">
-    {#if ascending}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-            <ArrowUpAZ size={20} color="white" />
+<div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
+    <div class="flex">
+        <div>
+        {#await getImageUrl(album?.image) then image}
+            <img class="h-64 w-64 rounded-sm" src={image} alt={album?.name?.toString() ?? ''} />
+        {:catch error}
+            <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
+        {/await}
+        </div>
+        <div class="flex flex-col items-start ml-7">
+            <div class="flex flex-col items-start">
+                <h1 class="text-foreground text-2xl font-bold leading-none mb-1">{album?.name}</h1>
+                <h1 class="text-slate-400 text-lg font-light leading-none p">{album?.artist}</h1>
+            </div>
+            <div class="flex flex-row items-end justify-between mt-auto">
+                <h1 class="text-slate-400 text-lg font-light leading-none p">{album?.year}</h1>
+            </div>
+        </div>
+    </div>
+    <div>
+        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => editMode()}>
+            <Pencil size={20} color="white" />
         </Button>
-    {:else}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-            <ArrowDownZA size={20} color="white" />
-        </Button>
-    {/if}
+    </div>
+</div>
+<Separator class="w-[95%] ml-14 mb-4 mt-1 pr-20"></Separator>
+<div class="mt-4 h-10 px-5 flex justify-end border-gray-600 mx-4">
+    <div class="flex items-center">
+        {#if ascending}
+            <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+                <ArrowUpAZ size={20} color="white" />
+            </Button>
+        {:else}
+            <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
+                <ArrowDownZA size={20} color="white" />
+            </Button>
+        {/if}
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild let:builder>
                 <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
@@ -130,18 +161,19 @@
                 </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content class="w-56">
-              <DropdownMenu.Label>Sort By</DropdownMenu.Label>
-              <DropdownMenu.Separator />
-              <DropdownMenu.RadioGroup bind:value={sort}>
-                  <DropdownMenu.RadioItem value="track" on:click={() => orderTracks("track")}>Track #</DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value="title" on:click={() => orderTracks("title")}>Title</DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value="duration" on:click={() => orderTracks("duration")}>Duration</DropdownMenu.RadioItem>
+                <DropdownMenu.Label>Sort By</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                <DropdownMenu.RadioGroup bind:value={sort}>
+                    <DropdownMenu.RadioItem value="track" on:click={() => orderTracks("track")}>Track #</DropdownMenu.RadioItem>
+                    <DropdownMenu.RadioItem value="title" on:click={() => orderTracks("title")}>Title</DropdownMenu.RadioItem>
+                    <DropdownMenu.RadioItem value="duration" on:click={() => orderTracks("duration")}>Duration</DropdownMenu.RadioItem>
                 </DropdownMenu.RadioGroup>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
         <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapListType()}>
             <List size={20} color="white" />
         </Button>
+    </div>
 </div>
 
 
@@ -201,7 +233,7 @@
         {#if alldisks.length > 1 && sort === "track"}
             {#each alldisks as disk, diskIndex}
                 {#if diskIndex > 0}
-                    <div class="flex flex-col items-start">
+                    <div class="flex flex-col ml-16 items-start">
                         <Separator class="w-[95%] mb-4 mt-1 pr-20"></Separator>
                     </div>
                 {/if}
