@@ -9,6 +9,8 @@
     import { Separator } from "$lib/components/ui/separator/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
+     // @ts-ignore
+     import Lazy from 'svelte-lazy';
 
     let albumName: string;
     let album: Album | undefined;
@@ -137,7 +139,9 @@
                     <div class="flex flex-col items-start">
                         {#await getImageUrl(track.image) then image}
                             <TrackWrapper track={track} tracks={tracks}>
-                                <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                                <Lazy keep={true}>
+                                    <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                                </Lazy>
                             </TrackWrapper>
                             <div class="flex flex-col items-start mt-4">
                                 <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>
@@ -156,7 +160,9 @@
                 <div class="flex flex-col items-start">
                     {#await getImageUrl(track.image) then image}
                         <TrackWrapper track={track} tracks={tracks}>
-                            <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                            <Lazy keep={true}>
+                                <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                            </Lazy>
                         </TrackWrapper>
                         <div class="flex flex-col items-start mt-4">
                             <h3 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h3>

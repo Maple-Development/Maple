@@ -7,6 +7,8 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { title } from "$lib/store";
+     // @ts-ignore
+     import Lazy from 'svelte-lazy';
 
 
     let albums: Album[] = [];
@@ -76,7 +78,9 @@
         <div class="flex flex-col items-start">
             {#await getImageUrl(album.image) then image}
                 <a class="pointer" href={`/album?album=${album.id}`}>
-                    <img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
+                    <Lazy keep={true}>
+                        <img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
+                    </Lazy>
                 </a>
             <div class="flex flex-row items-start">
                 <div class="flex flex-col items-start h-full mt-4">

@@ -7,6 +7,8 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
+    // @ts-ignore
+    import Lazy from 'svelte-lazy';
 
     let tracks: Song[] = [];
 
@@ -111,7 +113,9 @@
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-missing-attribute -->
             <TrackWrapper track={track} tracks={tracks}>
-                <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                <Lazy keep={true}>
+                    <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                </Lazy>
             </TrackWrapper>
             <div class="flex flex-row items-start">
                 <div class="flex flex-col items-start h-full mt-4">
@@ -131,7 +135,9 @@
       <TrackWrapper track={track} tracks={tracks}>
         <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm">
           {#await getImageUrl(track.image) then image}
-            <img class="h-24 w-24 mr-4" src={image} alt={track.title} />
+            <Lazy keep={true}>
+                <img class="h-24 w-24 mr-4" src={image} alt={track.title} />
+            </Lazy>
           {:catch error}
             <div class="h-24 w-24 bg-gray-500 mr-4"></div>
           {/await}
