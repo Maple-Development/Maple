@@ -3,11 +3,12 @@
     import { onMount } from "svelte";
     import type { Album } from "$lib/types/album";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
+    import { Input } from "$lib/components/ui/input/index.js";
     import { context, title } from "$lib/store";
      // @ts-ignore
      import Lazy from 'svelte-lazy';
@@ -18,6 +19,11 @@
     let disks: number = 0;
     let alldisks: Song[][] = [];
     let listType = "grid";
+    let editModeOn = false;
+    let changedName = "";
+    let changedArtist = "";
+    let changedYear = "";
+    let imageFile: Blob | null = null;
 
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
@@ -36,11 +42,16 @@
         alldisks = Object.values(diskMap).map(diskTracks => 
             diskTracks.sort((a, b) => a.trackNumber - b.trackNumber)
         );
+        console.log(album);
 
         disks = alldisks.length;
         tracks = alldisks.flat();
 
         title.set(album?.name ?? "Unknown Album");
+
+        changedName = album?.name?.toString() ?? "";
+        changedArtist = album?.artist?.toString() ?? "";
+        changedYear = album?.year?.toString() ?? "";
     })
 
     async function sortTracks() {
@@ -111,34 +122,80 @@
             listType = "list";
         }
     }
+	async function editMode() {
+    console.log(album);
+    editModeOn = !editModeOn; 
 
-    function editMode() {
-        
+    if (!editModeOn && album) {
+        const doImage = imageFile !== null;
+        const modifiedAlbum: Album = {
+            id: album.id,
+            name: changedName,
+            artist: changedArtist,
+            year: parseInt(changedYear, 10),
+            image: doImage ? imageFile : album.image,
+            genre: album.genre,
+            tracks: album.tracks
+        };
+        OPFS.album().edit(modifiedAlbum);
+        let newAlbum = await OPFS.get().album(modifiedAlbum.id.toString());
+        album = newAlbum;
     }
+}
+
+function handlePhotoChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file); 
+        reader.onload = () => {
+            const imageBlob = new Blob([reader.result as ArrayBuffer], { type: file.type });
+            imageFile = imageBlob;
+        };
+    }
+}
 </script>
 
 <div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
     <div class="flex">
         <div>
         {#await getImageUrl(album?.image) then image}
+            {#if editModeOn}
+            <input type="file" id="files" class="block w-full px-2 py-1 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500" accept="image/*" multiple on:change={(e) => handlePhotoChange(e) } />
+            {:else}
             <img class="h-64 w-64 rounded-sm" src={image} alt={album?.name?.toString() ?? ''} />
+            {/if}
         {:catch error}
             <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
         {/await}
         </div>
         <div class="flex flex-col items-start ml-7">
             <div class="flex flex-col items-start">
+                {#if editModeOn}
+                <h1 bind:innerHTML={changedName} contenteditable="true" class="text-foreground text-2xl font-bold leading-none mb-1 underline border p-1 rounded-sm border-1">{album?.name}</h1>
+                <h1 bind:innerHTML={changedArtist} contenteditable="true" class="text-slate-400 text-lg font-light leading-none underline border p-1 rounded-sm border-1">{album?.artist}</h1>
+                {:else}
                 <h1 class="text-foreground text-2xl font-bold leading-none mb-1">{album?.name}</h1>
                 <h1 class="text-slate-400 text-lg font-light leading-none p">{album?.artist}</h1>
+                {/if}
             </div>
             <div class="flex flex-row items-end justify-between mt-auto">
-                <h1 class="text-slate-400 text-lg font-light leading-none p">{album?.year}</h1>
+                {#if editModeOn}
+                <h1 bind:innerHTML={changedYear} contenteditable="true" class="text-slate-400 text-lg font-light leading-none underline border p-1 rounded-sm border-1">{album?.year}</h1>
+                {:else}
+                <h1 class="text-slate-400 text-lg font-light leading-none">{album?.year}</h1>
+                {/if}
             </div>
         </div>
     </div>
     <div>
         <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => editMode()}>
-            <Pencil size={20} color="white" />
+            {#if editModeOn}
+                <Check size={20} color="white" />
+            {:else}
+                <Pencil size={20} color="white" />
+            {/if}
         </Button>
     </div>
 </div>
@@ -248,7 +305,7 @@
                                 {:catch error}
                                     <div class="h-24 w-24 bg-gray-500 mr-4"></div>
                                 {/await}
-                                <div class="flex flex-col items-start flex-grow">
+                                <div class="flex flex-col items-start flex-grow"> 
                                     <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
                                     <h1 class="text-slate-400 text-base font-light leading-none">{track.artist}</h1>
                                 </div>

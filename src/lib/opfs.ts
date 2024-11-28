@@ -204,4 +204,24 @@ export class OPFS {
         return new Response(imageArrayBuffer);
       }
     });
+
+    public static album = () => ({
+        edit: async (album: Album) => {
+          if (!this.albumsCache) {
+            this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
+          }
+          const index = this.albumsCache.findIndex((a) => a.id === album.id);
+          if (index !== -1) {
+            if (album.image instanceof Blob) {
+              const imageFileName = `${album.id}.image`;
+              const imageArrayBuffer = await new Response(album.image).arrayBuffer();
+              await write(`/images/${imageFileName}`, imageArrayBuffer);
+              album.image = `/images/${imageFileName}`;
+            }
+            this.albumsCache[index] = album;
+            await this.writeCache('/albums/albums.json', this.albumsCache);
+            console.log(album);
+          }
+        }
+    });
   }

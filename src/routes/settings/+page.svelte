@@ -151,7 +151,7 @@
                 text += `${names.join('\n')}\n${dir}> `;
             }
         } else if (newText == "clear") {
-            await OPFS.clearLibrary();
+            await clearLibrary();
             text += "Library cleared\n" + dir + "> ";
             getLength();
         } else if (newText == "exit") {
@@ -191,6 +191,11 @@
         }
     }
 
+    function clearLibrary() {
+        OPFS.clearLibrary();
+        getLength();
+    }
+
     let devMode = false;
     let showLogging = false;
 </script>
@@ -203,7 +208,7 @@
         {:else}
             <Button variant="secondary" on:click={() => createLibrary() }>Import Music</Button>
         {/if}
-        <Button variant="destructive" on:click={() => OPFS.clearLibrary() }>Clear Library</Button>
+        <Button variant="destructive" on:click={() => clearLibrary() }>Clear Library</Button>
     </div>
 </div>
 
