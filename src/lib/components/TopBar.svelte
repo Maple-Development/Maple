@@ -5,7 +5,8 @@
 		DiscAlbum,
 		ListMusic,
 		SquareUser,
-		Search
+		Search,
+		AudioLines
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
@@ -16,6 +17,7 @@
 	import type { Album } from "$lib/types/album";
 	import type { Artist } from "$lib/types/artist";
 	import type { Playlist } from "$lib/types/playlist";
+	import { page } from '$app/stores';  
 	import TrackWrapper from './TrackWrapper.svelte';
 	
 	let songs: Song[] = [];
@@ -54,21 +56,34 @@
 	<Command.Input placeholder="Search for recent items, or type a page name." />
 	<Command.List>
 		<Command.Empty>No results found.</Command.Empty>
-		<Command.Group heading="Recent items">
-			<Command.Item>
-				<SquareUser class="mr-2 h-4 w-4" />
-				<span>Nirvana</span>
-			</Command.Item>
-			<Command.Item>
-				<SquareUser class="mr-2 h-4 w-4" />
-				<span>Kendrick Lamar</span>
-			</Command.Item>
-			<Command.Item>
-				<DiscAlbum class="mr-2 h-4 w-4" />
-				<span>Damn.</span>
-			</Command.Item>
+		<Command.Group heading="Go To">
+			<a class="pointer" href='/tracks'>
+				<Command.Item>
+					<AudioLines class="mr-2 h-4 w-4" />
+					<span>Tracks</span>
+				</Command.Item>
+			</a>
+			<a class="pointer" href='/albums'>
+				<Command.Item>
+					<DiscAlbum class="mr-2 h-4 w-4" />
+					<span>Albums</span>
+				</Command.Item>
+			</a>
+			<a class="pointer" href='/artists'>
+				<Command.Item>
+					<SquareUser class="mr-2 h-4 w-4" />
+					<span>Artists</span>
+				</Command.Item>
+			</a>
+			<a class="pointer" href='/playlists'>
+				<Command.Item>
+					<ListMusic class="mr-2 h-4 w-4" />
+					<span>Playlists</span>
+				</Command.Item>
+			</a>
 		</Command.Group>
 		<Command.Separator />
+		{#if $page.url.pathname  == '/tracks'}
 		<Command.Group heading="Tracks">
 			{#each songs as track}
 				<TrackWrapper {track} tracks={songs}>
@@ -80,6 +95,8 @@
 			{/each}
 		</Command.Group>
 		<Command.Separator />
+		{/if}
+		{#if $page.url.pathname  == '/albums'}
 		<Command.Group heading="Albums">
 			{#each albums as album}
 				<a class="pointer" href={`/album?album=${album.id}`}>
@@ -91,6 +108,8 @@
 			{/each}
 		</Command.Group>
 		<Command.Separator />
+		{/if}
+		{#if $page.url.pathname  == '/artists'}
 		<Command.Group heading="Artists">
 			{#each artists as artist}
 				<a class="pointer" href={`/artist?artist=${artist.id}`}>
@@ -102,6 +121,8 @@
 			{/each}
 		</Command.Group>
 		<Command.Separator />
+		{/if}
+		{#if $page.url.pathname  == '/playlists'}
 		<Command.Group heading="Playlists">
 			{#each playlists as playlist}
 				<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
@@ -112,5 +133,6 @@
 				</a>
 			{/each}
 		</Command.Group>
+		{/if}
 	</Command.List>
 </Command.Dialog>

@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
 
+export const searchType = writable('tracks');
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
 export const collapsed = writable(false);
