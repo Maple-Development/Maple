@@ -8,7 +8,7 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
-    import { Input } from "$lib/components/ui/input/index.js";
+    import { page } from '$app/stores';
     import { context, title } from "$lib/store";
      // @ts-ignore
      import Lazy from 'svelte-lazy';
@@ -24,7 +24,8 @@
     let changedArtist = "";
     let changedYear = "";
     let imageFile: Blob | null = null;
-
+    $: params =  new URLSearchParams($page.url.search);
+    $: { refresh(params.get('album') ?? '') }
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
         albumName = params.get('album') ?? '';
@@ -52,6 +53,32 @@
         changedArtist = album?.artist?.toString() ?? "";
         changedYear = album?.year?.toString() ?? "";
     })
+
+    async function refresh(albumName: string) {
+        album = await OPFS.get().album(albumName);  
+        await sortTracks();
+        // sort disks
+        const diskMap: { [disk: number]: Song[] } = {};
+        for (const track of tracks) {
+            const disk = track.disk ?? 1;
+            if (!diskMap[disk]) {
+                diskMap[disk] = [];
+            }
+            diskMap[disk].push(track);
+        }
+        alldisks = Object.values(diskMap).map(diskTracks => 
+            diskTracks.sort((a, b) => a.trackNumber - b.trackNumber)
+        );
+
+        disks = alldisks.length;
+        tracks = alldisks.flat();
+
+        title.set(album?.name ?? "Unknown Album");
+
+        changedName = album?.name?.toString() ?? "";
+        changedArtist = album?.artist?.toString() ?? "";
+        changedYear = album?.year?.toString() ?? "";
+    }
 
     async function sortTracks() {
         if (album && album.tracks) {
@@ -232,7 +259,7 @@
 
 
 {#if listType !== "grid"}
-<div class="flex flex-col gap-y-8 ml-16 my-5">
+    <div class="flex flex-col gap-y-8 ml-16 my-5">
         {#if alldisks.length > 1 && sort === "track"}
             {#each alldisks as disk, diskIndex}
                 {#if diskIndex > 0}

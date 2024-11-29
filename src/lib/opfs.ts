@@ -9,6 +9,7 @@ import { file, dir, write } from 'opfs-tools';
 import type { Song } from '$lib/types/song';
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
+import type { Playlist } from './types/playlist';
 import { toast } from "svelte-sonner";
 import { activeSong } from './store';
 
@@ -16,6 +17,7 @@ export class OPFS {
     private static albumsCache: Album[] | null = null;
     private static artistsCache: Artist[] | null = null;
     private static tracksCache: Song[] | null = null;
+    private static playlistsCache: Playlist[] | null = null;
   
     private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
       if (cache) return cache;
@@ -156,6 +158,20 @@ export class OPFS {
         return new Response(audioArrayBuffer);
     }
 
+    public static async addPlaylist(playlist: Playlist) {
+      if (!this.playlistsCache) {
+        this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
+      }
+
+      const imageFileName = `${playlist.id}.image`;
+      const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
+      await write(`/images/${imageFileName}`, imageArrayBuffer);
+      playlist.image = `/images/${imageFileName}`;
+
+      this.playlistsCache.push(playlist);
+      await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+    }
+
     public static get = () => ({
       tracks: async () => { 
         if (!this.tracksCache) {
@@ -202,6 +218,20 @@ export class OPFS {
       image: async (image: string) => {
         const imageArrayBuffer = await file(`${image}`).arrayBuffer();
         return new Response(imageArrayBuffer);
+      },
+
+      playlists: async () => {
+        if (!this.playlistsCache) {
+          this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
+        }
+        return this.playlistsCache;
+      },
+
+      playlist: async (id: string) => {
+        if (!this.playlistsCache) {
+          this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
+        }
+        return this.playlistsCache.find((p) => p.id === id);
       }
     });
 
@@ -241,6 +271,20 @@ export class OPFS {
             this.artistsCache[index] = artist;
             await this.writeCache('/artists/artists.json', this.artistsCache);
             console.log(artist);
+          }
+        }
+    });
+
+    public static playlist = () => ({
+        edit: async (playlist: Playlist) => {
+          if (!this.playlistsCache) {
+            this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
+          }
+          const index = this.playlistsCache.findIndex((p) => p.id === playlist.id);
+          if (index !== -1) {
+            this.playlistsCache[index] = playlist;
+            await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+            console.log(playlist);
           }
         }
     });
