@@ -1,7 +1,7 @@
 <script lang="ts">
     import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
-    import type { Artist } from "$lib/types/artist";
+    import type { Playlist } from "$lib/types/playlist";
     import type { Song } from "$lib/types/song";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil } from "lucide-svelte";
@@ -13,51 +13,56 @@
      // @ts-ignore
      import Lazy from 'svelte-lazy';
 
-    let artistName: string;
-    let artist: Artist | undefined;
+    let playlistName: string;
+    let playlist: Playlist | undefined;
     let tracks: Song[] = [];
     let listType = "list";
     let editModeOn = false;
     let changedName = "";
+    let changedDescription = "";
     let imageFile: Blob | null = null;
     $: params =  new URLSearchParams($page.url.search);
-    $: { refresh(params.get('artist') ?? '') }
+    $: { refresh(params.get('playlist') ?? '') }
     onMount(async () => {
         let params = new URLSearchParams(document.location.search);
-        artistName = params.get('artist') ?? '';
-        artist = await OPFS.get().artist(artistName);  
+        playlistName = params.get('playlist') ?? '';
+        playlist = await OPFS.get().playlist(playlistName);  
+        console.log(playlist);
         sortTracks();
-        if (artist && artist.name) {
-        title.set(artist.name);
+        if (playlist && playlist.name) {
+        title.set(playlist.name);
         } else {
-            title.set("Unknown Artist");
+            title.set("Unknown playlist");
         }
 
-        changedName = artist?.name?.toString() ?? "";
+        changedName = playlist?.name?.toString() ?? "";
+        changedDescription = playlist?.description?.toString() ?? "";
     })
 
-    async function refresh(artistName: string) {
-        artist = await OPFS.get().artist(artistName);  
+    async function refresh(playlistName: string) {
+        playlist = await OPFS.get().playlist(playlistName);  
         sortTracks();
-        if (artist && artist.name) {
-        title.set(artist.name);
+        if (playlist && playlist.name) {
+        title.set(playlist.name);
         } else {
-            title.set("Unknown Artist");
+            title.set("Unknown playlist");
         }
 
-        changedName = artist?.name?.toString() ?? "";
+        changedName = playlist?.name?.toString() ?? "";
     }
 
     async function sortTracks() {
-        if (artist && artist.tracks) {
+        if (playlist && playlist.tracks) {
             const newTracks: Song[] = [];
-            for (const track of artist.tracks) {
+            for (const track of playlist.tracks) {
                 const trackData = await OPFS.get().track(track as string);
+                console.log(trackData);
                 if (trackData) {
                     newTracks.push(trackData);
                 }
             }
             tracks = newTracks; // trigger re-render
+            console.log(tracks);
         }
     }
 
@@ -74,7 +79,7 @@
     let sort = "title";
     let ascending = true;
 
-    async function sortArtists(s: string) {
+    async function sortplaylists(s: string) {
         sort = s;
         if (s === "title") {
             tracks = tracks.sort((a, b) => ascending ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
@@ -91,7 +96,7 @@
 
     function swapAscending() {
         ascending = !ascending;
-        sortArtists(sort);
+        sortplaylists(sort);
     }
 
     function formatDuration(duration: number): string {
@@ -112,18 +117,18 @@
     async function editMode() {
         editModeOn = !editModeOn; 
 
-        if (!editModeOn && artist) {
+        if (!editModeOn && playlist) {
             const doImage = imageFile !== null;
-            const modifiedartist: Artist = {
-                id: artist.id,
+            const modifiedplaylist: Playlist = {
+                id: playlist.id,
                 name: changedName,
-                image: doImage ? imageFile : artist.image,
-                tracks: artist.tracks,
-                albums: artist.albums
+                description: changedDescription,
+                image: doImage ? imageFile : playlist.image,
+                tracks: playlist.tracks,
             };
-            OPFS.artist().edit(modifiedartist);
-            let newartist = await OPFS.get().artist(modifiedartist.id.toString());
-            artist = newartist;
+            OPFS.playlist().edit(modifiedplaylist);
+            let newplaylist = await OPFS.get().playlist(modifiedplaylist.id.toString());
+            playlist = newplaylist;
         }
     }
 
@@ -144,12 +149,12 @@
 <div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
     <div class="flex">
         <div>
-        {#await getImageUrl(artist?.image) then image}
+        {#await getImageUrl(playlist?.image) then image}
             {#if editModeOn}
             <input type="file" id="files" class="block w-full px-2 py-1 border-2 border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500" accept="image/*" multiple on:change={(e) => handlePhotoChange(e) } />
             {:else}
             {#if image !== ""}
-              <img class="h-64 w-64 rounded-sm" src={image} alt={artist?.name?.toString() ?? ''} />
+              <img class="h-64 w-64 rounded-sm" src={image} alt={playlist?.name?.toString() ?? ''} />
             {:else}
               <div class="h-52 w-52 bg-gray-500 rounded-[50%] animate-pulse"></div>
             {/if}
@@ -161,9 +166,11 @@
         <div class="flex flex-col items-start ml-7">
             <div class="flex flex-col items-start">
                 {#if editModeOn}
-                <h1 bind:innerHTML={changedName} contenteditable="true" class="text-foreground text-2xl font-bold leading-none mb-1 underline border p-1 rounded-sm border-1">{artist?.name}</h1>
+                <h1 bind:innerHTML={changedName} contenteditable="true" class="text-foreground text-2xl font-bold leading-none mb-1 underline border p-1 rounded-sm border-1">{playlist?.name}</h1>
+                <h1 bind:innerHTML={changedDescription} contenteditable="true" class="text-slate-400 text-base font-light leading-none mb-1 underline border p-1 rounded-sm border-1">{playlist?.description}</h1>
                 {:else}
-                <h1 class="text-foreground text-2xl font-bold leading-none mb-1">{artist?.name}</h1>
+                <h1 class="text-foreground text-2xl font-bold leading-none mb-1">{playlist?.name}</h1>
+                <h1 class="text-slate-400 text-base font-light leading-none mb-1">{playlist?.description}</h1>
                 {/if}
             </div>
         </div>
@@ -200,7 +207,7 @@
                 <DropdownMenu.Label>Sort By</DropdownMenu.Label>
                 <DropdownMenu.Separator />
                 <DropdownMenu.RadioGroup bind:value={sort}>
-                  <DropdownMenu.RadioItem value="title" on:click={() => sortArtists("name")}>Name</DropdownMenu.RadioItem>
+                  <DropdownMenu.RadioItem value="title" on:click={() => sortplaylists("name")}>Name</DropdownMenu.RadioItem>
                 </DropdownMenu.RadioGroup>
             </DropdownMenu.Content>
         </DropdownMenu.Root>

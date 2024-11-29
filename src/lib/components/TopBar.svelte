@@ -93,7 +93,7 @@
 		<Command.Separator />
 		<Command.Group heading="Artists">
 			{#each artists as artist}
-				<a class="pointer" href={`/album?album=${artist.id}`}>
+				<a class="pointer" href={`/artist?artist=${artist.id}`}>
 					<Command.Item>
 						<SquareUser class="mr-2 h-4 w-4" />
 						<span>{artist.name.replace(/["\[\]]/g, '')}</span>
@@ -104,7 +104,7 @@
 		<Command.Separator />
 		<Command.Group heading="Playlists">
 			{#each playlists as playlist}
-				<a class="pointer" href={`/album?album=${playlist.id}`}>
+				<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
 					<Command.Item>
 						<ListMusic class="mr-2 h-4 w-4" />
 						<span>{playlist.name.replace(/["\[\]]/g, '')}</span>
