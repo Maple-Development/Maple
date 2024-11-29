@@ -72,40 +72,44 @@
 		<Command.Group heading="Tracks">
 			{#each songs as track}
 				<TrackWrapper {track} tracks={songs}>
-				<Command.Item>
-					<DiscAlbum class="mr-2 h-4 w-4" />
-					<span>{track.title.replace(/["\[\]]/g, '')}</span>
-				</Command.Item>
+					<Command.Item>
+						<DiscAlbum class="mr-2 h-4 w-4" />
+						<span>{track.title.replace(/["\[\]]/g, '')}</span>
+					</Command.Item>
 				</TrackWrapper>
 			{/each}
 		</Command.Group>
 		<Command.Separator />
 		<Command.Group heading="Albums">
 			{#each albums as album}
-			<a class="pointer" href={`/album?album=${album.id}`}>
-				<Command.Item>
-					<DiscAlbum class="mr-2 h-4 w-4" />
-					<span>{album.name.replace(/["\[\]]/g, '')}</span>
-				</Command.Item>
-			</a>
+				<a class="pointer" href={`/album?album=${album.id}`}>
+					<Command.Item>
+						<DiscAlbum class="mr-2 h-4 w-4" />
+						<span>{album.name.replace(/["\[\]]/g, '')}</span>
+					</Command.Item>
+				</a>
 			{/each}
 		</Command.Group>
 		<Command.Separator />
 		<Command.Group heading="Artists">
 			{#each artists as artist}
-				<Command.Item>
-					<SquareUser class="mr-2 h-4 w-4" />
-					<span>{artist.name.replace(/["\[\]]/g, '')}</span>
-				</Command.Item>
+				<a class="pointer" href={`/album?album=${artist.id}`}>
+					<Command.Item>
+						<SquareUser class="mr-2 h-4 w-4" />
+						<span>{artist.name.replace(/["\[\]]/g, '')}</span>
+					</Command.Item>
+				</a>
 			{/each}
 		</Command.Group>
 		<Command.Separator />
 		<Command.Group heading="Playlists">
 			{#each playlists as playlist}
-				<Command.Item>
-					<ListMusic class="mr-2 h-4 w-4" />
-					<span>{playlist.name.replace(/["\[\]]/g, '')}</span>
-				</Command.Item>
+				<a class="pointer" href={`/album?album=${playlist.id}`}>
+					<Command.Item>
+						<ListMusic class="mr-2 h-4 w-4" />
+						<span>{playlist.name.replace(/["\[\]]/g, '')}</span>
+					</Command.Item>
+				</a>
 			{/each}
 		</Command.Group>
 	</Command.List>
