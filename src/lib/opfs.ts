@@ -252,6 +252,17 @@ export class OPFS {
             await this.writeCache('/albums/albums.json', this.albumsCache);
             console.log(album);
           }
+        },
+
+        delete: async (album: Album) => {
+          if (!this.albumsCache) {
+            this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
+          }
+          const index = this.albumsCache.findIndex((a) => a.id === album.id);
+          if (index !== -1) {
+            this.albumsCache.splice(index, 1);
+            await this.writeCache('/albums/albums.json', this.albumsCache);
+          }
         }
     });
 
@@ -272,6 +283,17 @@ export class OPFS {
             await this.writeCache('/artists/artists.json', this.artistsCache);
             console.log(artist);
           }
+        },
+
+        delete: async (artist: Artist) => {
+          if (!this.artistsCache) {
+            this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
+          }
+          const index = this.artistsCache.findIndex((a) => a.id === artist.id);
+          if (index !== -1) {
+            this.artistsCache.splice(index, 1);
+            await this.writeCache('/artists/artists.json', this.artistsCache);
+          }
         }
     });
 
@@ -285,6 +307,17 @@ export class OPFS {
             this.playlistsCache[index] = playlist;
             await this.writeCache('/playlists/playlists.json', this.playlistsCache);
             console.log(playlist);
+          }
+        },
+
+        delete: async (playlist: Playlist) => {
+          if (!this.playlistsCache) {
+            this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
+          }
+          const index = this.playlistsCache.findIndex((p) => p.id === playlist.id);
+          if (index !== -1) {
+            this.playlistsCache.splice(index, 1);
+            await this.writeCache('/playlists/playlists.json', this.playlistsCache);
           }
         }
     });

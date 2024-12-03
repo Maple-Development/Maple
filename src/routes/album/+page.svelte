@@ -3,13 +3,16 @@
     import { onMount } from "svelte";
     import type { Album } from "$lib/types/album";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check, Trash } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { page } from '$app/stores';
     import { context, title } from "$lib/store";
+    //@ts-ignore
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { goto } from "$app/navigation";
      // @ts-ignore
      import Lazy from 'svelte-lazy';
 
@@ -179,6 +182,15 @@
             };
         }
     }
+
+    function deleteAlbum() {
+        if (album) {
+            OPFS.album().delete(album);
+            goto('/albums');
+        } else {
+            console.error("Album not found");
+        }
+    }
 </script>
 
 <div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
@@ -221,8 +233,29 @@
                 <Pencil size={20} color="white" />
             {/if}
         </Button>
+        <AlertDialog.Root>
+            <AlertDialog.Trigger>
+                <Button class="my-1 ml-3 h-10 w-10 px-1" variant="destructive">
+                    <Trash size={20} color="white" />
+                </Button>
+            </AlertDialog.Trigger>
+            <AlertDialog.Content>
+              <AlertDialog.Header>
+                <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+                <AlertDialog.Description>
+                  This action cannot be undone. This will NOT delete the tracks within the album, only the album itself.
+                </AlertDialog.Description>
+              </AlertDialog.Header>
+              <AlertDialog.Footer>
+                <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+                <AlertDialog.Action on:click={() => deleteAlbum()}>Continue</AlertDialog.Action>
+              </AlertDialog.Footer>
+            </AlertDialog.Content>
+        </AlertDialog.Root>
     </div>
 </div>
+
+
 <Separator class="w-[95%] ml-14 mb-4 mt-1 pr-20"></Separator>
 <div class="mt-4 h-10 px-5 flex justify-end border-gray-600 mx-4">
     <div class="flex items-center">

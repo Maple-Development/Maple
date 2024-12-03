@@ -4,11 +4,14 @@
     import type { Artist } from "$lib/types/artist";
     import type { Song } from "$lib/types/song";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil, Trash } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { context, title } from "$lib/store";
     import { Separator } from "$lib/components/ui/separator/index.js";
+    //@ts-ignore
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { goto } from "$app/navigation";
     import { page } from '$app/stores';
      // @ts-ignore
      import Lazy from 'svelte-lazy';
@@ -139,6 +142,15 @@
             };
         }
     }
+
+    function deleteArtist() {
+        if (artist) {
+            OPFS.artist().delete(artist);
+            goto('/artists');
+        } else {
+            console.error("Artist not found");
+        }
+    }
 </script>
 
 <div class="mt-4 h-fit px-10 justify-between flex p-5 border-gray-600 rounded-md">
@@ -176,6 +188,25 @@
                 <Pencil size={20} color="white" />
             {/if}
         </Button>
+        <AlertDialog.Root>
+            <AlertDialog.Trigger>
+                <Button class="my-1 ml-3 h-10 w-10 px-1" variant="destructive">
+                    <Trash size={20} color="white" />
+                </Button>
+            </AlertDialog.Trigger>
+            <AlertDialog.Content>
+              <AlertDialog.Header>
+                <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+                <AlertDialog.Description>
+                  This action cannot be undone. This will NOT delete the artist's tracks, only the artist page itself.
+                </AlertDialog.Description>
+              </AlertDialog.Header>
+              <AlertDialog.Footer>
+                <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+                <AlertDialog.Action on:click={() => deleteArtist()}>Continue</AlertDialog.Action>
+              </AlertDialog.Footer>
+            </AlertDialog.Content>
+        </AlertDialog.Root>
     </div>
 </div>
 <Separator class="w-[95%] ml-14 mb-4 mt-1 pr-20"></Separator>
