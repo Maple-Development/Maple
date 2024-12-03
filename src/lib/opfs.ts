@@ -321,4 +321,17 @@ export class OPFS {
           }
         }
     });
+
+    public static track = () => ({
+        delete: async (track: Song) => {
+          if (!this.tracksCache) {
+            this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
+          }
+          const index = this.tracksCache.findIndex((t) => t.id === track.id);
+          if (index !== -1) {
+            this.tracksCache.splice(index, 1);
+            await this.writeCache('/tracks/tracks.json', this.tracksCache);
+          }
+        }
+    });
   }

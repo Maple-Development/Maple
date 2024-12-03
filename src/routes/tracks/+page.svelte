@@ -2,13 +2,14 @@
     import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
     import type { Song } from "$lib/types/song";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, List } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
+	import { goto } from "$app/navigation";
 
     let tracks: Song[] = [];
 
@@ -70,6 +71,16 @@
             listType = "list";
         }
     }
+
+    async function deleteTrack(track: Song) {
+        if (track) {
+            OPFS.track().delete(track);
+            tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+            sortTracks(sort);
+        } else {
+            console.error("Album not found");
+        }
+    }
 </script>
 
 <div class="w-full mt-4 h-10 px-10 flex justify-end">
@@ -112,7 +123,7 @@
             {#await getImageUrl(track.image) then image}
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <!-- svelte-ignore a11y-missing-attribute -->
-            <TrackWrapper track={track} tracks={tracks}>
+            <TrackWrapper className=""  track={track} tracks={tracks}>
                 <Lazy keep={true}>
                     <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
                 </Lazy>
@@ -130,28 +141,47 @@
         {/each}
     </div>
     {:else}
-    <div class="flex flex-col mx-4 mb-5 mt-2" >
-      {#each tracks as track}
-      <TrackWrapper track={track} tracks={tracks}>
-        <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm">
-          {#await getImageUrl(track.image) then image}
-            <Lazy keep={true}>
-                <img class="h-24 w-24 mr-4" src={image} alt={track.title} />
-            </Lazy>
-          {:catch error}
-            <div class="h-24 w-24 bg-gray-500 mr-4"></div>
-          {/await}
-          <div class="flex flex-col items-start flex-grow">
-            <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
-            <h1 class="text-slate-400 text-base font-light leading-none">{track.artist}</h1>
-          </div>
-          <div class="flex flex-col items-end text-right ml-4">
-            <h1 class="text-slate-400 text-base font-light leading-none">{formatDuration(track.duration)}</h1>
-            <h1 class="text-slate-400 text-base font-light leading-none">{track.album}</h1>
-          </div>
+    <div class="flex flex-col mx-4 mb-5 mt-2">
+    {#each tracks as track}
+        <div class="flex w-full">
+        <TrackWrapper className="flex-grow"  track={track} tracks={tracks}>
+            <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm w-full">
+            {#await getImageUrl(track.image) then image}
+                <Lazy keep={true}>
+                    <img class="h-24 w-24 mr-4" src={image} alt={track.title} />
+                </Lazy>
+            {:catch error}
+                <div class="h-24 w-24 bg-gray-500 mr-4"></div>
+            {/await}
+            <div class="flex flex-col items-start flex-grow">
+                <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
+                <h1 class="text-slate-400 text-base font-light leading-none">{track.artist}</h1>
+            </div>
+            <div class="flex flex-row items-center text-right ml-4">
+                <div class="flex flex-col">
+                <h1 class="text-slate-400 text-base font-light leading-none">{formatDuration(track.duration)}</h1>
+                <h1 class="text-slate-400 text-base font-light leading-none">{track.album}</h1>
+                <h1 class="text-slate-400 text-base font-light leading-none">{track.year}</h1>
+                </div>
+            </div>
+            </div>
+        </TrackWrapper>
+        <div class="flex items-center ml-2">
+            <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild let:builder>
+                    <Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+                        <EllipsisVertical size={20} color="white" />
+                    </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content class="w-56">
+                  <DropdownMenu.Label>Options</DropdownMenu.Label>
+                  <DropdownMenu.Separator />
+                  <DropdownMenu.Item on:click={() => deleteTrack(track)}>Delete</DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
         </div>
-    </TrackWrapper>
-      {/each}
+        </div>
+    {/each}
     </div>
   {/if}
  

@@ -86,7 +86,7 @@
 		{#if $page.url.pathname  == '/tracks'}
 		<Command.Group heading="Tracks">
 			{#each songs as track}
-				<TrackWrapper {track} tracks={songs}>
+				<TrackWrapper className=""  {track} tracks={songs}>
 					<Command.Item>
 						<DiscAlbum class="mr-2 h-4 w-4" />
 						<span>{track.title.replace(/["\[\]]/g, '')}</span>

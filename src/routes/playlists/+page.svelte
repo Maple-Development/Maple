@@ -10,6 +10,7 @@
     import { onMount } from "svelte";
     import * as Drawer from "$lib/components/ui/drawer/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
+    import { title } from "$lib/store";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
 
@@ -37,6 +38,7 @@
         changedName = newPlaylist.name;
         changedDescription = newPlaylist.description;
         playlists = await OPFS.get().playlists();
+        title.set("Playlists");
     });
 
     async function getImageUrl(imagePath: string): Promise<string> {

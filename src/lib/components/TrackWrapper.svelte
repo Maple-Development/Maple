@@ -4,6 +4,7 @@
     import Controls from "./controls.svelte";
     export let track: Song;
     export let tracks: Song[];
+    export let className: string;
 
     let controls: Controls;
 
@@ -14,7 +15,7 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div on:click={() => playSong(track)}>
+<div class={className} on:click={() => playSong(track)}>
   <slot />
 </div>
 

@@ -254,7 +254,7 @@
         {#each tracks as track}
             <div class="flex flex-col items-start">
                 {#await getImageUrl(track.image) then image}
-                <TrackWrapper track={track} tracks={tracks}>
+                <TrackWrapper className=""  track={track} tracks={tracks}>
                   <Lazy keep={true}>
                     <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
                   </Lazy>
@@ -274,7 +274,7 @@
     {:else}
     <div class="flex flex-col mx-4 mb-5 mt-2" >
       {#each tracks as track}
-      <TrackWrapper track={track} tracks={tracks}>
+      <TrackWrapper className=""  track={track} tracks={tracks}>
         <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm">
           {#await getImageUrl(track.image) then image}
           <Lazy keep={true}>
@@ -290,6 +290,7 @@
           <div class="flex flex-col items-end text-right ml-4">
             <h1 class="text-slate-400 text-base font-light leading-none">{formatDuration(track.duration)}</h1>
             <h1 class="text-slate-400 text-base font-light leading-none">{track.album}</h1>
+            <h1 class="text-slate-400 text-base font-light leading-none">{track.year}</h1>
           </div>
         </div>
     </TrackWrapper>
