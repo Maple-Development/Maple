@@ -35,12 +35,12 @@
                             const metadata = await parseBlob(file);
                             const track: Song = {
                                 id: uuidv4(),
-                                title: metadata.common.title,
-                                artist: metadata.common.artist,
-                                album: metadata.common.album,
-                                year: metadata.common.year,
-                                genre: metadata.common.genre,
-                                duration: metadata.format.duration,
+                                title: metadata.common.title || file.name.split('.').slice(0, -1).join('.'),
+                                artist: metadata.common.artist || 'Unknown Artist',
+                                album: metadata.common.album || 'Unknown Album',
+                                year: metadata.common.year || 0,
+                                genre: metadata.common.genre || 'Unknown Genre',
+                                duration: metadata.format.duration || 0,
                                 image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
                                 trackNumber: metadata.common.track.no,
                                 disk: metadata.common.disk.no,
@@ -49,16 +49,16 @@
 
                             const album: Album = {
                                 id: uuidv4(),
-                                name: metadata.common.album,
-                                artist: metadata.common.artist,
-                                year: metadata.common.year,
-                                genre: metadata.common.genre,
+                                name: metadata.common.album || 'Unknown Album',
+                                artist: metadata.common.artist || 'Unknown Artist',
+                                year: metadata.common.year || 0,
+                                genre: metadata.common.genre || 'Unknown Genre',
                                 image: metadata.common.picture ? new Blob([metadata.common.picture[0].data], { type: metadata.common.picture[0].format }) : undefined,
                             }
 
                             const artist: Artist = {
                                 id: uuidv4(),
-                                name: metadata.common.artist,
+                                name: metadata.common.artist || 'Unknown Artist',
                             }
 
                             await OPFS.addAlbum(album, track.id);
