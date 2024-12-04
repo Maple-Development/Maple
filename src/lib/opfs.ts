@@ -339,6 +339,18 @@ export class OPFS {
             this.tracksCache.splice(index, 1);
             await this.writeCache('/tracks/tracks.json', this.tracksCache);
           }
+        },
+
+      addToPlaylist: async (track: Song, playlist: Playlist) => {
+        if (!this.playlistsCache) {
+          this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
         }
+        const playlistIndex = this.playlistsCache.findIndex((p) => p.id === playlist.id);
+      
+        if (playlistIndex !== -1) {
+          this.playlistsCache[playlistIndex].tracks?.push(track.id);
+          await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+        }
+      }
     });
   }

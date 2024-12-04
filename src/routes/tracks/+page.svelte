@@ -2,18 +2,22 @@
     import { OPFS } from "$lib/opfs";
     import { onMount } from "svelte";
     import type { Song } from "$lib/types/song";
+    import type { Playlist } from "$lib/types/playlist";
     import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
+    import { toast } from "svelte-sonner";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
 
     let tracks: Song[] = [];
+    let playlists: Playlist[] = [];
 
     onMount(async () => {
         tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+        playlists = await OPFS.get().playlists();
         title.set("Tracks");
     });
 
@@ -78,6 +82,13 @@
             sortTracks(sort);
         } else {
             console.error("Album not found");
+        }
+    }
+
+    async function addTrackToPlaylist(track: Song, playlist: Playlist) {
+        if (track && playlist) {
+            OPFS.track().addToPlaylist(track, playlist);
+            toast.success(`Added ${track.title} to ${playlist.name}`);
         }
     }
 </script>
@@ -176,6 +187,24 @@
                   <DropdownMenu.Label>Options</DropdownMenu.Label>
                   <DropdownMenu.Separator />
                   <DropdownMenu.Item on:click={() => deleteTrack(track)}>Delete</DropdownMenu.Item>
+                  <DropdownMenu.Sub>
+                    <DropdownMenu.SubTrigger>
+                      <span>Add to Playlist</span>
+                    </DropdownMenu.SubTrigger>
+                    <DropdownMenu.SubContent side="left">
+                    {#if playlists.length > 0}
+                        {#each playlists as playlist}
+                        <DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
+                            <span>{playlist.name}</span>
+                        </DropdownMenu.Item>
+                        {/each}
+                    {:else}
+                        <DropdownMenu.Item disabled>
+                            <span>No Playlists</span>
+                        </DropdownMenu.Item>
+                    {/if}
+                    </DropdownMenu.SubContent>
+                  </DropdownMenu.Sub>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
         </div>
