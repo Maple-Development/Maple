@@ -156,10 +156,27 @@
             getLength();
         } else if (newText == "exit") {
             text = dir +"> ";
-        } else if (newText == "help") {
+        } else if (newText.startsWith("help")) {
+            let helpCmd = newText.split(' ')[1] || '';
             text += '\n';
-            text += "Welcome to the OPFS CLI!\n";
-            text += "Commands: ls, clear, exit, import, cd\n For more information, run the command with the -h flag\n" + dir + "> ";
+            if (helpCmd == 'ls') {
+                text += "This command lists the files in the selected directory, or if left blank, the current directory: 'ls (directory)'\n"  + dir + "> ";
+            } else if (helpCmd == 'clear') {
+                text += "This command clears the library. Use with caution: 'clear'\n"  + dir + "> ";
+            } else if (helpCmd == 'exit') {
+                text += "This command clears the terminal: 'exit'\n"  + dir + "> ";
+            } else if (helpCmd == 'import') {
+                text += "This command imports a library from your computer: 'import'\n"  + dir + "> ";
+            } else if (helpCmd == 'cd') {
+                text += "This command changes the current directory to the specified directory: 'cd [directory]'\n"  + dir + "> ";
+            } else if (helpCmd == 'download') {
+                text += "This command downloads a file from the library: 'download [filePath]'\n"  + dir + "> ";
+            } else if (helpCmd == 'help') {
+                text += "This command lists the available commands, and information about them: 'help [command]'\n"  + dir + "> ";
+            } else {
+                text += "Welcome to the OPFS CLI!\n";
+                text += "Commands: ls, clear, exit, import, cd, download, help\n For more information, type 'help [command]'\n" + dir + "> ";
+            }
         } else if (newText == "import") {
             await createLibrary();
             text += "Library imported\n" + dir + "> ";
@@ -172,6 +189,34 @@
                 dir = dir + '/';
             }
             text += "\n" + dir + "> ";
+        } else if (newText.startsWith("download")) {
+            let selectedDir = '';
+            let subdir = newText.split(' ')[1] || '';
+            if (!subdir.startsWith('/')) {
+                subdir = '/' + subdir;
+            }
+            if (dir === '' && subdir === '') {
+                selectedDir = '/';
+            } else if (dir === '') {
+                selectedDir = subdir;
+            } else {
+                selectedDir = dir + subdir;
+            }
+
+            const fileObj = await OPFS.downloadFile(selectedDir);
+            const file = fileObj[1];
+            const fileName = fileObj[0];
+            let type = file.type;
+            file.text().then((text) => {
+                const blob = new Blob([text], { type });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();  
+                URL.revokeObjectURL(url);
+            })
+            text += "Downloading " + selectedDir + "...\n" + dir + "> ";
         } else {
             text += "Command not found\n" + dir + "> ";
         }

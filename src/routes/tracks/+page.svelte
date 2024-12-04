@@ -9,7 +9,6 @@
     import { context, title } from "$lib/store";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
-	import { goto } from "$app/navigation";
 
     let tracks: Song[] = [];
 

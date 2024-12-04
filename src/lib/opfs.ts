@@ -266,6 +266,13 @@ export class OPFS {
         }
     });
 
+    public static async downloadFile(path: string) {
+      const fileArrayBuffer = await file(path).arrayBuffer();
+      let fileName = await file(path).name;
+      let returnArray = [fileName, new Response(fileArrayBuffer)];
+      return returnArray;
+    }
+
     public static artist = () => ({
         edit: async (artist: Artist) => {
           if (!this.artistsCache) {
