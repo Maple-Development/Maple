@@ -338,6 +338,29 @@ export class OPFS {
           if (index !== -1) {
             this.tracksCache.splice(index, 1);
             await this.writeCache('/tracks/tracks.json', this.tracksCache);
+            await file(`/tracks/${track.id}.${track.ext}`).remove();
+            await file(`/images/${track.id}.image`).remove();
+
+           async function removeTrackFromCollections(trackId: string, collections: any[], editFn: (item: any) => Promise<void>) {
+               for (const item of collections) {
+                   const index = item.tracks?.findIndex((t: string) => t === trackId);
+                   if (index !== undefined && index !== -1) {
+                       item.tracks?.splice(index, 1);
+                       await editFn(item);
+                   }
+               }
+           }
+           
+           const trackId = track.id;
+           
+           const albums: Album[] = await this.get().albums();
+           await removeTrackFromCollections(trackId, albums, this.album().edit);
+           
+           const artists: Artist[] = await this.get().artists();
+           await removeTrackFromCollections(trackId, artists, this.artist().edit);
+           
+           const playlists: Playlist[] = await this.get().playlists();
+           await removeTrackFromCollections(trackId, playlists, this.playlist().edit);
           }
         },
 

@@ -9,6 +9,7 @@
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
     import { toast } from "svelte-sonner";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
 
@@ -75,20 +76,28 @@
         }
     }
 
-    async function deleteTrack(track: Song) {
-        if (track) {
-            OPFS.track().delete(track);
-            tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
-            sortTracks(sort);
-        } else {
-            console.error("Album not found");
-        }
-    }
-
     async function addTrackToPlaylist(track: Song, playlist: Playlist) {
         if (track && playlist) {
             OPFS.track().addToPlaylist(track, playlist);
             toast.success(`Added ${track.title} to ${playlist.name}`);
+        }
+    }
+
+    let open = false;
+    let selectedSong: Song | null = null;
+
+    function openAlert(track: Song) {
+        open = true;
+        selectedSong = track;
+    }
+
+    async function deleteTrack() {
+        if (selectedSong) {
+            OPFS.track().delete(selectedSong);
+            tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+            sortTracks(sort);
+        } else {
+            console.error("Album not found");
         }
     }
 </script>
@@ -186,7 +195,7 @@
                 <DropdownMenu.Content class="w-56">
                   <DropdownMenu.Label>Options</DropdownMenu.Label>
                   <DropdownMenu.Separator />
-                  <DropdownMenu.Item on:click={() => deleteTrack(track)}>Delete</DropdownMenu.Item>
+                    <DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
                   <DropdownMenu.Sub>
                     <DropdownMenu.SubTrigger>
                       <span>Add to Playlist</span>
@@ -213,3 +222,19 @@
     </div>
   {/if}
  
+  <AlertDialog.Root bind:open>
+    <AlertDialog.Trigger>
+    </AlertDialog.Trigger>
+    <AlertDialog.Content>
+      <AlertDialog.Header>
+        <AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+        <AlertDialog.Description>
+          This action cannot be undone. This will COMPLETELY delete the track, and remove it from any playlists, albums or artist pages.
+        </AlertDialog.Description>
+      </AlertDialog.Header>
+      <AlertDialog.Footer>
+        <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+        <AlertDialog.Action on:click={() => deleteTrack()}>Continue</AlertDialog.Action>
+      </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>
