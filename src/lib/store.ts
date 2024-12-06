@@ -41,10 +41,10 @@ function createTitle() {
 	return {
 		subscribe,
 		set: (value: any) => {
-			set(`${value} • UMLA`);
+			set(`${value} • Maple`);
 		},
 		clear: () => {
-			set('UMLA');
+			set('Maple');
 		}
 	};
 }

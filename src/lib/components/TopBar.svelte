@@ -6,7 +6,9 @@
 		ListMusic,
 		SquareUser,
 		Search,
-		AudioLines
+		AudioLines,
+		Home,
+		Settings
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
@@ -63,6 +65,12 @@
 	<Command.List>
 		<Command.Empty>No results found.</Command.Empty>
 		<Command.Group heading="Go To">
+			<a class="pointer" href="/">
+				<Command.Item>
+					<Home class="mr-2 h-4 w-4" />
+					<span>Home</span>
+				</Command.Item>
+			</a>
 			<a class="pointer" href="/tracks">
 				<Command.Item>
 					<AudioLines class="mr-2 h-4 w-4" />
@@ -85,6 +93,12 @@
 				<Command.Item>
 					<ListMusic class="mr-2 h-4 w-4" />
 					<span>Playlists</span>
+				</Command.Item>
+			</a>
+			<a class="pointer" href="/settings">
+				<Command.Item>
+					<Settings class="mr-2 h-4 w-4" />
+					<span>Settings</span>
 				</Command.Item>
 			</a>
 		</Command.Group>

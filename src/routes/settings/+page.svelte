@@ -281,6 +281,7 @@
 		{/if}
 		<Button variant="destructive" on:click={() => clearLibrary()}>Clear Library</Button>
 	</div>
+	<h1 class="text-muted-foreground text-center text-sm">tip: you can upload as many different folders/files as you'd like.</h1>
 </div>
 
 <div class="mt-5 flex flex-col items-center justify-center space-x-2">

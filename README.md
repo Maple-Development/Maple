@@ -1,4 +1,4 @@
-# UMLA
+# Maple
 
 ## What's this project?
 
