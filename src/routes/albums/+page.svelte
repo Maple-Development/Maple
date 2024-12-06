@@ -1,141 +1,223 @@
 <script lang="ts">
-//@ts-nocheck
-    import { OPFS } from "$lib/opfs";
-    import { onMount } from "svelte";
-    import type { Album } from "$lib/types/album";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, List } from "lucide-svelte";
-    import Button from "$lib/components/ui/button/button.svelte";
-    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-    import { title } from "$lib/store";
-     // @ts-ignore
-     import Lazy from 'svelte-lazy';
+	import { OPFS } from '$lib/opfs';
+	import { onMount } from 'svelte';
+	import type { Album } from '$lib/types/album';
+	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from 'lucide-svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+    import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import { title } from '$lib/store';
+    import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	// @ts-ignore
+	import Lazy from 'svelte-lazy';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
 
+	let albums: Album[] = [];
 
-    let albums: Album[] = [];
+	onMount(async () => {
+		albums = (await OPFS.get().albums()).sort((a, b) => a.name.localeCompare(b.name));
+		title.set('Albums');
+	});
 
-    onMount(async () => {
-        albums = (await OPFS.get().albums()).sort((a, b) => a.name.localeCompare(b.name));
-        title.set("Albums");
-    });
+	async function getImageUrl(imagePath: string): Promise<string> {
+		const response = await OPFS.get().image(imagePath);
+		const arrayBuffer = await response.arrayBuffer();
+		const blob = new Blob([arrayBuffer]);
+		return URL.createObjectURL(blob);
+	}
 
-   async function getImageUrl(imagePath: string): Promise<string> {
-     const response = await OPFS.get().image(imagePath);
-     const arrayBuffer = await response.arrayBuffer();
-     const blob = new Blob([arrayBuffer]);
-     return URL.createObjectURL(blob);
-   }
+	let sort = 'title';
+	let ascending = true;
+	let listType = 'grid';
 
-    let sort = "title";
-    let ascending = true;
-    let listType = "grid";
+	async function sortAlbums(s: string) {
+		sort = s;
+		if (s === 'title') {
+			albums = albums.sort((a, b) =>
+				ascending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+			); // idk why I choose name instead of title but yeah
+		} else if (s === 'artist') {
+			albums = albums.sort((a, b) =>
+				ascending ? a.artist.localeCompare(b.artist) : b.artist.localeCompare(a.artist)
+			);
+		} else if (s === 'year') {
+			albums = albums.sort((a, b) => (ascending ? a.year - b.year : b.year - a.year));
+		}
+	}
 
-    async function sortAlbums(s: string) {
-        sort = s;
-        if (s === "title") {
-            albums = albums.sort((a, b) => ascending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)); // idk why I choose name instead of title but yeah
-        } else if (s === "artist") {
-            albums = albums.sort((a, b) => ascending ? a.artist.localeCompare(b.artist) : b.artist.localeCompare(a.artist));
-        } else if (s === "year") {
-            albums = albums.sort((a, b) => ascending ? a.year - b.year : b.year - a.year);
-        }
-    }
+	function swapAscending() {
+		ascending = !ascending;
+		sortAlbums(sort);
+	}
 
-    function swapAscending() {
-        ascending = !ascending;
-        sortAlbums(sort);
-    }
+	function formatDuration(duration: number): string {
+		const roundedDuration = Math.round(duration);
+		const minutes = Math.floor(roundedDuration / 60);
+		const seconds = roundedDuration % 60;
+		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+	}
 
-    function formatDuration(duration: number): string {
-      const roundedDuration = Math.round(duration);
-      const minutes = Math.floor(roundedDuration / 60);
-      const seconds = roundedDuration % 60;
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
+	function swapListType() {
+		if (listType === 'list') {
+			listType = 'grid';
+		} else {
+			listType = 'list';
+		}
+	}
 
-    function swapListType() {
-        if (listType === "list") {
-            listType = "grid";
-        } else {
-            listType = "list";
-        }
-    }
+    let isOpenAlert = false;
+	let selectedAlbum: Album | null = null;
+
+	function deleteAlbum() {
+		if (selectedAlbum) {
+			OPFS.artist().delete(selectedAlbum);
+			toast.success(`Playlist ${selectedAlbum.name} deleted successfully!`);
+			goto('/albums');
+		} else {
+			console.error('Playlist not found');
+		}
+	}
+
+	function openAlert(album: Album) {
+		selectedAlbum = album;
+		isOpenAlert = true;
+	}
 </script>
 
-<div class="w-full mt-4 h-10 px-10 flex justify-end">
-    {#if ascending}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-            <ArrowUpAZ size={20} color="white" />
-        </Button>
-    {:else}
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapAscending()}>
-            <ArrowDownZA size={20} color="white" />
-        </Button>
-    {/if}
-        <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild let:builder>
-                <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-                    <ListFilter size={20} color="white" />
-                </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content class="w-56">
-              <DropdownMenu.Label>Sort By</DropdownMenu.Label>
-              <DropdownMenu.Separator />
-              <DropdownMenu.RadioGroup bind:value={sort}>
-                  <DropdownMenu.RadioItem value="title" on:click={() => sortAlbums("title")}>Title</DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value="artist" on:click={() => sortAlbums("artist")}>Artist</DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value="year" on:click={() => sortAlbums("year")}>Year</DropdownMenu.RadioItem>
-                </DropdownMenu.RadioGroup>
-            </DropdownMenu.Content>
-        </DropdownMenu.Root>
-        <Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary" on:click={() => swapListType()}>
-            <List size={20} color="white" />
-        </Button>
+<div class="mt-4 flex h-10 w-full justify-end px-10">
+	{#if ascending}
+		<Button
+			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+			on:click={() => swapAscending()}
+		>
+			<ArrowUpAZ size={20} color="white" />
+		</Button>
+	{:else}
+		<Button
+			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+			on:click={() => swapAscending()}
+		>
+			<ArrowDownZA size={20} color="white" />
+		</Button>
+	{/if}
+	<DropdownMenu.Root>
+		<DropdownMenu.Trigger asChild let:builder>
+			<Button
+				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+				builders={[builder]}
+			>
+				<ListFilter size={20} color="white" />
+			</Button>
+		</DropdownMenu.Trigger>
+		<DropdownMenu.Content class="w-56">
+			<DropdownMenu.Label>Sort By</DropdownMenu.Label>
+			<DropdownMenu.Separator />
+			<DropdownMenu.RadioGroup bind:value={sort}>
+				<DropdownMenu.RadioItem value="title" on:click={() => sortAlbums('title')}
+					>Title</DropdownMenu.RadioItem
+				>
+				<DropdownMenu.RadioItem value="artist" on:click={() => sortAlbums('artist')}
+					>Artist</DropdownMenu.RadioItem
+				>
+				<DropdownMenu.RadioItem value="year" on:click={() => sortAlbums('year')}
+					>Year</DropdownMenu.RadioItem
+				>
+			</DropdownMenu.RadioGroup>
+		</DropdownMenu.Content>
+	</DropdownMenu.Root>
+	<Button
+		class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+		on:click={() => swapListType()}
+	>
+		<List size={20} color="white" />
+	</Button>
 </div>
 
 {#if listType !== 'list'}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-6 sm:gap-x-6 md:gap-x-8 lg:gap-x-10 xl:gap-x-12 ml-16 my-5">
-        {#each albums as album}
-            <div class="flex flex-col items-start">
-                {#await getImageUrl(album.image) then image}
-                    <a class="pointer" href={`/album?album=${album.id}`}>
-                        <Lazy keep={true}>
-                            <img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
-                        </Lazy>
-                    </a>
-                <div class="flex flex-row items-start">
-                    <div class="flex flex-col items-start h-full mt-4">
-                        <h1 class="text-foreground text-lg font-bold leading-none mb-1">{album.name}</h1>
-                        <h1 class="text-slate-400 text-base font-light leading-none p">{album.artist}</h1>
-                    </div>
-                </div>
-                {:catch error}
-                <div class="h-52 w-52 bg-gray-500 rounded-sm animate-pulse"></div>
-                {/await}
-            </div>
-        {/each}
-    </div>
+	<div
+		class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+	>
+		{#each albums as album}
+			<div class="flex flex-col items-start">
+				{#await getImageUrl(album.image) then image}
+                <ContextMenu type={'album'} on:delete={(e) => openAlert(album)}>
+					<a class="pointer" href={`/album?album=${album.id}`}>
+						<Lazy keep={true}>
+							<img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
+						</Lazy>
+					</a>
+                </ContextMenu>
+					<div class="flex flex-row items-start">
+						<div class="mt-4 flex h-full flex-col items-start">
+							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
+							<h1 class="p text-base font-light leading-none text-slate-400">{album.artist}</h1>
+						</div>
+					</div>
+				{:catch error}
+					<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
+				{/await}
+			</div>
+		{/each}
+	</div>
 {:else}
-    <div class="flex flex-col mx-4 mb-5 mt-2" >
-        {#each albums as album}
-        <a class="pointer" href={`/album?album=${album.id}`}>
-        <div class="flex flex-row items-center hover:bg-secondary py-2 px-2 rounded-sm">
-            {#await getImageUrl(album.image) then image}
-            <Lazy keep={true}>
-                <img class="h-24 w-24 mr-4" src={image} alt={album.name} />
-            </Lazy>
-            {:catch error}
-                <div class="h-24 w-24 bg-gray-500 mr-4"></div>
-            {/await}
-            <div class="flex flex-col items-start flex-grow">
-                <h1 class="text-foreground text-lg font-bold leading-none mb-1">{album.name}</h1>
-                <h1 class="text-slate-400 text-base font-light leading-none">{album.artist}</h1>
+	<div class="mx-4 mb-5 mt-2 flex flex-col">
+		{#each albums as album}
+          <div class="flex w-full">
+            <div class="flex-grow">
+              <a class="pointer" href={`/album?album=${album.id}`}>
+                <div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
+                  {#await getImageUrl(album.image) then image}
+                    <Lazy keep={true}>
+                      <img class="mr-4 h-24 w-24" src={image} alt={album.name} />
+                    </Lazy>
+                  {:catch error}
+                    <div class="mr-4 h-24 w-24 bg-gray-500"></div>
+                  {/await}
+                  <div class="flex flex-grow flex-col items-start">
+                    <h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
+                    <h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
+                  </div>
+                  <div class="ml-4 flex flex-col items-end text-right">
+                    <h1 class="text-base font-light leading-none text-slate-400">{album.year}</h1>
+                    <h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
+                  </div>
+                </div>
+              </a>
             </div>
-            <div class="flex flex-col items-end text-right ml-4">
-                <h1 class="text-slate-400 text-base font-light leading-none">{album.year}</h1>
-                <h1 class="text-slate-400 text-base font-light leading-none">{album.artist}</h1>
+            <div class="ml-2 flex items-center">
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild let:builder>
+                  <Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+                    <EllipsisVertical size={20} color="white" />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content class="w-56">
+                  <DropdownMenu.Label>Options</DropdownMenu.Label>
+                  <DropdownMenu.Separator />
+                  <DropdownMenu.Item on:click={() => openAlert(album)}>Delete</DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
             </div>
-        </div>
-        </a>
+          </div>
         {/each}
-    </div>
+	</div>
 {/if}
+
+
+<AlertDialog.Root bind:open={isOpenAlert}>
+	<AlertDialog.Trigger></AlertDialog.Trigger>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+			<AlertDialog.Description>
+				This action cannot be undone. This will COMPLETELY delete the playlist, it will NOT remove
+				the tracks within the playlist.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action on:click={() => deleteAlbum()}>Continue</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
