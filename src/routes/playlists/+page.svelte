@@ -48,6 +48,15 @@
 		title.set('Playlists');
 	});
 
+	async function refresh() {
+		playlists = [];
+		let newPlaylists = await OPFS.get().playlists();
+		songs = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+		changedName = newPlaylist.name;
+		changedDescription = newPlaylist.description;
+		playlists = newPlaylists;
+	}
+
 	async function getImageUrl(imagePath: string): Promise<string> {
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
@@ -73,7 +82,9 @@
 				newPlaylist = updatedPlaylist;
 			}
 			doCreate = false;
-		}
+			goto('/playlists');
+			refresh();
+		} 
 	}
 
 	function handlePhotoChange(event: Event) {
@@ -125,6 +136,7 @@
 			OPFS.playlist().delete(selectedPlaylist);
 			toast.success(`Playlist ${selectedPlaylist.name} deleted successfully!`);
 			goto('/playlists');
+			refresh();
 		} else {
 			console.error('Playlist not found');
 		}

@@ -76,25 +76,27 @@
 			<div class="flex flex-col items-start">
 				<Button
 					variant="link"
-					class="text-md mb-0 mt-5 h-fit p-0 px-0 py-0 font-bold underline-offset-1"
-					>{$activeSong.title || 'Unknown'}</Button
+					class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0"
 				>
+					{$activeSong.title || 'Unknown'}
+				</Button>
 				<Button
 					variant="link"
-					class="m-0 my-0 mt-[-0.5rem] h-3 p-0 px-0 py-0 text-sm font-normal underline-offset-1"
-					>{$activeSong.artist || 'Unknown'}</Button
+					class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0"
 				>
+					{$activeSong.artist || 'Unknown'}
+				</Button>
 			</div>
 		{:else}
-			<img src="/temp/gnx_album.png" alt="gnx" class="h-20 self-center rounded-xl p-2" />
-			<div class="flex flex-col items-start">
-				<Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">GNX</Button>
-      			<Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">Kendrick Lamar</Button>
-			</div>
+				<img src="/temp/gnx_album.png" alt="gnx" class="h-20 self-center rounded-xl p-2" />
+				<div class="flex flex-col items-start">
+					<Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">GNX</Button>
+					<Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">Kendrick Lamar</Button>
+				</div>
 		{/if}
 	</div>
 	<div class="absolute left-1/2 flex -translate-x-1/2 transform items-center justify-center">
-		<Button
+		<Button disabled
 			class="flex h-fit w-fit flex-row items-center justify-start bg-transparent p-2 hover:bg-secondary"
 		>
 			<Shuffle size={15} class="text-foreground" />
@@ -121,7 +123,7 @@
 		>
 			<SkipForward size={25} class="text-foreground" />
 		</Button>
-		<Button
+		<Button disabled
 			class="flex h-fit w-fit flex-row items-center justify-start bg-transparent p-2 hover:bg-secondary"
 		>
 			{#if one}
