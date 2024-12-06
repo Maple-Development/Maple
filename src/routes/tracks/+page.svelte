@@ -3,13 +3,14 @@
     import { onMount } from "svelte";
     import type { Song } from "$lib/types/song";
     import type { Playlist } from "$lib/types/playlist";
-    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from "lucide-svelte";
+    import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical, X } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import TrackWrapper from "$lib/components/TrackWrapper.svelte";
     import { context, title } from "$lib/store";
     import { toast } from "svelte-sonner";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import ContextMenu from "$lib/components/ui/context-menu/context-menu.svelte";
     // @ts-ignore
     import Lazy from 'svelte-lazy';
 
@@ -83,6 +84,7 @@
         }
     }
 
+    let openContextMenu = false;
     let open = false;
     let selectedSong: Song | null = null;
 
@@ -93,7 +95,7 @@
 
     async function deleteTrack() {
         if (selectedSong) {
-            OPFS.track().delete(selectedSong);
+            OPFS.track().delete(selectedSong)
             tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
             sortTracks(sort);
         } else {
@@ -140,13 +142,13 @@
         {#each tracks as track (track.id)}
         <div class="flex flex-col items-start">
             {#await getImageUrl(track.image) then image}
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <TrackWrapper className=""  track={track} tracks={tracks}>
-                <Lazy keep={true}>
-                    <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-                </Lazy>
-            </TrackWrapper>
+            <ContextMenu>
+                <TrackWrapper className=""  track={track} tracks={tracks}>
+                    <Lazy keep={true}>
+                        <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+                    </Lazy>
+                </TrackWrapper>
+            </ContextMenu>
             <div class="flex flex-row items-start">
                 <div class="flex flex-col items-start h-full mt-4">
                     <h1 class="text-foreground text-lg font-bold leading-none mb-1">{track.title}</h1>
