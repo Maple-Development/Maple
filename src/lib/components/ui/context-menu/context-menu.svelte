@@ -2,7 +2,24 @@
 // Converted to ts by me - Cattn
 // Original code by Github @dukenmarga, July 2022
 
+    import type { Playlist } from "$lib/types/playlist";
+    import type { Song } from "$lib/types/song";
+    import { createEventDispatcher } from 'svelte'
+    const dispatch = createEventDispatcher()
 
+    export const playlists: Playlist[] = [];
+    export const track: Song = {
+		 id: "",
+		 title: "",
+		 artist: "",
+		 album: "",
+		 year: 0,
+		 fileName: "",
+		 duration: 0,
+		 trackNumber: 0,
+		 disk: 0,
+		 ext: ""
+	 };
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
     // Cursor position on right-click
@@ -92,6 +109,14 @@
         };
         content = node;
     }
+
+    function openAlert () {
+        dispatch('openAlert')
+    }
+
+    function addTrackToPlaylist(playlist: Playlist) {
+        dispatch('addTrackToPlaylist', playlist)
+    }
 </script>
 <style>
     * {
@@ -109,16 +134,29 @@
     <div class="navbar" id="navbar">
         <DropdownMenu.Root bind:open={showMenu}>
             <DropdownMenu.Trigger></DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-                <DropdownMenu.Group>
-                    <DropdownMenu.Label>My Account</DropdownMenu.Label>
-                    <DropdownMenu.Separator />
-                    <DropdownMenu.Item>Profile</DropdownMenu.Item>
-                    <DropdownMenu.Item>Billing</DropdownMenu.Item>
-                    <DropdownMenu.Item>Team</DropdownMenu.Item>
-                    <DropdownMenu.Item>Subscription</DropdownMenu.Item>
-                </DropdownMenu.Group>
-            </DropdownMenu.Content>
+            <DropdownMenu.Content class="w-56 bg-primary-foreground border-popover-foreground border">
+                <DropdownMenu.Label>Options</DropdownMenu.Label>
+                <DropdownMenu.Separator />
+                  <DropdownMenu.Item on:click={() => openAlert()}>Delete</DropdownMenu.Item>
+                <DropdownMenu.Sub>
+                  <DropdownMenu.SubTrigger>
+                    <span>Add to Playlist</span>
+                  </DropdownMenu.SubTrigger>
+                  <DropdownMenu.SubContent side="left" class="bg-primary-foreground">
+                  {#if playlists.length > 0}
+                      {#each playlists as playlist}
+                      <DropdownMenu.Item on:click={() => addTrackToPlaylist(playlist)}>
+                          <span>{playlist.name}</span>
+                      </DropdownMenu.Item>
+                      {/each}
+                  {:else}
+                      <DropdownMenu.Item disabled>
+                          <span>No Playlists</span>
+                      </DropdownMenu.Item>
+                  {/if}
+                  </DropdownMenu.SubContent>
+                </DropdownMenu.Sub>
+              </DropdownMenu.Content>
         </DropdownMenu.Root>
     </div>
 </div>

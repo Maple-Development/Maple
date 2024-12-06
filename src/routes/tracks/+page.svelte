@@ -142,7 +142,7 @@
         {#each tracks as track (track.id)}
         <div class="flex flex-col items-start">
             {#await getImageUrl(track.image) then image}
-            <ContextMenu>
+            <ContextMenu playlists={playlists} track={track} on:openAlert={(e) => openAlert(track)} on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}>
                 <TrackWrapper className=""  track={track} tracks={tracks}>
                     <Lazy keep={true}>
                         <img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
