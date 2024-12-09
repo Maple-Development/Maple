@@ -9,7 +9,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Carousel from "$lib/components/ui/carousel/index.js";
-	let onboard = false;
+	let onboard = true;
 	onMount(async () => {
 		onboard = await OPFS.ifExists('tracks');
 		console.log(onboard);
@@ -59,7 +59,7 @@
 				  class="m-0 p-1 text-secondary-foreground"
 				  variant="link"
 				  href="/tracks">/tracks</Button
-			  > to get started!</Alert.Description
+			  > to see your full library!</Alert.Description
 				>
 			  </Alert.Root>
 		</div>
@@ -67,6 +67,7 @@
 	</div>
 
 	
+	{#if !onboard}
 	<div class="mt-2 flex items-center justify-center rounded-md">
 		<div class="mx-20">
 		<Carousel.Root class="w-full max-w-md mt-1">
@@ -195,4 +196,5 @@
 			</div>
 		</div>
 	</div>
+	{/if}
 

@@ -5,12 +5,19 @@ import type { Song } from './types/song';
 export const searchType = writable('tracks');
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
+let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
 export const collapsed = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
 	onEnded: () => {},
 	playing: false,
 	volume: 100
+});
+export const recentlyPlayedManager = writable({
+	set: (value: Song) => {
+		recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?];
+	},
+	get: () => recentlyPlayed
 });
 
 let endedHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
