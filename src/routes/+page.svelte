@@ -4,8 +4,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { title } from '$lib/store';
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-	import { ArrowDownZA, ArrowUpAZ, List, ListFilter } from 'lucide-svelte';
+	import { ArrowDownZA, ArrowUpAZ, List, ListFilter, Info, CircleAlert, CircleCheck } from 'lucide-svelte';
+	import * as Alert from "$lib/components/ui/alert/index.js";
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Card from "$lib/components/ui/card/index.js";
+	import * as Carousel from "$lib/components/ui/carousel/index.js";
 	let onboard = false;
 	onMount(async () => {
 		onboard = await OPFS.ifExists('tracks');
@@ -21,51 +24,60 @@
 	}
 </script>
 
-	<div class="mt-5 flex flex-col items-center">
-		<h1 class="text-lg font-bold">Welcome to Maple!</h1>
-
-		<div class="mt-5 flex flex-col items-center justify-center bg-secondary p-5 rounded-md">
-			<p class="text-sm text-secondary-foreground text-center text-md font-medium">
-				Welcome to maple! This site allows you to upload your music library, and explore and organize your music. <br>
-				You can upload your music by going to settings or using the developer terminal.
-			</p>
-		</div>
+	<div class="mt-2 flex flex-col items-center">
 		{#if !onboard}
-		<div class="mt-5 flex flex-col items-center justify-center bg-destructive p-5 rounded-md">
-			<p class="text-sm text-destructive-foreground">
-				It seems like you are missing a library, head to <Button
-					class="m-0 p-1"
-					variant="link"
-					href="/settings">Settings</Button
-				> to add music!
-			</p>
+		<div class="flex flex-col items-center justify-center p-5 rounded-md">
+			<Alert.Root class="p-4">
+				<Info class="h-4 w-4" />
+				<Alert.Title>Welcome!</Alert.Title>
+				<Alert.Description
+				  >This site allows you to upload your music library, and explore and organize your music. <br>
+				  You can upload your music by going to settings or using the developer terminal.</Alert.Description
+				>
+			  </Alert.Root>
+		</div>
+		<div class="flex flex-col items-center justify-center p-1 rounded-md">
+			<Alert.Root class="p-4" variant="destructive">
+				<CircleAlert class="h-4 w-4" />
+				<Alert.Title>Issue</Alert.Title>
+				<Alert.Description
+				  >It seems like you are missing a library, head to <Button
+				  class="m-0 p-1"
+				  variant="link"
+				  href="/settings">Settings</Button
+			  > to add one.</Alert.Description
+				>
+			</Alert.Root>			  
 		</div>
 		{:else}
-		<div class="mt-5 flex flex-col items-center justify-center bg-primary p-5 rounded-md">
-			<p class="text-sm text-primary-foreground">
-				You're all set! Head to <Button
-					class="m-0 p-1 text-primary-foreground"
-					variant="link"
-					href="/tracks">/tracks</Button
-				> to get started!
-			</p>
+		<div class="mt-2 flex flex-col items-center justify-centerrounded-md">
+			<Alert.Root class="p-4">
+				<CircleCheck class="h-4 w-4" />
+				<Alert.Title>Done!</Alert.Title>
+				<Alert.Description
+				  >You're all set! Head to <Button
+				  class="m-0 p-1 text-secondary-foreground"
+				  variant="link"
+				  href="/tracks">/tracks</Button
+			  > to get started!</Alert.Description
+				>
+			  </Alert.Root>
 		</div>
 		{/if}
+	</div>
 
-		<div class="mt-5 flex flex-col bg-secondary p-5 rounded-md">
-			<h2 class="text-sm text-secondary-foreground text-left text-md font-medium">#1: Context Menus:</h2>
-			<p class="text-sm text-muted-foreground text-left text-md font-medium">
-				tip: right click on a song to open a context menu!<br>
-				(try it below!)
-			</p>
-			<div class="flex flex-col items-center justify-center">
-				<ContextMenu type={'track'}>
-					<div class="h-52 w-52 animate-pulse rounded-md bg-gray-500 mt-2"></div>
-				</ContextMenu>
-			</div>
-		</div>
-		<div class="mt-5 flex flex-col bg-background p-5 rounded-md w-96">
-			<h2 class="text-sm text-secondary-foreground text-left text-md font-medium">#2: Filters:</h2>
+	
+	<div class="mt-2 flex items-center justify-center rounded-md">
+		<div class="mx-20">
+		<Carousel.Root class="w-full max-w-md mt-1">
+			<Carousel.Content>
+				<Carousel.Item>
+				  <div class="p-1">
+					<Card.Root>
+					  <Card.Content
+						class="flex flex-col aspect-square items-center justify-center p-6"
+					  >
+					  <h2 class="text-sm text-secondary-foreground text-left text-md font-medium">Tip #1: Filters</h2>
 			<p class="text-sm text-muted-foreground text-left text-md font-medium">
 				Filters allow you to organize the different sections of your library by various attributes. <br>
 				(try it below!)
@@ -124,36 +136,62 @@
 						<List size={20} color="white" />
 					</Button>
 				</div>
-				
-			</div>
+					  </Card.Content>
+					</Card.Root>
+				  </div>
+				</Carousel.Item>
+				<Carousel.Item>
+				  <div class="p-1">
+					<Card.Root>
+					  <Card.Content
+						class="flex flex-col aspect-square items-center justify-center p-6"
+					  >
+						<h2 class="text-sm text-secondary-foreground text-left text-md font-medium">Tip #2 Search</h2>
+						<p class="text-sm text-muted-foreground text-left text-md font-medium">
+							The search box is always avalible at the top of the screen to easily swap pages, or search the content on your current page!
+							(try it below!)
+						</p>
+						<div class="flex flex-col items-center justify-center border-1 border rounded-sm mt-2">
+							<Command.Root class="w-96 bg-bg border-secondary-foreground border-1">
+								<Command.Input placeholder="Search for recent items, or type a page name." />
+								<Command.List>
+								<Command.Empty>No results found.</Command.Empty>
+								<Command.Group heading="Pages">
+									<Command.Item>Home</Command.Item>
+									<Command.Item>Tracks</Command.Item>
+									<Command.Item>Albums</Command.Item>
+									<Command.Item>Playlists</Command.Item>
+									<Command.Item>Artists</Command.Item>
+									<Command.Item>Settings</Command.Item>
+								</Command.Group>
+								<Command.Separator />
+								<Command.Group heading="Tracks">
+									<Command.Item>bad guy</Command.Item>
+									<Command.Item>i want it that way</Command.Item>
+									<Command.Item>no tears left to cry</Command.Item>
+								</Command.Group>
+								</Command.List>
+							</Command.Root>
+						</div>
+					  </Card.Content>
+					</Card.Root>
+				  </div>
+				</Carousel.Item>
+			</Carousel.Content>
+			<Carousel.Previous />
+			<Carousel.Next />
+		  </Carousel.Root>
 		</div>
-		<div class="mt-5 flex flex-col bg-secondary p-5 rounded-md mb-5">
-			<h2 class="text-sm text-secondary-foreground text-left text-md font-medium">#3: Search:</h2>
+		<div class="mt-5 flex flex-col bg-secondary p-5 rounded-md">
+			<h2 class="text-sm text-secondary-foreground text-left text-md font-medium">#1: Context Menus:</h2>
 			<p class="text-sm text-muted-foreground text-left text-md font-medium">
-				The search box is always avalible at the top of the screen to easily swap <br>pages, or search the content on your current page! <br>
+				tip: right click on a song to open a context menu!<br>
 				(try it below!)
 			</p>
 			<div class="flex flex-col items-center justify-center">
-				<Command.Root class="w-96 mt-4">
-					<Command.Input placeholder="Search for recent items, or type a page name." />
-					<Command.List>
-					  <Command.Empty>No results found.</Command.Empty>
-					  <Command.Group heading="Pages">
-						<Command.Item>Home</Command.Item>
-						<Command.Item>Tracks</Command.Item>
-						<Command.Item>Albums</Command.Item>
-						<Command.Item>Playlists</Command.Item>
-						<Command.Item>Artists</Command.Item>
-						<Command.Item>Settings</Command.Item>
-					  </Command.Group>
-					  <Command.Separator />
-					  <Command.Group heading="Tracks">
-						<Command.Item>bad guy</Command.Item>
-						<Command.Item>i want it that way</Command.Item>
-						<Command.Item>no tears left to cry</Command.Item>
-					  </Command.Group>
-					</Command.List>
-				  </Command.Root>
+				<ContextMenu type={'track'}>
+					<div class="h-52 w-52 animate-pulse rounded-md bg-gray-500 mt-2"></div>
+				</ContextMenu>
 			</div>
 		</div>
 	</div>
