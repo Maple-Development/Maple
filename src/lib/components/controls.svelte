@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Song } from '$lib/types/song';
 	import { OPFS } from '$lib/opfs';
-	import { context, activeSong, audioPlayer } from '$lib/store';
+	import { context, activeSong, audioPlayer, currentDuration } from '$lib/store';
 
 	let audioUrl: string = '';
 
@@ -17,8 +17,10 @@
 			if (state.audio instanceof HTMLAudioElement) {
 				state.audio.src = audioUrl;
 				state.audio.play();
+				return { ...state, playing: true, onEnded: nextSong };
+			} else {
+				return state;
 			}
-			return { ...state, playing: true, onEnded: nextSong };
 		});
 
 		audioPlayer.update((store) => ({
@@ -44,6 +46,13 @@
 		audioPlayer.update((store) => ({
 			...store,
 			volume: volume
+		}));
+	}
+
+	export function currentTime(time: number) {
+		audioPlayer.update((store) => ({
+			...store,
+			currentTime: time
 		}));
 	}
 </script>

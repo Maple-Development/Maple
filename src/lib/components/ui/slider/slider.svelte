@@ -3,6 +3,7 @@
 	import { cn } from '$lib/utils.js';
 	let className = undefined;
 	export let value = [0];
+	export let color = "bg-blue-300";
 	export { className as class };
 </script>
 
@@ -12,8 +13,8 @@
 	{...$$restProps}
 	let:thumbs
 >
-	<span class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
-		<SliderPrimitive.Range class="absolute h-full bg-primary" />
+	<span class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
+		<SliderPrimitive.Range class="absolute h-full {color}" />
 	</span>
 	{#each thumbs as thumb}
 		<SliderPrimitive.Thumb

@@ -5,6 +5,7 @@
 	import { activeSong, audioPlayer, currentDuration, curTime } from '$lib/store';
 	import Controls from './controls.svelte';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	import { Play, SkipForward, SkipBack, Shuffle, Repeat, Repeat1, Pause } from 'lucide-svelte';
 
@@ -48,10 +49,12 @@
 		audioPlayer.update((state) => {
 			if (state.audio instanceof HTMLAudioElement) {
 				if (state.playing) {
+					console.log($curTime + " ermm " + state.audio.currentTime);
 					state.audio.pause();
 					paused = true;
 					return { ...state, playing: false };
 				} else {
+					console.log($curTime + "ermm " + state.audio.currentTime);
 					state.audio.play();
 					paused = false;
 					return { ...state, playing: true };
@@ -83,8 +86,8 @@
 	}
 
 	$: {
-		if ($curTime !== undefined && $curTime[0] !== 0) {
-			console.log($curTime); 
+		if ($curTime) {
+			console.log("cir " + $curTime);
 		}
 	}
 
@@ -92,9 +95,15 @@
 		console.log(currentTime);
 		controls.currentTime(currentTime[0]);
 	}
-</script>
 
-<Slider color="bg-primary" bind:value={currentTime} bind:max={maxDuration} step={1} class="h-[2%] w-[98%] z-10 ml-1"></Slider>
+	function testLog() {
+		console.log("real");
+	}
+</script>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div on:mouseup={testLog}>
+<Slider color="bg-primary" bind:value={$curTime} bind:max={maxDuration} step={1} class="h-[2%] w-[98%] z-10 ml-1"></Slider>
+</div>
 <!-- scrub bar -->
 <div class="relative flex h-[98%] items-center justify-between">
 	<div class="flex">

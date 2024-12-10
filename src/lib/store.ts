@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
 
@@ -7,11 +7,13 @@ export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
 export const collapsed = writable(false);
+export const curTime = writable([0] as number[]);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
 	onEnded: () => {},
 	playing: false,
-	volume: 100
+	volume: 100,
+	currentTime: 0
 });
 export const recentlyPlayedManager = writable({
 	set: (value: Song) => {
@@ -21,27 +23,57 @@ export const recentlyPlayedManager = writable({
 });
 
 let endedHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
+let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
+
+export const currentDuration = derived(audioPlayer, ($audioPlayer) => {
+	return $audioPlayer.audio?.duration ?? 0;
+});
+
+let currentTime = 0;
 
 audioPlayer.subscribe((value) => {
 	if (browser) {
 		if (value.audio instanceof HTMLAudioElement) {
 			if (endedHandler) {
 				value.audio.removeEventListener('ended', endedHandler);
+				endedHandler = null;
 			}
 
-			endedHandler = () => {
-				value.onEnded();
+			if (value.onEnded) {
+				endedHandler = () => {
+					value.onEnded();
+				};
+				value.audio.addEventListener('ended', endedHandler);
+			}
+	
+			value.audio.ontimeupdate = () => {
+				currentTime = value.audio?.currentTime ?? 0;
+				if (value.playing) {
+					curTime.set([value.audio?.currentTime ?? currentTime]);
+					console.log("reak  " + currentTime);
+				}
 			};
 
-			value.audio.addEventListener('ended', endedHandler);
+			if (durationChangeHandler) {
+				value.audio.removeEventListener('durationchange', durationChangeHandler);
+				durationChangeHandler = null;
+			}
+
+			durationChangeHandler = () => {
+				audioPlayer.update((state) => ({ ...state }));
+			};
+			value.audio.addEventListener('durationchange', durationChangeHandler);
 		}
+
 		if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
 			console.log(value.volume);
 			value.audio.volume = value.volume / 100;
 		}
+		if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
+			value.audio.currentTime = value.currentTime;
+		}
 	}
 });
-
 function createTitle() {
 	const { subscribe, set, update } = writable('');
 
