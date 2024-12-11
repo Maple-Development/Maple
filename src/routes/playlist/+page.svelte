@@ -422,7 +422,7 @@
 							on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 						>
 							<TrackWrapper className="" {track} {tracks}>
-								<Lazy keep={true}>
+								<Lazy height={208} keep={true}>
 									<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
 								</Lazy>
 							</TrackWrapper>
@@ -446,7 +446,7 @@
 					<TrackWrapper className="flex-grow" {track} {tracks}>
 						<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
 							{#await getImageUrl(track.image) then image}
-								<Lazy keep={true}>
+								<Lazy height={208} keep={true}>
 									<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
 								</Lazy>
 							{:catch error}
@@ -531,7 +531,7 @@
 		{#each tracks as track, i}
 			<div class="flex w-full flex-row items-center rounded-sm px-2 py-2">
 				{#await getImageUrl(track.image) then image}
-					<Lazy keep={true}>
+					<Lazy height={208} keep={true}>
 						<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
 					</Lazy>
 				{:catch error}
@@ -583,7 +583,7 @@
 									<div class="mr-4 flex h-24 w-24 items-center justify-center bg-gray-500">
 										{#await getImageUrl(song.image) then image}
 											{#if isToggled(song)}
-												<Lazy keep={true}>
+												<Lazy height={208} keep={true}>
 													<img
 														class="mr-4 h-24 w-24 border-2 border-green-400"
 														src={image}
@@ -591,7 +591,7 @@
 													/>
 												</Lazy>
 											{:else}
-												<Lazy keep={true}>
+												<Lazy height={208} keep={true}>
 													<img class="mr-4 h-24 w-24" src={image} alt={song.title} />
 												</Lazy>
 											{/if}

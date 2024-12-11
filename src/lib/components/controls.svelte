@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { Song } from '$lib/types/song';
 	import { OPFS } from '$lib/opfs';
-	import { context, activeSong, audioPlayer, currentDuration } from '$lib/store';
+	import { context, activeSong, audioPlayer, recentlyPlayedManager } from '$lib/store';
 
 	let audioUrl: string = '';
 
 	export async function playSong(song: Song) {
 		currentTime(0);
+		$recentlyPlayedManager.add(song);
 		activeSong.set(song);
 		const buffer = await OPFS.getSong(song);
 		if (buffer) {
@@ -45,7 +46,8 @@
 	export function volume(volume: number) {
 		audioPlayer.update((store) => ({
 			...store,
-			volume: volume
+			volume: volume,
+			changeVolume: true
 		}));
 	}
 

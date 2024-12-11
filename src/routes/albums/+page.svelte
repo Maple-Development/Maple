@@ -143,7 +143,7 @@
 				{#await getImageUrl(album.image) then image}
 					<ContextMenu type={'album'} on:delete={(e) => openAlert(album)}>
 						<a class="pointer" href={`/album?album=${album.id}`}>
-							<Lazy keep={true}>
+							<Lazy height={208} keep={true}>
 								<img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
 							</Lazy>
 						</a>
@@ -168,7 +168,7 @@
 					<a class="pointer" href={`/album?album=${album.id}`}>
 						<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
 							{#await getImageUrl(album.image) then image}
-								<Lazy keep={true}>
+								<Lazy height={208} keep={true}>
 									<img class="mr-4 h-24 w-24" src={image} alt={album.name} />
 								</Lazy>
 							{:catch error}

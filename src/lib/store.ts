@@ -14,24 +14,32 @@ export const audioPlayer = writable({
 	onEnded: () => {},
 	playing: false,
 	volume: 100,
-	currentTime: 0
+	currentTime: 0,
+	changeVolume: false
 });
 export const recentlyPlayedManager = writable({
-	set: (value: Song) => {
-		recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?,
-			Song?
-		];
+	add: (value: Song) => {
+		if (!recentlyPlayed.some(song => song?.id === value.id)) {
+			recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?,
+				Song?
+			];
+			localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
+		}
 	},
-	get: () => recentlyPlayed
+	get: () => {
+		if(!browser) return [];
+		recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+		return recentlyPlayed;
+	}
 });
 
 let endedHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
@@ -46,44 +54,52 @@ let currentTime = 0;
 audioPlayer.subscribe((value) => {
 	if (browser) {
 		if (value.audio instanceof HTMLAudioElement) {
-			if (endedHandler) {
-				value.audio.removeEventListener('ended', endedHandler);
-				endedHandler = null;
-			}
-
-			if (value.onEnded) {
-				endedHandler = () => {
-					value.onEnded();
-				};
-				value.audio.addEventListener('ended', endedHandler);
-			}
-
-			value.audio.ontimeupdate = () => {
-				currentTime = value.audio?.currentTime ?? 0;
-				if (value.playing) {
-					curTime.set([value.audio?.currentTime ?? currentTime]);
-					setCurTime.set([value.audio?.currentTime ?? currentTime]);
+			if (!value.changeVolume) {
+				if (endedHandler) {
+					value.audio.removeEventListener('ended', endedHandler);
+					endedHandler = null;
 				}
-			};
 
-			if (durationChangeHandler) {
-				value.audio.removeEventListener('durationchange', durationChangeHandler);
-				durationChangeHandler = null;
+				if (value.onEnded) {
+					endedHandler = () => {
+						value.onEnded();
+					};
+					value.audio.addEventListener('ended', endedHandler);
+				}
+
+				value.audio.ontimeupdate = () => {
+					currentTime = value.audio?.currentTime ?? 0;
+					if (value.playing) {
+						curTime.set([value.audio?.currentTime ?? currentTime]);
+						setCurTime.set([value.audio?.currentTime ?? currentTime]);
+					}
+				};
+
+				if (durationChangeHandler) {
+					value.audio.removeEventListener('durationchange', durationChangeHandler);
+					durationChangeHandler = null;
+				}
+
+				durationChangeHandler = () => {
+					audioPlayer.update((state) => ({ ...state }));
+				};
+				value.audio.addEventListener('durationchange', durationChangeHandler);
+
+				if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
+					value.audio.currentTime = value.currentTime;
+				}
+			} else {
+				if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
+						value.audio.volume = value.volume / 100;
+						value.changeVolume = false;
+						return;
+					} else {
+						value.changeVolume = false;
+						return;
+					}
+				}
 			}
-
-			durationChangeHandler = () => {
-				audioPlayer.update((state) => ({ ...state }));
-			};
-			value.audio.addEventListener('durationchange', durationChangeHandler);
 		}
-
-		if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
-			value.audio.volume = value.volume / 100;
-		}
-		if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
-			value.audio.currentTime = value.currentTime;
-		}
-	}
 });
 function createTitle() {
 	const { subscribe, set, update } = writable('');

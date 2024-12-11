@@ -110,7 +110,7 @@
 				<img src={image} alt={$activeSong.title} class="h-20 self-center rounded-xl p-2" />
 			{:catch error}
 				<img
-					src="/temp/gnx_album.png"
+					src="/temp/MapleD.svg"
 					alt={$activeSong.title}
 					class="h-20 self-center rounded-xl p-2"
 				/>
@@ -130,10 +130,10 @@
 				</Button>
 			</div>
 		{:else}
-		<img src="/temp/gnx_album.png" alt="gnx" class="h-20 self-center rounded-xl p-2" />
+		<img src="/temp/MapleD.svg" alt="gnx" class="h-20 self-center rounded-xl p-2" />
 		<div class="flex flex-col items-start">
-			<Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">GNX</Button>
-			<Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">Kendrick Lamar</Button>
+			<Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">Nothing Playing</Button>
+			<Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">...</Button>
 		</div>
 		{/if}
 	</div>
@@ -179,7 +179,11 @@
 	</div>
 
 	<div class="mr-5 flex flex-grow justify-end">
-		<Slider onValueChange={changeVolume} bind:value={volume} max={100} step={2} class="w-40" />
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<!-- svelte-ignore a11y-missing-attribute -->
+		<a on:click={() => changeVolume()} on:mouseup={() => changeVolume()}>
+		<Slider bind:value={volume} max={100} step={2} class="w-40" />
+		</a>
 	</div>
 </div>
 

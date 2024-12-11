@@ -257,6 +257,7 @@
 
 	function clearLibrary() {
 		OPFS.clearLibrary();
+		localStorage.clear();
 		getLength();
 	}
 

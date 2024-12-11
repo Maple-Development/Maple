@@ -408,7 +408,7 @@
 									on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 								>
 									<TrackWrapper className="" {track} {tracks}>
-										<Lazy keep={true}>
+										<Lazy height={208} keep={true}>
 											<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
 										</Lazy>
 									</TrackWrapper>
@@ -437,7 +437,7 @@
 								on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 							>
 								<TrackWrapper className="" {track} {tracks}>
-									<Lazy keep={true}>
+									<Lazy height={208} keep={true}>
 										<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
 									</Lazy>
 								</TrackWrapper>
@@ -471,7 +471,7 @@
 									class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
 								>
 									{#await getImageUrl(track.image) then image}
-										<Lazy keep={true}>
+										<Lazy height={208} keep={true}>
 											<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
 										</Lazy>
 									{:catch error}
@@ -544,7 +544,7 @@
 								class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
 							>
 								{#await getImageUrl(track.image) then image}
-									<Lazy keep={true}>
+									<Lazy height={208} keep={true}>
 										<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
 									</Lazy>
 								{:catch error}
