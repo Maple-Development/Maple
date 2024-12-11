@@ -4,7 +4,16 @@
 	import type { Artist } from '$lib/types/artist';
 	import type { Song } from '$lib/types/song';
 	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil, Trash, EllipsisVertical } from 'lucide-svelte';
+	import {
+		ArrowUpAZ,
+		ArrowDownZA,
+		ListFilter,
+		List,
+		Check,
+		Pencil,
+		Trash,
+		EllipsisVertical
+	} from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { context, title } from '$lib/store';
@@ -314,17 +323,17 @@
 		{#each tracks as track}
 			<div class="flex flex-col items-start">
 				{#await getImageUrl(track.image) then image}
-				<ContextMenu
+					<ContextMenu
 						type={'track'}
 						on:delete={(e) => openAlert(track)}
 						on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 					>
-					<TrackWrapper className="" {track} {tracks}>
-						<Lazy keep={true}>
-							<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-						</Lazy>
-					</TrackWrapper>
-				</ContextMenu>
+						<TrackWrapper className="" {track} {tracks}>
+							<Lazy keep={true}>
+								<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+							</Lazy>
+						</TrackWrapper>
+					</ContextMenu>
 					<div class="flex flex-row items-start">
 						<div class="mt-4 flex h-full flex-col items-start">
 							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>

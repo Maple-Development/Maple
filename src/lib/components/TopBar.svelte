@@ -38,27 +38,27 @@
 	});
 </script>
 
-	<div class="relative flex items-center justify-between">
-		<div class="flex items-center">
-			<Button
-				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-				on:click={() => ($collapsed = !$collapsed)}
-			>
-				<PanelRightOpen size={20} color="white" />
-			</Button>
-			<h1 class="ml-2 text-xl font-bold text-muted-foreground">{$title}</h1>
-		</div>
-		<div class="absolute left-1/2 transform -translate-x-1/2">
-			<Button
-				on:click={() => (open = !open)}
-				class="my-2 h-8 max-w-xs text-primary"
-				variant="outline"
-			>
-				<Search size={20} color="white" />
-				<span class="ml-2">Search</span>
-			</Button>
-		</div>
+<div class="relative flex items-center justify-between">
+	<div class="flex items-center">
+		<Button
+			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+			on:click={() => ($collapsed = !$collapsed)}
+		>
+			<PanelRightOpen size={20} color="white" />
+		</Button>
+		<h1 class="ml-2 text-xl font-bold text-muted-foreground">{$title}</h1>
 	</div>
+	<div class="absolute left-1/2 -translate-x-1/2 transform">
+		<Button
+			on:click={() => (open = !open)}
+			class="my-2 h-8 max-w-xs text-primary"
+			variant="outline"
+		>
+			<Search size={20} color="white" />
+			<span class="ml-2">Search</span>
+		</Button>
+	</div>
+</div>
 
 <Command.Dialog class="bg-background" bind:open loop>
 	<Command.Input placeholder="Search for recent items, or type a page name." />

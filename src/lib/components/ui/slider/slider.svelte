@@ -3,7 +3,7 @@
 	import { cn } from '$lib/utils.js';
 	let className = undefined;
 	export let value = [0];
-	export let color = "bg-blue-300";
+	export let color = 'bg-blue-300';
 	export { className as class };
 </script>
 

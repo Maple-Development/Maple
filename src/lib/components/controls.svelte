@@ -6,6 +6,7 @@
 	let audioUrl: string = '';
 
 	export async function playSong(song: Song) {
+		currentTime(0);
 		activeSong.set(song);
 		const buffer = await OPFS.getSong(song);
 		if (buffer) {
@@ -30,7 +31,6 @@
 	}
 
 	export function nextSong() {
-		console.log('Track Wrap Next');
 		const index = $context.indexOf($activeSong);
 		const nextIndex = (index + 1) % $context.length;
 		playSong($context[nextIndex]);

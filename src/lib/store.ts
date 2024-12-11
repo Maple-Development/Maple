@@ -8,6 +8,7 @@ export const context = writable([] as Song[]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
 export const collapsed = writable(false);
 export const curTime = writable([0] as number[]);
+export const setCurTime = writable([0] as number[]);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
 	onEnded: () => {},
@@ -17,7 +18,18 @@ export const audioPlayer = writable({
 });
 export const recentlyPlayedManager = writable({
 	set: (value: Song) => {
-		recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?];
+		recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?,
+			Song?
+		];
 	},
 	get: () => recentlyPlayed
 });
@@ -45,12 +57,12 @@ audioPlayer.subscribe((value) => {
 				};
 				value.audio.addEventListener('ended', endedHandler);
 			}
-	
+
 			value.audio.ontimeupdate = () => {
 				currentTime = value.audio?.currentTime ?? 0;
 				if (value.playing) {
 					curTime.set([value.audio?.currentTime ?? currentTime]);
-					console.log("reak  " + currentTime);
+					setCurTime.set([value.audio?.currentTime ?? currentTime]);
 				}
 			};
 
@@ -66,7 +78,6 @@ audioPlayer.subscribe((value) => {
 		}
 
 		if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
-			console.log(value.volume);
 			value.audio.volume = value.volume / 100;
 		}
 		if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {

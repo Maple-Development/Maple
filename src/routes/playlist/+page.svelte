@@ -13,12 +13,8 @@
 		Pencil,
 		Trash,
 		EllipsisVertical,
-
 		Plus,
-
 		X
-
-
 	} from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -336,12 +332,12 @@
 			{/if}
 		</Button>
 		{#if editModeOn}
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => editModeOff()}
-		>
-		<X size={20} color="white" />
-		</Button>
+			<Button
+				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+				on:click={() => editModeOff()}
+			>
+				<X size={20} color="white" />
+			</Button>
 		{/if}
 		<AlertDialog.Root>
 			<AlertDialog.Trigger>
@@ -474,7 +470,10 @@
 					<div class="ml-2 flex items-center">
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger asChild let:builder>
-								<Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+								<Button
+									class="h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+									builders={[builder]}
+								>
 									<EllipsisVertical size={20} color="white" />
 								</Button>
 							</DropdownMenu.Trigger>
@@ -552,7 +551,11 @@
 					</div>
 				</div>
 				<div class="ml-2 flex items-center">
-					<Button class="my-1 ml-3 h-10 w-10 px-1" variant="destructive" on:click={() => editRemove(track, i)}>
+					<Button
+						class="my-1 ml-3 h-10 w-10 px-1"
+						variant="destructive"
+						on:click={() => editRemove(track, i)}
+					>
 						<Trash size={20} color="white" />
 					</Button>
 				</div>

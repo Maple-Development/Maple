@@ -5,9 +5,9 @@
 	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-    import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import { title } from '$lib/store';
-    import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
 	import { toast } from 'svelte-sonner';
@@ -66,7 +66,7 @@
 		}
 	}
 
-    let isOpenAlert = false;
+	let isOpenAlert = false;
 	let selectedAlbum: Album | null = null;
 
 	function deleteAlbum() {
@@ -141,13 +141,13 @@
 		{#each albums as album}
 			<div class="flex flex-col items-start">
 				{#await getImageUrl(album.image) then image}
-                <ContextMenu type={'album'} on:delete={(e) => openAlert(album)}>
-					<a class="pointer" href={`/album?album=${album.id}`}>
-						<Lazy keep={true}>
-							<img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
-						</Lazy>
-					</a>
-                </ContextMenu>
+					<ContextMenu type={'album'} on:delete={(e) => openAlert(album)}>
+						<a class="pointer" href={`/album?album=${album.id}`}>
+							<Lazy keep={true}>
+								<img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
+							</Lazy>
+						</a>
+					</ContextMenu>
 					<div class="flex flex-row items-start">
 						<div class="mt-4 flex h-full flex-col items-start">
 							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
@@ -163,47 +163,46 @@
 {:else}
 	<div class="mx-4 mb-5 mt-2 flex flex-col">
 		{#each albums as album}
-          <div class="flex w-full">
-            <div class="flex-grow">
-              <a class="pointer" href={`/album?album=${album.id}`}>
-                <div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-                  {#await getImageUrl(album.image) then image}
-                    <Lazy keep={true}>
-                      <img class="mr-4 h-24 w-24" src={image} alt={album.name} />
-                    </Lazy>
-                  {:catch error}
-                    <div class="mr-4 h-24 w-24 bg-gray-500"></div>
-                  {/await}
-                  <div class="flex flex-grow flex-col items-start">
-                    <h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
-                    <h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
-                  </div>
-                  <div class="ml-4 flex flex-col items-end text-right">
-                    <h1 class="text-base font-light leading-none text-slate-400">{album.year}</h1>
-                    <h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="ml-2 flex items-center">
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild let:builder>
-                  <Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-                    <EllipsisVertical size={20} color="white" />
-                  </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content class="w-56">
-                  <DropdownMenu.Label>Options</DropdownMenu.Label>
-                  <DropdownMenu.Separator />
-                  <DropdownMenu.Item on:click={() => openAlert(album)}>Delete</DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            </div>
-          </div>
-        {/each}
+			<div class="flex w-full">
+				<div class="flex-grow">
+					<a class="pointer" href={`/album?album=${album.id}`}>
+						<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
+							{#await getImageUrl(album.image) then image}
+								<Lazy keep={true}>
+									<img class="mr-4 h-24 w-24" src={image} alt={album.name} />
+								</Lazy>
+							{:catch error}
+								<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+							{/await}
+							<div class="flex flex-grow flex-col items-start">
+								<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
+							</div>
+							<div class="ml-4 flex flex-col items-end text-right">
+								<h1 class="text-base font-light leading-none text-slate-400">{album.year}</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
+							</div>
+						</div>
+					</a>
+				</div>
+				<div class="ml-2 flex items-center">
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger asChild let:builder>
+							<Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
+								<EllipsisVertical size={20} color="white" />
+							</Button>
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content class="w-56">
+							<DropdownMenu.Label>Options</DropdownMenu.Label>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Item on:click={() => openAlert(album)}>Delete</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
+				</div>
+			</div>
+		{/each}
 	</div>
 {/if}
-
 
 <AlertDialog.Root bind:open={isOpenAlert}>
 	<AlertDialog.Trigger></AlertDialog.Trigger>

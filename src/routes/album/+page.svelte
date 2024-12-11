@@ -3,7 +3,16 @@
 	import { onMount } from 'svelte';
 	import type { Album } from '$lib/types/album';
 	import type { Song } from '$lib/types/song';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check, Trash, EllipsisVertical } from 'lucide-svelte';
+	import {
+		ArrowUpAZ,
+		ArrowDownZA,
+		ListFilter,
+		Pencil,
+		List,
+		Check,
+		Trash,
+		EllipsisVertical
+	} from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
@@ -17,12 +26,12 @@
 	import Lazy from 'svelte-lazy';
 	import type { Playlist } from '$lib/types/playlist';
 	import { toast } from 'svelte-sonner';
-    import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 
 	let albumName: string;
 	let album: Album | undefined;
 	let tracks: Song[] = [];
-    let playlists: Playlist[] = [];
+	let playlists: Playlist[] = [];
 	let disks: number = 0;
 	let alldisks: Song[][] = [];
 	let listType = 'grid';
@@ -61,7 +70,7 @@
 		changedName = album?.name?.toString() ?? '';
 		changedArtist = album?.artist?.toString() ?? '';
 		changedYear = album?.year?.toString() ?? '';
-        playlists = await OPFS.get().playlists();
+		playlists = await OPFS.get().playlists();
 	});
 
 	async function refresh(albumName: string) {
@@ -209,7 +218,7 @@
 		}
 	}
 
-    let open = false;
+	let open = false;
 	let selectedSong: Song | null = null;
 
 	function openAlert(track: Song) {
@@ -393,17 +402,17 @@
 					{#each disk as track}
 						<div class="flex flex-col items-start">
 							{#await getImageUrl(track.image) then image}
-                                <ContextMenu
-                                    type={'track'}
-                                    on:delete={(e) => openAlert(track)}
-                                    on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
-                                >
-								<TrackWrapper className="" {track} {tracks}>
-									<Lazy keep={true}>
-										<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-									</Lazy>
-								</TrackWrapper>
-                                </ContextMenu>
+								<ContextMenu
+									type={'track'}
+									on:delete={(e) => openAlert(track)}
+									on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
+								>
+									<TrackWrapper className="" {track} {tracks}>
+										<Lazy keep={true}>
+											<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+										</Lazy>
+									</TrackWrapper>
+								</ContextMenu>
 								<div class="mt-4 flex flex-col items-start">
 									<h3 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h3>
 									<p class="text-base font-light leading-none text-slate-400">{track.artist}</p>
@@ -422,17 +431,17 @@
 				{#each tracks as track}
 					<div class="flex flex-col items-start">
 						{#await getImageUrl(track.image) then image}
-                            <ContextMenu
-                                type={'track'}
-                                on:delete={(e) => openAlert(track)}
-                                on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
-                            >
-							<TrackWrapper className="" {track} {tracks}>
-								<Lazy keep={true}>
-									<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-								</Lazy>
-							</TrackWrapper>
-                            </ContextMenu>
+							<ContextMenu
+								type={'track'}
+								on:delete={(e) => openAlert(track)}
+								on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
+							>
+								<TrackWrapper className="" {track} {tracks}>
+									<Lazy keep={true}>
+										<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+									</Lazy>
+								</TrackWrapper>
+							</ContextMenu>
 							<div class="mt-4 flex flex-col items-start">
 								<h3 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h3>
 								<p class="text-base font-light leading-none text-slate-400">{track.artist}</p>
@@ -446,139 +455,153 @@
 		{/if}
 	</div>
 {:else}
-    <div class="mx-4 mb-5 mt-2 flex flex-col">
-        {#if alldisks.length > 1 && sort === 'track'}
-        {#each alldisks as disk, diskIndex}
-            {#if diskIndex > 0}
-            <div class="ml-16 flex flex-col items-start">
-                <Separator class="mb-4 mt-1 w-[95%] pr-20"></Separator>
-            </div>
-            {/if}
-            <div class="mx-4 mb-5 mt-2 flex flex-col">
-            {#each disk as track}
-                <div class="flex w-full">
-                <TrackWrapper className="flex-grow" {track} {tracks}>
-                    <div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-                    {#await getImageUrl(track.image) then image}
-                        <Lazy keep={true}>
-                        <img class="mr-4 h-24 w-24" src={image} alt={track.title} />
-                        </Lazy>
-                    {:catch error}
-                        <div class="mr-4 h-24 w-24 bg-gray-500"></div>
-                    {/await}
-                    <div class="flex flex-grow flex-col items-start">
-                        <h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-                        <h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-                    </div>
-                    <div class="ml-4 flex flex-row items-center text-right">
-                        <div class="flex flex-col">
-                        <h1 class="text-base font-light leading-none text-slate-400">
-                            {formatDuration(track.duration)}
-                        </h1>
-                        <h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-                        <h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
-                        </div>
-                    </div>
-                    </div>
-                </TrackWrapper>
-                <div class="ml-2 flex items-center">
-                    <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild let:builder>
-                        <Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-                        <EllipsisVertical size={20} color="white" />
-                        </Button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Content class="w-56">
-                        <DropdownMenu.Label>Options</DropdownMenu.Label>
-                        <DropdownMenu.Separator />
-                        <DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
-                        <DropdownMenu.Sub>
-                        <DropdownMenu.SubTrigger>
-                            <span>Add to Playlist</span>
-                        </DropdownMenu.SubTrigger>
-                        <DropdownMenu.SubContent side="left">
-                            {#if playlists.length > 0}
-                            {#each playlists as playlist}
-                                <DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
-                                <span>{playlist.name}</span>
-                                </DropdownMenu.Item>
-                            {/each}
-                            {:else}
-                            <DropdownMenu.Item disabled>
-                                <span>No Playlists</span>
-                            </DropdownMenu.Item>
-                            {/if}
-                        </DropdownMenu.SubContent>
-                        </DropdownMenu.Sub>
-                    </DropdownMenu.Content>
-                    </DropdownMenu.Root>
-                </div>
-                </div>
-            {/each}
-            </div>
-        {/each}
-        {:else}
-			<div class="mx-4 mb-5 mt-2 flex flex-col">
-				{#each tracks as track}
-			<div class="flex w-full">
-				<TrackWrapper className="flex-grow" {track} {tracks}>
-					<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-						{#await getImageUrl(track.image) then image}
-							<Lazy keep={true}>
-								<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
-							</Lazy>
-						{:catch error}
-							<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-						{/await}
-						<div class="flex flex-grow flex-col items-start">
-							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-							<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-						</div>
-						<div class="ml-4 flex flex-row items-center text-right">
-							<div class="flex flex-col">
-								<h1 class="text-base font-light leading-none text-slate-400">
-									{formatDuration(track.duration)}
-								</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+	<div class="mx-4 mb-5 mt-2 flex flex-col">
+		{#if alldisks.length > 1 && sort === 'track'}
+			{#each alldisks as disk, diskIndex}
+				{#if diskIndex > 0}
+					<div class="ml-16 flex flex-col items-start">
+						<Separator class="mb-4 mt-1 w-[95%] pr-20"></Separator>
+					</div>
+				{/if}
+				<div class="mx-4 mb-5 mt-2 flex flex-col">
+					{#each disk as track}
+						<div class="flex w-full">
+							<TrackWrapper className="flex-grow" {track} {tracks}>
+								<div
+									class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
+								>
+									{#await getImageUrl(track.image) then image}
+										<Lazy keep={true}>
+											<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
+										</Lazy>
+									{:catch error}
+										<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+									{/await}
+									<div class="flex flex-grow flex-col items-start">
+										<h1 class="mb-1 text-lg font-bold leading-none text-foreground">
+											{track.title}
+										</h1>
+										<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
+									</div>
+									<div class="ml-4 flex flex-row items-center text-right">
+										<div class="flex flex-col">
+											<h1 class="text-base font-light leading-none text-slate-400">
+												{formatDuration(track.duration)}
+											</h1>
+											<h1 class="text-base font-light leading-none text-slate-400">
+												{track.album}
+											</h1>
+											<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+										</div>
+									</div>
+								</div>
+							</TrackWrapper>
+							<div class="ml-2 flex items-center">
+								<DropdownMenu.Root>
+									<DropdownMenu.Trigger asChild let:builder>
+										<Button
+											class="h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+											builders={[builder]}
+										>
+											<EllipsisVertical size={20} color="white" />
+										</Button>
+									</DropdownMenu.Trigger>
+									<DropdownMenu.Content class="w-56">
+										<DropdownMenu.Label>Options</DropdownMenu.Label>
+										<DropdownMenu.Separator />
+										<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
+										<DropdownMenu.Sub>
+											<DropdownMenu.SubTrigger>
+												<span>Add to Playlist</span>
+											</DropdownMenu.SubTrigger>
+											<DropdownMenu.SubContent side="left">
+												{#if playlists.length > 0}
+													{#each playlists as playlist}
+														<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
+															<span>{playlist.name}</span>
+														</DropdownMenu.Item>
+													{/each}
+												{:else}
+													<DropdownMenu.Item disabled>
+														<span>No Playlists</span>
+													</DropdownMenu.Item>
+												{/if}
+											</DropdownMenu.SubContent>
+										</DropdownMenu.Sub>
+									</DropdownMenu.Content>
+								</DropdownMenu.Root>
 							</div>
 						</div>
-					</div>
-				</TrackWrapper>
-				<div class="ml-2 flex items-center">
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder>
-							<Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-								<EllipsisVertical size={20} color="white" />
-							</Button>
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content class="w-56">
-							<DropdownMenu.Label>Options</DropdownMenu.Label>
-							<DropdownMenu.Separator />
-							<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
-							<DropdownMenu.Sub>
-								<DropdownMenu.SubTrigger>
-									<span>Add to Playlist</span>
-								</DropdownMenu.SubTrigger>
-								<DropdownMenu.SubContent side="left">
-									{#if playlists.length > 0}
-										{#each playlists as playlist}
-											<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
-												<span>{playlist.name}</span>
-											</DropdownMenu.Item>
-										{/each}
-									{:else}
-										<DropdownMenu.Item disabled>
-											<span>No Playlists</span>
-										</DropdownMenu.Item>
-									{/if}
-								</DropdownMenu.SubContent>
-							</DropdownMenu.Sub>
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
+					{/each}
 				</div>
-			</div>
-		{/each}
+			{/each}
+		{:else}
+			<div class="mx-4 mb-5 mt-2 flex flex-col">
+				{#each tracks as track}
+					<div class="flex w-full">
+						<TrackWrapper className="flex-grow" {track} {tracks}>
+							<div
+								class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
+							>
+								{#await getImageUrl(track.image) then image}
+									<Lazy keep={true}>
+										<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
+									</Lazy>
+								{:catch error}
+									<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+								{/await}
+								<div class="flex flex-grow flex-col items-start">
+									<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
+									<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
+								</div>
+								<div class="ml-4 flex flex-row items-center text-right">
+									<div class="flex flex-col">
+										<h1 class="text-base font-light leading-none text-slate-400">
+											{formatDuration(track.duration)}
+										</h1>
+										<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
+										<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+									</div>
+								</div>
+							</div>
+						</TrackWrapper>
+						<div class="ml-2 flex items-center">
+							<DropdownMenu.Root>
+								<DropdownMenu.Trigger asChild let:builder>
+									<Button
+										class="h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+										builders={[builder]}
+									>
+										<EllipsisVertical size={20} color="white" />
+									</Button>
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content class="w-56">
+									<DropdownMenu.Label>Options</DropdownMenu.Label>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
+									<DropdownMenu.Sub>
+										<DropdownMenu.SubTrigger>
+											<span>Add to Playlist</span>
+										</DropdownMenu.SubTrigger>
+										<DropdownMenu.SubContent side="left">
+											{#if playlists.length > 0}
+												{#each playlists as playlist}
+													<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
+														<span>{playlist.name}</span>
+													</DropdownMenu.Item>
+												{/each}
+											{:else}
+												<DropdownMenu.Item disabled>
+													<span>No Playlists</span>
+												</DropdownMenu.Item>
+											{/if}
+										</DropdownMenu.SubContent>
+									</DropdownMenu.Sub>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
+						</div>
+					</div>
+				{/each}
 			</div>
 		{/if}
 	</div>

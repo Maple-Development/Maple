@@ -6,8 +6,8 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { context, title } from '$lib/store';
-    import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-    import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 
@@ -45,7 +45,7 @@
 		sortArtists(sort);
 	}
 
-    let isOpenAlert = false;
+	let isOpenAlert = false;
 	let selectedArtist: Artist | null = null;
 
 	function deleteArtist() {
@@ -107,15 +107,15 @@
 	{#each artists as artist}
 		<div class="flex flex-col items-start">
 			{#await getImageUrl(artist.image) then image}
-                <ContextMenu type={'artist'} on:delete={(e) => openAlert(artist)}>
-                    <a class="pointer" href={`/artist?artist=${artist.id}`}>
-                        {#if image !== ''}
-                            <img class="h-52 w-52 rounded-[50%]" src={image} alt={artist.name} />
-                        {:else}
-                            <div class="h-52 w-52 animate-pulse rounded-[50%] bg-gray-500"></div>
-                        {/if}
-                    </a>
-                </ContextMenu>
+				<ContextMenu type={'artist'} on:delete={(e) => openAlert(artist)}>
+					<a class="pointer" href={`/artist?artist=${artist.id}`}>
+						{#if image !== ''}
+							<img class="h-52 w-52 rounded-[50%]" src={image} alt={artist.name} />
+						{:else}
+							<div class="h-52 w-52 animate-pulse rounded-[50%] bg-gray-500"></div>
+						{/if}
+					</a>
+				</ContextMenu>
 				<div class="flex flex-row items-start">
 					<div class="mt-4 flex h-full flex-col items-start">
 						<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{artist.name}</h1>

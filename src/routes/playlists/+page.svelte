@@ -84,7 +84,7 @@
 			doCreate = false;
 			goto('/playlists');
 			refresh();
-		} 
+		}
 	}
 
 	function handlePhotoChange(event: Event) {
