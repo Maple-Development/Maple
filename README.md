@@ -1,17 +1,30 @@
-# Maple
+<div style="display: flex; align-items: center; flex-direction: column;">
+    <img src="resources/maple_main_icon.png" width="128"/>
+    <h1 style="font-size: 4rem; font-weight: bold; margin-top: 0.5rem; margin-bottom: 0.5rem;">Maple</h1>
+</div>
 
-## What's this project?
+<div style="text-align: left; text-align: center; margin-left: 2.2rem; margin-right: 2.2rem;">
+    <p>Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.</p>
+</div>
 
-Maple is a music library and organization tool. It allows you to upload your music library, then watch it be organized into albums, artists, playlists, etc! You are given robust controls to play and organize your music. In the future, it'll include optional social and stat tracking features.
+## How to use?
+
+- Head to settings
+- Upload your music library
+- That's it!
 
 ## What's the inspiration behind it?
 
-I was inspired to make this through many times in my life, such as being on a plane with no internet. Where I had my music, but found my local tools to play it lacking. For example, windows media player, etc. So this project is not only to solve that issue forever. But to help me learn.
+<div style="text-align: left;">
+    <p style="font-size: 1rem; font-weight: medium; margin-top: 0.5rem; margin-bottom: 0.5rem;">I was inspired to create this project from various experiences in my life, such as being on a plane without internet. While I had my music with me, I found local tools like Windows Media Player lacking. This project not only aims to solve that issue but also serves as a learning experience for me.</p>
+</div>
 
-### Lead & Only Developer:
+## Credits
 
-> Cattn
+### Lead & Only Developer
 
-### Logos & Branding:
+- Cattn
 
-> Nailington
+### Logos & Branding
+
+- Nailington
