@@ -12,6 +12,6 @@ I was inspired to make this through many times in my life, such as being on a pl
 
 > Cattn
 
-### Images:
+### Logos & Branding:
 
 > Nailington
