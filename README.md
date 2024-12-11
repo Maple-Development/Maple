@@ -11,3 +11,7 @@ I was inspired to make this through many times in my life, such as being on a pl
 ### Lead & Only Developer:
 
 > Cattn
+
+### Images:
+
+> Nailington
