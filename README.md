@@ -1,8 +1,18 @@
+<p align="center">
+    <img src="https://github.com/Maple-Development/Maple/blob/d3edeef4f7bce80170f58220a677d1fecc7c40f2/resources/maple_main_icon.png?raw=true" width="128" alt="Maple Icon"/>
+</p>
 
-# Maple
-[stable](https://maple.cattn.dev/)  · [beta](https://beta.cattn.dev/)
+<h3 align="center">
+    <strong>Maple</strong>
+</h3>
 
-Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
+<p align="center">
+    <a href="https://maple.cattn.dev/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
+</p>
+
+<p align="center">
+    Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
+</p>
 
 ## How to use?
 
