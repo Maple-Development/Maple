@@ -56,7 +56,6 @@
 		"tailwind-variants": "^0.2.1",
 		"uuid": "^11.0.3",
 		"workbox-cacheable-response": "^7.3.0",
-		"workbox-core": "^7.3.0",
 		"workbox-expiration": "^7.3.0",
 		"workbox-google-analytics": "^7.3.0",
 		"workbox-navigation-preload": "^7.3.0",
