@@ -1,4 +1,4 @@
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 //import adapter from '@sveltejs/adapter-auto';
 //import adapter from '@sveltejs/adapter-static';
 import adapter from '@sveltejs/adapter-cloudflare';
@@ -12,10 +12,10 @@ const config = {
 		adapter: adapter({
 			// See below for an explanation of these options
 			routes: {
-			  include: ['/*'],
-			  exclude: ['<all>'],
-			},
-		  }),
+				include: ['/*'],
+				exclude: ['<all>']
+			}
+		})
 	},
 	preprocess: [vitePreprocess({})]
 };

@@ -1,7 +1,46 @@
-# UMLA
+<p align="center">
+    <img src="resources/maple_main_icon.png" width="128" alt="Maple Icon"/>
+</p>
 
-## What's this project?
-This is UMLA/Maple, a local library first music platform. This is a website meant to help you use, organize, and enjoy your own music!
+<h3 align="center">
+    <strong>Maple</strong>
+</h3>
+
+<p align="center">
+    <a href="https://maple.cattn.dev/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
+</p>
+
+<p align="center">
+    Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
+</p>
+
+## How to use?
+
+- Head to settings
+- Upload your music library
+- That's it!
+
+## Q&As
+
+Will my library be sent to anyone?
+- No! Your library is completely managed on-device using the Origin Private File System (OPFS). If you enable developer controls in settings, you can interface with this OPFS in a rudimentary terminal-style environment!
+
+Help! I have ___ Bug!
+- You can report any bugs in the Issues tab [here](https://github.com/Maple-Development/Maple/issues)!
+> Please note, this site is still early in development. Many features/bugs are known and are actively being worked on. Check our discord [here](https://discord.gg/Wxrp73HVj4) for more information.
+
+If you have any other questions, feel free to DM ``cattn.`` on discord, or email me @ ``Logan@cattn.dev``
 
 ## What's the inspiration behind it?
-I was inspired to make this through many times in my life, such as being on a plane with no internet. Where I had my music, but found my local tools to play it lacking. For example, windows media player, etc. So this project is not only to solve that issue forever. But to help me learn.
+
+Maple was inspired by various experiences, such as being on a plane without internet. While I had my music with me, I found local tools like Windows Media Player lacking. This project not only aims to solve that issue but also serves as a learning experience for me.
+
+## Credits
+
+### Lead & Only Developer
+
+- Cattn
+
+### Logos & Branding
+
+- Nailington
