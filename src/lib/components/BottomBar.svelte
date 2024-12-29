@@ -6,7 +6,7 @@
 	import Controls from './controls.svelte';
 	import { onMount } from 'svelte';
 
-	import { Play, SkipForward, SkipBack, Shuffle, Repeat, Repeat1, Pause } from 'lucide-svelte';
+	import { Play, SkipForward, SkipBack, Shuffle, Repeat, Repeat1, Pause, ChevronUp } from 'lucide-svelte';
 	import { browser } from '$app/environment';
 
 	let currentTime: number[];
@@ -85,6 +85,10 @@
 		}
 	}
 
+	function drawerUp() {
+
+	}
+
 	let mouseOn = false;
 </script>
 
@@ -102,7 +106,7 @@
 
 <!-- scrub bar -->
 <div class="relative flex h-[98%] items-center justify-between">
-	<div class="flex">
+	<div class="flex ml-2 sm:ml-0">
 		{#if $activeSong.title}
 			{#await getImageUrl($activeSong.image)}
 				<div class="ml-1 h-20 w-20 self-center rounded-xl bg-gray-500"></div>
@@ -131,7 +135,7 @@
 			</div>
 		{:else}
 		<img src="/temp/MapleD.svg" alt="gnx" class="h-20 self-center rounded-xl p-2" />
-		<div class="flex flex-col items-start">
+		<div class="flex-col items-start sm:flex hidden">
 			<Button variant="link" class="mt-5 font-bold text-md mb-0 p-0 h-fit underline-offset-1 py-0 px-0">Nothing Playing</Button>
 			<Button variant="link" class="mt-[-0.5rem] p-0 m-0 h-3 text-sm font-normal underline-offset-1 py-0 px-0 my-0">...</Button>
 		</div>
@@ -178,13 +182,22 @@
 		</Button>
 	</div>
 
-	<div class="mr-5 flex flex-grow justify-end">
+	<div class="mr-5 flex-grow justify-end sm:flex hidden">
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<!-- svelte-ignore a11y-missing-attribute -->
 		<a on:click={() => changeVolume()} on:mouseup={() => changeVolume()}>
 		<Slider bind:value={volume} max={100} step={2} class="w-40" />
 		</a>
 	</div>
+	<div class="mr-4 justify-end sm:flex">
+		<Button
+				on:click={drawerUp}
+				variant="secondary"
+				class="flex h-fit w-fit flex-row items-center justify-start p-2 rounded-[50%]"
+			>
+				<ChevronUp size={25} class="text-foreground" />
+		</Button>
+	</div>
 </div>
 
-<Controls bind:this={controls} />
+<Controls bind:this={controls} /> 
