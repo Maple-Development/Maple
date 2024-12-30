@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	// @ts-nocheck
 	import '../app.pcss';
 	import SideBar from '$lib/components/SideBar.svelte';
@@ -7,12 +7,22 @@
 	import { collapsed } from '$lib/store';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title } from '$lib/store';
+
+	let bottomDiv: HTMLDivElement;
+
+	function expand() {
+		if (bottomDiv.style.height === '100%') {
+			bottomDiv.style.height = 'auto';
+		} else {
+			bottomDiv.style.height = '100%';
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>{$title}</title>
 </svelte:head>
-<Toaster position="top-right" />
+<Toaster position="top-right" /> 
 
 <div class="flex h-screen flex-col">
 	<div class="sticky top-0 z-10 border-b bg-background">
@@ -32,7 +42,7 @@
 			<slot />
 		</div>
 	</div>
-	<div class="sticky bottom-0 z-10 border-t bg-background">
-		<BottomBar />
+	<div bind:this={bottomDiv} class="sticky bottom-0 transition  z-10 border-t bg-background">
+		<BottomBar on:expand={expand} />
 	</div>
 </div>

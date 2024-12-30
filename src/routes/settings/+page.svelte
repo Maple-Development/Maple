@@ -19,6 +19,8 @@
 	let deferredPrompt;
 	async function createLibrary(mobileFiles: FileList) {
 		try {
+			const sampleImage = await fetch("/placeholder.png");
+			const blob = await sampleImage.blob();
 			await OPFS.initializeLibrary();
 
 			let entries: FileSystemHandle[] = [];
@@ -44,11 +46,11 @@
 									? new Blob([metadata.common.picture[0].data], {
 											type: metadata.common.picture[0].format
 										})
-									: undefined,
+									: blob,
 								trackNumber: metadata.common.track.no,
 								disk: metadata.common.disk.no,
 								ext: file.name.split('.').pop()
-							};
+							}; 
 
 							const album: Album = {
 								id: uuidv4(),
@@ -60,7 +62,7 @@
 									? new Blob([metadata.common.picture[0].data], {
 											type: metadata.common.picture[0].format
 										})
-									: undefined
+									: blob
 							};
 
 							const artist: Artist = {
