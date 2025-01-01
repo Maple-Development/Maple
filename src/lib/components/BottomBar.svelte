@@ -49,18 +49,7 @@
 	}
 
 	function pausePlay() {
-		audioPlayer.update((state) => {
-			if (state.audio instanceof HTMLAudioElement) {
-				if (state.playing) {
-					state.audio.pause();
-				} else {
-					state.audio.play();
-				}
-				return { ...state, playing: !state.playing, currentTime: state.audio.currentTime };
-			} else {
-				return state;
-			}
-		});
+		controls.pausePlay();
 	}
 
 	function nextSong() {
@@ -108,7 +97,7 @@
 		bind:value={$curTime}
 		bind:max={maxDuration[0]}
 		step={0.1}
-		class="z-10 ml-1 h-[2%] w-[98%]"
+		class="z-10 ml-4 h-[2%] w-[98%]"
 	></Slider>
 </a>
 
@@ -198,7 +187,7 @@
 	</div>
 	<div class="mr-4 justify-end sm:hidden flex">
 		<Button
-				on:click={drawerUp}
+				on:click={drawerUp} 
 				variant="secondary"
 				class="flex h-fit w-fit flex-row items-center justify-start p-2 rounded-[50%]"
 			>
