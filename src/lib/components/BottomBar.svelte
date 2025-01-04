@@ -97,10 +97,10 @@
 		bind:value={$curTime}
 		bind:max={maxDuration[0]}
 		step={0.1}
-		class="z-10 ml-4 h-[2%] w-[98%]"
+		class="z-10 ml-4 h-[2%] w-[100%] pr-8" 
 	></Slider>
 </a>
-
+ 
 <div class="relative flex h-[98%] items-center justify-between">
 	<div class="flex ml-2 sm:ml-0">
 		{#if $activeSong.title}

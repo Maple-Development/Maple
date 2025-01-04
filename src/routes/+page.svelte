@@ -115,13 +115,13 @@
 
 
 {#if recentlyPlayedSongs.length > 0}
-	<div class="mt-5 my-5 ml-16 flex flex-col rounded-md">
+	<div class="mt-5 my-5 md:ml-16 ml-2 flex flex-col rounded-md">
 		<h2 class="text-md text-left text-xl font-black">
 			Recently Played:
 		</h2>
 	</div>
 	<div
-		class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+		class="my-5 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 	>
 	{#each recentlyPlayedSongs as track}
 		{#if track}
@@ -134,14 +134,14 @@
 					>
 					<TrackWrapper className="" {track} {tracks}>
 						<Lazy height={208} keep={true}>
-							<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+							<img class="md:h-52 md:w-52 h-44 w-44 rounded-sm" src={image} alt={track.title} />
 						</Lazy>
 					</TrackWrapper>
 				</ContextMenu>
 				<div class="flex flex-row items-start">
 					<div class="mt-4 flex h-full flex-col items-start">
-						<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-						<h1 class="p text-base font-light leading-none text-slate-400">{track.artist}</h1>
+						<h1 class="p-0 text-lg md:text-md font-bold leading-none text-foreground">{track.title}</h1>
+						<h1 class="p-0 text-sm md:text-base font-light leading-none text-slate-400">{track.artist}</h1>
 					</div>
 				</div>
 			{:catch error}

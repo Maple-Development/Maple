@@ -6,7 +6,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-	import { title } from '$lib/store';
+	import { title, isSmallDevice } from '$lib/store';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
@@ -136,22 +136,22 @@
 
 {#if listType !== 'list'}
 	<div
-		class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+		class="my-5 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 	>
 		{#each albums as album}
-			<div class="flex flex-col items-start">
+			<div class="flex flex-col items-start mr-2">
 				{#await getImageUrl(album.image) then image}
 					<ContextMenu type={'album'} on:delete={(e) => openAlert(album)}>
 						<a class="pointer" href={`/album?album=${album.id}`}>
 							<Lazy height={208} keep={true}>
-								<img class="h-52 w-52 rounded-sm" src={image} alt={album.name} />
+								<img class="md:h-52 md:w-52 h-44 w-44 rounded-sm" src={image} alt={album.name} />
 							</Lazy>
 						</a>
 					</ContextMenu>
 					<div class="flex flex-row items-start">
 						<div class="mt-4 flex h-full flex-col items-start">
-							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
-							<h1 class="p text-base font-light leading-none text-slate-400">{album.artist}</h1>
+							<h1 class="p-0 text-lg md:text-md font-bold leading-none text-foreground">{album.name}</h1>
+							<h1 class="p-0 text-sm md:text-base font-light leading-none text-slate-40">{album.artist}</h1>
 						</div>
 					</div>
 				{:catch error}
@@ -167,21 +167,25 @@
 				<div class="flex-grow">
 					<a class="pointer" href={`/album?album=${album.id}`}>
 						<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-							{#await getImageUrl(album.image) then image}
-								<Lazy height={208} keep={true}>
-									<img class="mr-4 h-24 w-24" src={image} alt={album.name} />
-								</Lazy>
-							{:catch error}
-								<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-							{/await}
-							<div class="flex flex-grow flex-col items-start">
-								<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{album.name}</h1>
+							<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
+								{#await getImageUrl(album.image) then image}
+									<Lazy height={208} keep={true}>
+										<img class="rounded-md" src={image} alt={album.name} />
+									</Lazy>
+								{:catch error}
+									<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+								{/await}
+							</div>
+							<div class="flex flex-grow flex-col items-start ml-4">
+								<h1 class="text-lg font-bold leading-none text-foreground">{album.name}</h1>
 								<h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
 							</div>
+							{#if !$isSmallDevice}
 							<div class="ml-4 flex flex-col items-end text-right">
 								<h1 class="text-base font-light leading-none text-slate-400">{album.year}</h1>
 								<h1 class="text-base font-light leading-none text-slate-400">{album.artist}</h1>
 							</div>
+							{/if}
 						</div>
 					</a>
 				</div>

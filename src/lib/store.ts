@@ -9,6 +9,7 @@ let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Son
 export const collapsed = writable(false);
 export const curTime = writable([0] as number[]);
 export const setCurTime = writable([0] as number[]);
+export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
 	onEnded: () => {},
