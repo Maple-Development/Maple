@@ -75,7 +75,7 @@
 	</div>
 	{:else}
 	<div class="fixed inset-x-0 bottom-0 z-10 bg-background border-t" bind:this={bottomDiv}>
-		<div class="mb-16">
+		<div class="mb-16 h-full">
 			<BottomBar on:expand={expand} />
 		</div>
 		{#if !isExpanded}

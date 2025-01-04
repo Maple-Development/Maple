@@ -18,7 +18,7 @@
 	} from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { context, title } from '$lib/store';
+	import { context, title, isSmallDevice } from '$lib/store';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { page } from '$app/stores';
 	//@ts-ignore
@@ -273,7 +273,7 @@
 </script>
 
 <div class="mt-4 flex h-fit justify-between rounded-md border-gray-600 p-5 px-10">
-	<div class="flex">
+	<div class="flex md:flex-row flex-col">
 		<div>
 			{#await getImageUrl(playlist?.image) then image}
 				{#if editModeOn}
@@ -286,7 +286,7 @@
 						on:change={(e) => handlePhotoChange(e)}
 					/>
 				{:else if image !== ''}
-					<img class="h-64 w-64 rounded-sm" src={image} alt={playlist?.name?.toString() ?? ''} />
+					<img class="md:h-64 md:w-64 h-44 w-44 rounded-sm" src={image} alt={playlist?.name?.toString() ?? ''} />
 				{:else}
 					<div class="h-52 w-52 animate-pulse rounded-[50%] bg-gray-500"></div>
 				{/if}
@@ -294,7 +294,7 @@
 				<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
 			{/await}
 		</div>
-		<div class="ml-7 flex flex-col items-start">
+		<div class="ml-2 md:ml-7 mt-2 md:mt-0 flex flex-col items-start">
 			<div class="flex flex-col items-start">
 				{#if editModeOn}
 					<h1
@@ -320,7 +320,7 @@
 			</div>
 		</div>
 	</div>
-	<div>
+	<div class="flex flex-row items-center">
 		<Button
 			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
 			on:click={() => editMode()}
@@ -361,8 +361,8 @@
 		</AlertDialog.Root>
 	</div>
 </div>
-<Separator class="mb-4 ml-14 mt-1 w-[95%] pr-20"></Separator>
-<div class="mx-4 mt-4 flex h-10 justify-end border-gray-600 px-5">
+<Separator class="mb-4 ml-2 md:ml-14 mt-1 w-[95%] pr-20"></Separator>
+<div class="mx-4 mt-4 flex h-10 justify-center md:justify-end border-gray-600 px-5">
 	<div class="flex items-center">
 		{#if ascending}
 			<Button
@@ -409,9 +409,9 @@
 
 {#if !editModeOn}
 	{#if listType !== 'list'}
-		<div
-			class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
-		>
+	<div
+		class="my-5 mr-2 md:mr-0 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+	>
 			{#each tracks as track}
 				<div class="flex flex-col items-start">
 					{#await getImageUrl(track.image) then image}
@@ -423,14 +423,14 @@
 						>
 							<TrackWrapper className="" {track} {tracks}>
 								<Lazy height={208} keep={true}>
-									<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
+									<img class="md:h-52 md:w-52 h-44 w-44 rounded-sm" src={image} alt={track.title} />
 								</Lazy>
 							</TrackWrapper>
 						</ContextMenu>
 						<div class="flex flex-row items-start">
 							<div class="mt-4 flex h-full flex-col items-start">
-								<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-								<h1 class="p text-base font-light leading-none text-slate-400">{track.artist}</h1>
+								<h1 class="p-0 text-lg md:text-md font-bold leading-none text-foreground">{track.title}</h1>
+								<h1 class="p-0 text-sm md:text-base font-light leading-none text-slate-400">{track.artist}</h1>
 							</div>
 						</div>
 					{:catch error}
@@ -442,30 +442,34 @@
 	{:else}
 		<div class="mx-4 mb-5 mt-2 flex flex-col">
 			{#each tracks as track}
-				<div class="flex w-full">
-					<TrackWrapper className="flex-grow" {track} {tracks}>
-						<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
+			<div class="flex w-full">
+				<TrackWrapper className="flex-grow" {track} {tracks}>
+					<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
+						<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
 							{#await getImageUrl(track.image) then image}
 								<Lazy height={208} keep={true}>
-									<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
+									<img class="rounded-md" src={image} alt={track.title} />
 								</Lazy>
 							{:catch error}
-								<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+								<div class="rounded-full h-24 w-24 bg-gray-500"></div>
 							{/await}
-							<div class="flex flex-grow flex-col items-start">
-								<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-							</div>
-							<div class="ml-4 flex flex-row items-center text-right">
-								<div class="flex flex-col">
-									<h1 class="text-base font-light leading-none text-slate-400">
-										{formatDuration(track.duration)}
-									</h1>
-									<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-									<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
-								</div>
+						</div>
+						<div class="ml-4 flex flex-col">
+							<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
+							<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
+						</div>
+						{#if !$isSmallDevice}
+						<div class="ml-4 flex flex-grow justify-end flex-row items-center text-right">
+							<div class="flex flex-col">
+								<h1 class="text-base font-light leading-none text-slate-400">
+									{formatDuration(track.duration)}
+								</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
 							</div>
 						</div>
+						{/if}
+					</div>
 					</TrackWrapper>
 					<div class="ml-2 flex items-center">
 						<DropdownMenu.Root>
@@ -517,9 +521,9 @@
 			on:click={() => (openAdd = true)}
 			class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
 		>
-			<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-				<div class="mr-4 flex h-24 w-24 items-center justify-center bg-gray-500">
-					<div class="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+			<div class="flex flex-row items-center rounded-sm md:px-2 py-2 hover:bg-secondary">
+				<div class="mr-4 flex h-12 w-12 md:h-24 md:w-24 items-center justify-center bg-gray-500">
+					<div class="flex h-6 w-6 md:h-12 md:w-12 items-center justify-center rounded-full bg-white">
 						<Plus size={20} color="black" />
 					</div>
 				</div>
@@ -530,34 +534,38 @@
 		</a>
 		{#each tracks as track, i}
 			<div class="flex w-full flex-row items-center rounded-sm px-2 py-2">
-				{#await getImageUrl(track.image) then image}
-					<Lazy height={208} keep={true}>
-						<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
-					</Lazy>
-				{:catch error}
-					<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-				{/await}
-				<div class="flex flex-grow flex-col items-start">
-					<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
+				<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
+					{#await getImageUrl(track.image) then image}
+						<Lazy height={208} keep={true}>
+							<img class="rounded-md" src={image} alt={track.title} />
+						</Lazy>
+					{:catch error}
+						<div class="mr-4 h-24 w-24 bg-gray-500"></div>
+					{/await}
+				</div>
+				<div class="ml-4 flex flex-col">
+					<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
 					<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
 				</div>
-				<div class="ml-4 flex flex-row items-center text-right">
-					<div class="flex flex-col">
-						<h1 class="text-base font-light leading-none text-slate-400">
-							{formatDuration(track.duration)}
-						</h1>
-						<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-						<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+				<div class="ml-4 flex flex-grow justify-end flex-row items-center text-right">
+					{#if !$isSmallDevice}
+						<div class="flex flex-col">
+								<h1 class="text-base font-light leading-none text-slate-400">
+									{formatDuration(track.duration)}
+								</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
+								<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+						</div>
+					{/if}
+					<div class="ml-2 flex items-center">
+						<Button
+							class="my-1 ml-3 h-10 w-10 px-1"
+							variant="destructive"
+							on:click={() => editRemove(track, i)}
+						>
+							<Trash size={20} color="white" />
+						</Button>
 					</div>
-				</div>
-				<div class="ml-2 flex items-center">
-					<Button
-						class="my-1 ml-3 h-10 w-10 px-1"
-						variant="destructive"
-						on:click={() => editRemove(track, i)}
-					>
-						<Trash size={20} color="white" />
-					</Button>
 				</div>
 			</div>
 		{/each}

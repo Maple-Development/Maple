@@ -83,9 +83,9 @@
 		selectedAlbum = album;
 		isOpenAlert = true;
 	}
-</script>
+</script>  
 
-<div class="mt-4 flex h-10 w-full justify-end px-10">
+<div class="mt-4 flex h-10 w-full justify-center md:justify-end px-10">
 	{#if ascending}
 		<Button
 			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
