@@ -2,7 +2,7 @@
 	import { OPFS } from '$lib/opfs';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { title, recentlyPlayedManager } from '$lib/store';
+	import { title, recentlyPlayedManager, isSmallDevice, hideTips } from '$lib/store';
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import {
 		ArrowDownZA,
@@ -11,7 +11,8 @@
 		ListFilter,
 		Info,
 		CircleAlert,
-		CircleCheck
+		CircleCheck,
+		X
 	} from 'lucide-svelte';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -66,6 +67,10 @@
 	function openAlert(track: Song) {
 		open = true;
 		selectedSong = track;
+	}
+
+	function hidetips() {
+		hideTips.set(true);
 	}
 </script>
 
@@ -131,7 +136,7 @@
 						type={'track'}
 						on:delete={(e) => openAlert(track)}
 						on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
-					>
+					> 
 					<TrackWrapper className="" {track} {tracks}>
 						<Lazy height={208} keep={true}>
 							<img class="md:h-52 md:w-52 h-44 w-44 rounded-sm" src={image} alt={track.title} />
@@ -147,135 +152,128 @@
 			{:catch error}
 				<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
 			{/await}
-			</div>
-		{/if}
+			</div> 
+		{/if} 
 	{/each}
 	</div>
 {/if}
 
+{#if $hideTips == false}
 <!-- tips -->
-<div class="mt-20 ml-16 flex flex-col rounded-md">
+<div class="bg-secondary mx-4 my-4 rounded-md py-1">
+<div class="mt-5 ml-12 flex flex-row rounded-md justify-between items-center">
 	<h2 class="text-md text-left text-xl font-black">
 		Tips:
 	</h2>
+	<Button class="my-1 mr-10 md:mr-12 h-10 w-10 px-1" on:click={() => hidetips()} variant="destructive">
+		<X size={20} color="white" /> 
+	</Button>
 </div>
 <Lazy keep={true}>
-	<div class="mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-center justify-center rounded-md p-4 md:p-8">
-		<div class="mx-auto flex flex-col items-center justify-center">
-			<Carousel.Root class="mt-1 w-full max-w-md px-4 md:px-8">
-				<Carousel.Content>
-					<Carousel.Item>
-						<div class="p-1">
-							<Card.Root>
-								<Card.Content class="flex aspect-square flex-col items-center justify-center p-6">
-									<h2 class="text-sm font-medium text-secondary-foreground">Tip #1: Filters</h2>
-									<p class="text-sm font-medium text-muted-foreground">
-										Filters allow you to organize the different sections of your library by various
-										attributes. <br />
-										(try it below!)
-									</p>
-									<div class="flex flex-col items-center justify-center">
-										<div class="mt-4 flex h-10 w-full justify-center">
-											{#if ascending}
-												<Button
-													class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-													on:click={() => swapAscending()}
-												>
-													<ArrowUpAZ size={20} color="white" />
-												</Button>
-											{:else}
-												<Button
-													class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-													on:click={() => swapAscending()}
-												>
-													<ArrowDownZA size={20} color="white" />
-												</Button>
-											{/if}
-											<DropdownMenu.Root>
-												<DropdownMenu.Trigger asChild let:builder>
-													<Button
-														class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-														builders={[builder]}
-													>
-														<ListFilter size={20} color="white" />
-													</Button>
-												</DropdownMenu.Trigger>
-												<DropdownMenu.Content class="w-56">
-													<DropdownMenu.Label>Sort By</DropdownMenu.Label>
-													<DropdownMenu.Separator />
-													<DropdownMenu.RadioGroup>
-														<DropdownMenu.RadioItem value="title">Title</DropdownMenu.RadioItem>
-														<DropdownMenu.RadioItem value="artist">Artist</DropdownMenu.RadioItem>
-														<DropdownMenu.RadioItem value="album">Album</DropdownMenu.RadioItem>
-														<DropdownMenu.RadioItem value="year">Year</DropdownMenu.RadioItem>
-														<DropdownMenu.RadioItem value="duration"
-															>Duration</DropdownMenu.RadioItem
-														>
-													</DropdownMenu.RadioGroup>
-												</DropdownMenu.Content>
-											</DropdownMenu.Root>
-											<Button class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary">
-												<List size={20} color="white" />
-											</Button>
-										</div>
-									</div>
-								</Card.Content>
-							</Card.Root>
-						</div>
-					</Carousel.Item>
-					<Carousel.Item>
-						<div class="p-1">
-							<Card.Root>
-								<Card.Content class="flex aspect-square flex-col items-center justify-center p-6">
-									<h2 class="text-sm font-medium text-secondary-foreground">Tip #2: Search</h2>
-									<p class="text-sm font-medium text-muted-foreground">
-										The search box is always available at the top of the screen to easily swap pages,
-										or search the content on your current page! (try it below!)
-									</p>
-									<div class="border-1 mt-2 flex flex-col items-center justify-center rounded-sm border">
-										<Command.Root class="bg-bg border-1 w-96 border-secondary-foreground">
-											<Command.Input placeholder="Search for recent items, or type a page name." />
-											<Command.List>
-												<Command.Empty>No results found.</Command.Empty>
-												<Command.Group heading="Pages">
-													<Command.Item>Home</Command.Item>
-													<Command.Item>Tracks</Command.Item>
-													<Command.Item>Albums</Command.Item>
-													<Command.Item>Playlists</Command.Item>
-													<Command.Item>Artists</Command.Item>
-													<Command.Item>Settings</Command.Item>
-												</Command.Group>
-												<Command.Separator />
-												<Command.Group heading="Tracks">
-													<Command.Item>bad guy</Command.Item>
-													<Command.Item>i want it that way</Command.Item>
-													<Command.Item>no tears left to cry</Command.Item>
-												</Command.Group>
-											</Command.List>
-										</Command.Root>
-									</div>
-								</Card.Content>
-							</Card.Root>
-						</div>
-					</Carousel.Item>
-				</Carousel.Content>
-				<Carousel.Previous />
-				<Carousel.Next />
-			</Carousel.Root>
+  <div class="mx-auto flex flex-col items-center justify-center rounded-md p-4 md:p-8">
+	<div class="mx-auto flex flex-col items-center justify-center">
+	  <div class="p-5">
+		<h2 class="text-sm font-medium text-secondary-foreground">Tip #1: Filters</h2>
+		<p class="text-sm font-medium text-muted-foreground">
+		  Filters allow you to organize the different sections of your library by various
+		  attributes.
+		  (try it below!)
+		</p>
+		<div class="flex flex-col items-center justify-center">
+		  <div class="mt-4 flex h-10 w-full justify-center">
+			{#if ascending}
+			  <Button
+				class="my-1 ml-3 h-10 w-10 px-1"
+				on:click={() => swapAscending()}
+			  >
+				<ArrowUpAZ size={20} color="white" />
+			  </Button>
+			{:else}
+			  <Button
+				class="my-1 ml-3 h-10 w-10 px-1 "
+				on:click={() => swapAscending()}
+			  >
+				<ArrowDownZA size={20} color="white" />
+			  </Button>
+			{/if}
+			<DropdownMenu.Root>
+			  <DropdownMenu.Trigger asChild let:builder>
+				<Button
+				  class="my-1 ml-3 h-10 w-10 px-1"
+				  builders={[builder]}
+				>
+				  <ListFilter size={20} color="white" />
+				</Button>
+			  </DropdownMenu.Trigger>
+			  <DropdownMenu.Content class="w-56">
+				<DropdownMenu.Label>Sort By</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.RadioGroup>
+				  <DropdownMenu.RadioItem value="title">Title</DropdownMenu.RadioItem>
+				  <DropdownMenu.RadioItem value="artist">Artist</DropdownMenu.RadioItem>
+				  <DropdownMenu.RadioItem value="album">Album</DropdownMenu.RadioItem>
+				  <DropdownMenu.RadioItem value="year">Year</DropdownMenu.RadioItem>
+				  <DropdownMenu.RadioItem value="duration"
+					>Duration</DropdownMenu.RadioItem
+				  >
+				</DropdownMenu.RadioGroup>
+			  </DropdownMenu.Content>
+			</DropdownMenu.Root>
+			<Button class="my-1 ml-3 h-10 w-10 px-1">
+			  <List size={20} color="white" />
+			</Button>
+		  </div>
 		</div>
-		<div class="mx-auto flex flex-col items-center justify-center">
-			<div class="mt-5 flex flex-col items-center justify-center rounded-md bg-secondary p-5">
-				<h2 class="text-sm font-medium text-secondary-foreground">Context Menus:</h2>
-				<p class="text-sm font-medium text-muted-foreground">
-					tip: right click on a song to open a context menu!<br />
-					(try it below!)
-				</p>
-				<div class="flex flex-col items-center justify-center">
-					<ContextMenu type={'track'}>
-						<div class="mt-2 h-52 w-52 animate-pulse rounded-md bg-gray-500"></div>
-					</ContextMenu>
-				</div>
-			</div>
-		</div>
+	  </div>
 	</div>
+	<div class="mx-auto flex flex-col items-center justify-center w-full md:w-[60%] lg:w-[50%]">
+	  <div class="p-4 sm:p-6">
+		<h2 class="text-sm font-medium text-secondary-foreground">Tip #2: Search</h2>
+		<p class="text-xs sm:text-sm font-medium text-muted-foreground">
+		  The search box is always available at the top of the screen to easily swap pages,
+		  or search the content on your current page! (try it below!)
+		</p>
+		<div class="border-1 mt-2 flex flex-col items-center justify-center rounded-sm border w-full">
+		  <Command.Root class="bg-bg w-full sm:w-80 md:w-96 border-1 border-secondary-foreground">
+			<Command.Input placeholder="Search for recent items, or type a page name." />
+			<Command.List>
+			  <Command.Empty>No results found.</Command.Empty>
+			  <Command.Group heading="Pages">
+				<Command.Item>Home</Command.Item>
+				<Command.Item>Tracks</Command.Item>
+				<Command.Item>Albums</Command.Item>
+				<Command.Item>Playlists</Command.Item>
+				<Command.Item>Artists</Command.Item>
+				<Command.Item>Settings</Command.Item>
+			  </Command.Group>
+			  <Command.Separator />
+			  <Command.Group heading="Tracks">
+				<Command.Item>bad guy</Command.Item>
+				<Command.Item>i want it that way</Command.Item>
+				<Command.Item>no tears left to cry</Command.Item>
+			  </Command.Group>
+			</Command.List>
+		  </Command.Root>
+		</div>
+	  </div>
+	</div>
+	{#if !$isSmallDevice}
+	<div class="mx-auto flex flex-col items-center justify-center">
+		<div class="p-5">
+		  <h2 class="text-sm font-medium text-secondary-foreground">Tip #3: Context Menus</h2>
+		  <p class="text-sm font-medium text-muted-foreground">
+			Filters allow you to organize the different sections of your library by various
+			attributes.
+			(try it below!)
+		  </p>
+		  <div class="flex flex-col items-center justify-center">
+			<ContextMenu type={'track'}>
+				<div class="mt-2 h-52 w-52 animate-pulse rounded-md bg-gray-500"></div>
+			</ContextMenu>
+		  </div>
+		</div>
+	  </div>
+	{/if}
 </Lazy>
+</div>
+{/if}

@@ -9,6 +9,14 @@ let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Son
 export const collapsed = writable(false);
 export const curTime = writable([0] as number[]);
 export const setCurTime = writable([0] as number[]);
+export const hideTips = writable(false);
+hideTips.subscribe((value) => {
+	if (value) {
+		if (browser) {
+		localStorage.setItem('hideTips', 'true');
+		}
+	}
+})
 export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
@@ -117,3 +125,12 @@ function createTitle() {
 }
 
 export const title = createTitle();
+
+if (browser) {
+	const storedhideTips = localStorage.getItem('hideTips');
+	if (storedhideTips && storedhideTips === 'true') {
+		hideTips.set(true);
+	} else {
+		hideTips.set(false);
+	}
+}
