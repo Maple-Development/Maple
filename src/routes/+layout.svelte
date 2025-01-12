@@ -8,6 +8,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title, isSmallDevice } from '$lib/store';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
+	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
 
 	let bottomDiv: HTMLDivElement;
 
@@ -46,6 +47,10 @@
 		<div class="sticky top-0 z-10 border-b bg-background">
 			<TopBar />
 		</div>
+	{:else}
+		<div class="fixed inset-x-0 top-0 z-10 bg-background border-b">
+			<MobileTopBar />
+		</div>
 	{/if}
 	<div class="flex flex-1 overflow-hidden">
 		{#if !smallDevice}
@@ -64,7 +69,7 @@
 			<slot />
 		</div>
 		{:else}
-		<div class="scrollbar flex-1 overflow-auto mb-36">
+		<div class="scrollbar flex-1 overflow-auto mb-36 mt-12">
 			<slot />
 		</div>
 		{/if}

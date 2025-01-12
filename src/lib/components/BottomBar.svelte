@@ -111,7 +111,7 @@
 		class="z-10 ml-0 h-[2%] w-[100%] pr-0" 
 		colors={colors}
 	></Slider>
-</a>
+</a>  
 {:else}
 <!-- svelte-ignore a11y-missing-attribute -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
