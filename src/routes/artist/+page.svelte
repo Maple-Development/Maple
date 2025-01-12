@@ -3,17 +3,9 @@
 	import { onMount } from 'svelte';
 	import type { Artist } from '$lib/types/artist';
 	import type { Song } from '$lib/types/song';
-	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
-	import {
-		ArrowUpAZ,
-		ArrowDownZA,
-		ListFilter,
-		List,
-		Check,
-		Pencil,
-		Trash,
-		EllipsisVertical
-	} from 'lucide-svelte';
+	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil, Trash } from 'lucide-svelte';
+	import GridTrack from '$lib/components/blocks/GridTrack.svelte';
+	import ListTrack from '$lib/components/blocks/ListTrack.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { context, title } from '$lib/store';
@@ -22,10 +14,7 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	// @ts-ignore
-	import Lazy from 'svelte-lazy';
 	import { toast } from 'svelte-sonner';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import type { Playlist } from '$lib/types/playlist';
 
 	let artistName: string;
@@ -117,13 +106,6 @@
 		sortArtists(sort);
 	}
 
-	function formatDuration(duration: number): string {
-		const roundedDuration = Math.round(duration);
-		const minutes = Math.floor(roundedDuration / 60);
-		const seconds = roundedDuration % 60;
-		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-	}
-
 	function swapListType() {
 		if (listType === 'list') {
 			listType = 'grid';
@@ -188,13 +170,6 @@
 			sortTracks();
 		} else {
 			console.error('Album not found');
-		}
-	}
-
-	async function addTrackToPlaylist(track: Song, playlist: Playlist) {
-		if (track && playlist) {
-			OPFS.track().addToPlaylist(track, playlist);
-			toast.success(`Added ${track.title} to ${playlist.name}`);
 		}
 	}
 </script>
@@ -321,92 +296,13 @@
 		class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 	>
 		{#each tracks as track}
-			<div class="flex flex-col items-start">
-				{#await getImageUrl(track.image) then image}
-					<ContextMenu
-						type={'track'}
-						on:delete={(e) => openAlert(track)}
-						on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
-					>
-						<TrackWrapper className="" {track} {tracks}>
-							<Lazy height={208} keep={true}>
-								<img class="h-52 w-52 rounded-sm" src={image} alt={track.title} />
-							</Lazy>
-						</TrackWrapper>
-					</ContextMenu>
-					<div class="flex flex-row items-start">
-						<div class="mt-4 flex h-full flex-col items-start">
-							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-							<h1 class="p text-base font-light leading-none text-slate-400">{track.artist}</h1>
-						</div>
-					</div>
-				{:catch error}
-					<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-				{/await}
-			</div>
+			<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
 		{/each}
 	</div>
 {:else}
 	<div class="mx-4 mb-5 mt-2 flex flex-col">
 		{#each tracks as track}
-			<div class="flex w-full">
-				<TrackWrapper className="flex-grow" {track} {tracks}>
-					<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-						{#await getImageUrl(track.image) then image}
-							<Lazy height={208} keep={true}>
-								<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
-							</Lazy>
-						{:catch error}
-							<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-						{/await}
-						<div class="flex flex-grow flex-col items-start">
-							<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-							<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-						</div>
-						<div class="ml-4 flex flex-row items-center text-right">
-							<div class="flex flex-col">
-								<h1 class="text-base font-light leading-none text-slate-400">
-									{formatDuration(track.duration)}
-								</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
-							</div>
-						</div>
-					</div>
-				</TrackWrapper>
-				<div class="ml-2 flex items-center">
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder>
-							<Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-								<EllipsisVertical size={20} color="white" />
-							</Button>
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content class="w-56">
-							<DropdownMenu.Label>Options</DropdownMenu.Label>
-							<DropdownMenu.Separator />
-							<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
-							<DropdownMenu.Sub>
-								<DropdownMenu.SubTrigger>
-									<span>Add to Playlist</span>
-								</DropdownMenu.SubTrigger>
-								<DropdownMenu.SubContent side="left">
-									{#if playlists.length > 0}
-										{#each playlists as playlist}
-											<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
-												<span>{playlist.name}</span>
-											</DropdownMenu.Item>
-										{/each}
-									{:else}
-										<DropdownMenu.Item disabled>
-											<span>No Playlists</span>
-										</DropdownMenu.Item>
-									{/if}
-								</DropdownMenu.SubContent>
-							</DropdownMenu.Sub>
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
-				</div>
-			</div>
+			<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 		{/each}
 	</div>
 {/if}

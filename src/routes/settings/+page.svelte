@@ -19,7 +19,7 @@
 	let deferredPrompt;
 	async function createLibrary(mobileFiles: FileList) {
 		try {
-			const sampleImage = await fetch("/placeholder.png");
+			const sampleImage = await fetch('/placeholder.png');
 			const blob = await sampleImage.blob();
 			await OPFS.initializeLibrary();
 
@@ -50,7 +50,7 @@
 								trackNumber: metadata.common.track.no,
 								disk: metadata.common.disk.no,
 								ext: file.name.split('.').pop()
-							}; 
+							};
 
 							const album: Album = {
 								id: uuidv4(),

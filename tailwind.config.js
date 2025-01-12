@@ -15,7 +15,7 @@ const config = {
 		},
 		extend: {
 			transitionProperty: {
-				'height': 'height'
+				height: 'height'
 			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',

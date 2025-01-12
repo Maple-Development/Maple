@@ -150,30 +150,36 @@
 
 {#if !doCreate}
 	<div
-		class="my-5 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+		class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 	>
-	<a class="pointer" href={`/playlists?create=true`}>
-		<div class="md:h-52 md:w-52 h-44 w-44 rounded-sm animate-pulse bg-gray-500 flex items-center justify-center">
-			<Plus size={40} color="white" />
-		</div>
-		<div class="flex flex-row items-start">
-			<div class="mt-4 flex h-full flex-col items-start">
-				<h1 class="mb-1 text-lg font-bold leading-none text-foreground">Create Playlist</h1>
+		<a class="pointer" href={`/playlists?create=true`}>
+			<div
+				class="flex h-44 w-44 animate-pulse items-center justify-center rounded-sm bg-gray-500 md:h-52 md:w-52"
+			>
+				<Plus size={40} color="white" />
 			</div>
-		</div>
-	</a>
+			<div class="flex flex-row items-start">
+				<div class="mt-4 flex h-full flex-col items-start">
+					<h1 class="mb-1 text-lg font-bold leading-none text-foreground">Create Playlist</h1>
+				</div>
+			</div>
+		</a>
 		{#each playlists as playlist}
 			<div class="flex flex-col items-start">
 				{#await getImageUrl(playlist.image) then image}
 					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
 						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-							<img src={image} class="md:h-52 md:w-52 h-44 w-44 rounded-sm object-cover" alt={playlist.name} />
+							<img
+								src={image}
+								class="h-44 w-44 rounded-sm object-cover md:h-52 md:w-52"
+								alt={playlist.name}
+							/>
 						</a>
 					</ContextMenu>
 				{:catch error}
 					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
 						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-							<div class="h-52 w-52 rounded-sm animate-pulse bg-gray-500"></div>
+							<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
 						</a>
 					</ContextMenu>
 				{/await}

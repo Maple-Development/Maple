@@ -1,5 +1,5 @@
 <script>
-// @ts-nocheck
+	// @ts-nocheck
 
 	import { Slider as SliderPrimitive } from 'bits-ui';
 	import { cn } from '$lib/utils.js';
@@ -11,14 +11,17 @@
 	export { className as class };
 </script>
 
-{#if colors?.[0]?.hex && colors?.[1]?.hex && colors?.[2]?.hex && colors} 
+{#if colors?.[0]?.hex && colors?.[1]?.hex && colors?.[2]?.hex && colors}
 	<SliderPrimitive.Root
 		bind:value
 		class={cn('relative flex w-full touch-none select-none items-center', className)}
 		{...$$restProps}
 		let:thumbs
-		>
-		<span class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary" style="background: linear-gradient(to right, rgba({colors[0].red},{colors[0].green},{colors[0].blue},0.5), rgba({colors[1].red},{colors[1].green},{colors[1].blue},0.5));"
+	>
+		<span
+			class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary"
+			style="background: linear-gradient(to right, rgba({colors[0].red},{colors[0].green},{colors[0]
+				.blue},0.5), rgba({colors[1].red},{colors[1].green},{colors[1].blue},0.5));"
 		>
 			<SliderPrimitive.Range class="absolute h-full {color}" />
 		</span>
@@ -35,7 +38,7 @@
 		class={cn('relative flex w-full touch-none select-none items-center', className)}
 		{...$$restProps}
 		let:thumbs
-		>
+	>
 		<span class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
 			<SliderPrimitive.Range class="absolute h-full {color}" />
 		</span>

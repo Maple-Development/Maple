@@ -3,30 +3,18 @@
 	import { onMount } from 'svelte';
 	import type { Album } from '$lib/types/album';
 	import type { Song } from '$lib/types/song';
-	import {
-		ArrowUpAZ,
-		ArrowDownZA,
-		ListFilter,
-		Pencil,
-		List,
-		Check,
-		Trash,
-		EllipsisVertical
-	} from 'lucide-svelte';
+	import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check, Trash } from 'lucide-svelte';
+	import GridTrack from '$lib/components/blocks/GridTrack.svelte';
+	import ListTrack from '$lib/components/blocks/ListTrack.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
 	import { page } from '$app/stores';
-	import { context, title, isSmallDevice } from '$lib/store';
+	import { context, title } from '$lib/store';
 	//@ts-ignore
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { goto } from '$app/navigation';
-	// @ts-ignore
-	import Lazy from 'svelte-lazy';
 	import type { Playlist } from '$lib/types/playlist';
-	import { toast } from 'svelte-sonner';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 
 	let albumName: string;
 	let album: Album | undefined;
@@ -164,13 +152,6 @@
 		orderTracks(sort);
 	}
 
-	function formatDuration(duration: number): string {
-		const roundedDuration = Math.round(duration);
-		const minutes = Math.floor(roundedDuration / 60);
-		const seconds = roundedDuration % 60;
-		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-	}
-
 	function swapListType() {
 		if (listType === 'list') {
 			listType = 'grid';
@@ -237,17 +218,10 @@
 			console.error('Album not found');
 		}
 	}
-
-	async function addTrackToPlaylist(track: Song, playlist: Playlist) {
-		if (track && playlist) {
-			OPFS.track().addToPlaylist(track, playlist);
-			toast.success(`Added ${track.title} to ${playlist.name}`);
-		}
-	}
 </script>
 
 <div class="mt-4 flex h-fit justify-between rounded-md border-gray-600 p-5 px-10">
-	<div class="flex md:flex-row flex-col">
+	<div class="flex flex-col md:flex-row">
 		<div>
 			{#await getImageUrl(album?.image) then image}
 				{#if editModeOn}
@@ -260,13 +234,17 @@
 						on:change={(e) => handlePhotoChange(e)}
 					/>
 				{:else}
-					<img class="md:h-64 md:w-64 h-44 w-44 rounded-sm" src={image} alt={album?.name?.toString() ?? ''} />
+					<img
+						class="h-44 w-44 rounded-sm md:h-64 md:w-64"
+						src={image}
+						alt={album?.name?.toString() ?? ''}
+					/>
 				{/if}
 			{:catch error}
 				<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
 			{/await}
 		</div>
-		<div class="ml-2 md:ml-7 mt-2 md:mt-0 flex flex-col items-start">
+		<div class="ml-2 mt-2 flex flex-col items-start md:ml-7 md:mt-0">
 			<div class="flex flex-col items-start">
 				{#if editModeOn}
 					<h1
@@ -337,8 +315,8 @@
 	</div>
 </div>
 
-<Separator class="mb-4 ml-2 md:ml-14 mt-1 w-[95%] pr-20"></Separator>
-<div class="mx-4 mt-4 flex h-10 justify-center md:justify-end border-gray-600 px-5">
+<Separator class="mb-4 ml-2 mt-1 w-[95%] pr-20 md:ml-14"></Separator>
+<div class="mx-4 mt-4 flex h-10 justify-center border-gray-600 px-5 md:justify-end">
 	<div class="flex items-center">
 		{#if ascending}
 			<Button
@@ -390,7 +368,7 @@
 </div>
 
 {#if listType !== 'grid'}
-	<div class="my-0 md:my-5 md:ml-16 ml-0 flex flex-col gap-y-8">
+	<div class="my-0 ml-0 flex flex-col gap-y-8 md:my-5 md:ml-16">
 		{#if alldisks.length > 1 && sort === 'track'}
 			{#each alldisks as disk, diskIndex}
 				{#if diskIndex > 0}
@@ -399,204 +377,42 @@
 					</div>
 				{/if}
 				<div
-					class="my-5 mr-2 md:mr-0 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+					class="my-5 ml-4 mr-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-2 md:mr-0 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 				>
 					{#each disk as track}
-						<div class="flex flex-col items-start">
-							<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
-								{#await getImageUrl(track.image) then image}
-									<Lazy height={208} keep={true}>
-										<img class="rounded-md" src={image} alt={track.title} />
-									</Lazy>
-								{:catch}
-									<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-								{/await}
-							</div>
-							<div class="ml-4 flex flex-col">
-								<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-							</div>
-						</div>
+						<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
 					{/each}
 				</div>
 			{/each}
 		{:else}
 			<div
-				class="my-5 mr-2 md:mr-0 ml-4 md:ml-16 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+				class="my-5 ml-4 mr-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-2 md:mr-0 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 			>
 				{#each tracks as track}
-					<div class="flex flex-col items-start">
-						{#await getImageUrl(track.image) then image}
-							<ContextMenu
-								type={'track'}
-								on:delete={(e) => openAlert(track)}
-								on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
-							>
-								<TrackWrapper className="" {track} {tracks}>
-									<Lazy height={208} keep={true}>
-										<img class="md:h-52 md:w-52 h-44 w-44 rounded-sm" src={image} alt={track.title} />
-									</Lazy>
-								</TrackWrapper>
-							</ContextMenu>
-							<div class="mt-4 flex flex-col items-start">
-								<h1 class="p-0 text-lg md:text-md font-bold leading-none text-foreground">{track.title}</h1>
-								<h1 class="p-0 text-sm md:text-base font-light leading-none text-slate-400">{track.artist}</h1>
-							</div>
-						{:catch error}
-							<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-						{/await}
-					</div>
+					<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
 				{/each}
 			</div>
 		{/if}
 	</div>
 {:else}
-	<div class="md:mx-4 mx-0 mb-5 mt-2 flex flex-col">
+	<div class="mx-0 mb-5 mt-2 flex flex-col md:mx-4">
 		{#if alldisks.length > 1 && sort === 'track'}
 			{#each alldisks as disk, diskIndex}
 				{#if diskIndex > 0}
 					<div class="ml-16 flex flex-col items-start">
 						<Separator class="mb-4 mt-1 w-[95%] pr-20"></Separator>
 					</div>
-				{/if} 
+				{/if}
 				<div class="mx-4 mb-5 mt-2 flex flex-col">
 					{#each disk as track}
-					<div class="flex w-full">
-						<TrackWrapper className="flex-grow" {track} {tracks}>
-							<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-								<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
-									{#await getImageUrl(track.image) then image}
-										<Lazy height={208} keep={true}>
-											<img class="rounded-md" src={image} alt={track.title} />
-										</Lazy>
-									{:catch error}
-										<div class="rounded-full h-24 w-24 bg-gray-500"></div>
-									{/await}
-								</div>
-								<div class="ml-4 flex flex-col">
-									<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
-									<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-								</div>
-								{#if !$isSmallDevice}
-								<div class="ml-4 flex flex-grow justify-end flex-row items-center text-right">
-									<div class="flex flex-col">
-										<h1 class="text-base font-light leading-none text-slate-400">
-											{formatDuration(track.duration)}
-										</h1>
-										<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-										<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
-										</div>
-									</div>
-								{/if}
-								</div>
-							</TrackWrapper>
-							<div class="ml-2 flex items-center">
-								<DropdownMenu.Root>
-									<DropdownMenu.Trigger asChild let:builder>
-										<Button
-											class="h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-											builders={[builder]}
-										>
-											<EllipsisVertical size={20} color="white" />
-										</Button>
-									</DropdownMenu.Trigger>
-									<DropdownMenu.Content class="w-56">
-										<DropdownMenu.Label>Options</DropdownMenu.Label>
-										<DropdownMenu.Separator />
-										<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
-										<DropdownMenu.Sub>
-											<DropdownMenu.SubTrigger>
-												<span>Add to Playlist</span>
-											</DropdownMenu.SubTrigger>
-											<DropdownMenu.SubContent side="left">
-												{#if playlists.length > 0}
-													{#each playlists as playlist}
-														<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
-															<span>{playlist.name}</span>
-														</DropdownMenu.Item>
-													{/each}
-												{:else}
-													<DropdownMenu.Item disabled>
-														<span>No Playlists</span>
-													</DropdownMenu.Item>
-												{/if}
-											</DropdownMenu.SubContent>
-										</DropdownMenu.Sub>
-									</DropdownMenu.Content>
-								</DropdownMenu.Root>
-							</div>
-						</div>
+						<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 					{/each}
 				</div>
 			{/each}
 		{:else}
 			<div class="mx-4 mb-5 mt-2 flex flex-col">
 				{#each tracks as track}
-				<div class="flex w-full">
-					<TrackWrapper className="flex-grow" {track} {tracks}>
-						<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-							<div class="flex-shrink-0 w-12 h-12 md:w-24 md:h-24">
-								{#await getImageUrl(track.image) then image}
-									<Lazy height={208} keep={true}>
-										<img class="rounded-md" src={image} alt={track.title} />
-									</Lazy>
-								{:catch error}
-									<div class="rounded-full h-24 w-24 bg-gray-500"></div>
-								{/await}
-							</div>
-							<div class="ml-4 flex flex-col">
-								<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
-								<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
-							</div>
-							{#if !$isSmallDevice}
-							<div class="ml-4 flex flex-grow justify-end flex-row items-center text-right">
-								<div class="flex flex-col">
-									<h1 class="text-base font-light leading-none text-slate-400">
-										{formatDuration(track.duration)}
-									</h1>
-									<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-									<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
-									</div>
-								</div>
-							{/if}
-							</div>
-						</TrackWrapper>
-						<div class="ml-2 flex items-center">
-							<DropdownMenu.Root>
-								<DropdownMenu.Trigger asChild let:builder>
-									<Button
-										class="h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-										builders={[builder]}
-									>
-										<EllipsisVertical size={20} color="white" />
-									</Button>
-								</DropdownMenu.Trigger>
-								<DropdownMenu.Content class="w-56">
-									<DropdownMenu.Label>Options</DropdownMenu.Label>
-									<DropdownMenu.Separator />
-									<DropdownMenu.Item on:click={() => openAlert(track)}>Delete</DropdownMenu.Item>
-									<DropdownMenu.Sub>
-										<DropdownMenu.SubTrigger>
-											<span>Add to Playlist</span>
-										</DropdownMenu.SubTrigger>
-										<DropdownMenu.SubContent side="left">
-											{#if playlists.length > 0}
-												{#each playlists as playlist}
-													<DropdownMenu.Item on:click={() => addTrackToPlaylist(track, playlist)}>
-														<span>{playlist.name}</span>
-													</DropdownMenu.Item>
-												{/each}
-											{:else}
-												<DropdownMenu.Item disabled>
-													<span>No Playlists</span>
-												</DropdownMenu.Item>
-											{/if}
-										</DropdownMenu.SubContent>
-									</DropdownMenu.Sub>
-								</DropdownMenu.Content>
-							</DropdownMenu.Root>
-						</div>
-					</div>
+					<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 				{/each}
 			</div>
 		{/if}

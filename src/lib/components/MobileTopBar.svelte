@@ -48,104 +48,104 @@
 			<Search size={20} color="white" />
 			<span class="ml-2">Search</span>
 		</Button>
-	</div> 
+	</div>
 </div>
-  
+
 <div class="absolute inset-x-0 top-0">
-<Command.Dialog class="bg-background" bind:open loop>
-	<Command.Input placeholder="Search for recent items, or type a page name." />
-	<Command.List>
-		<Command.Empty>No results found.</Command.Empty>
-		<Command.Group heading="Go To">
-			<a class="pointer" href="/">
-				<Command.Item>
-					<Home class="mr-2 h-4 w-4" />
-					<span>Home</span>
-				</Command.Item>
-			</a>
-			<a class="pointer" href="/tracks">
-				<Command.Item>
-					<AudioLines class="mr-2 h-4 w-4" />
-					<span>Tracks</span>
-				</Command.Item>
-			</a>
-			<a class="pointer" href="/albums">
-				<Command.Item>
-					<DiscAlbum class="mr-2 h-4 w-4" />
-					<span>Albums</span>
-				</Command.Item>
-			</a>
-			<a class="pointer" href="/artists">
-				<Command.Item>
-					<SquareUser class="mr-2 h-4 w-4" />
-					<span>Artists</span>
-				</Command.Item>
-			</a>
-			<a class="pointer" href="/playlists">
-				<Command.Item>
-					<ListMusic class="mr-2 h-4 w-4" />
-					<span>Playlists</span>
-				</Command.Item>
-			</a>
-			<a class="pointer" href="/settings">
-				<Command.Item>
-					<Settings class="mr-2 h-4 w-4" />
-					<span>Settings</span>
-				</Command.Item>
-			</a>
-		</Command.Group>
-		<Command.Separator />
-		{#if $page.url.pathname == '/tracks'}
-			<Command.Group heading="Tracks">
-				{#each songs as track}
-					<TrackWrapper className="" {track} tracks={songs}>
-						<Command.Item>
-							<DiscAlbum class="mr-2 h-4 w-4" />
-							<span>{track.title.replace(/["\[\]]/g, '')}</span>
-						</Command.Item>
-					</TrackWrapper>
-				{/each}
+	<Command.Dialog class="bg-background" bind:open loop>
+		<Command.Input placeholder="Search for recent items, or type a page name." />
+		<Command.List>
+			<Command.Empty>No results found.</Command.Empty>
+			<Command.Group heading="Go To">
+				<a class="pointer" href="/">
+					<Command.Item>
+						<Home class="mr-2 h-4 w-4" />
+						<span>Home</span>
+					</Command.Item>
+				</a>
+				<a class="pointer" href="/tracks">
+					<Command.Item>
+						<AudioLines class="mr-2 h-4 w-4" />
+						<span>Tracks</span>
+					</Command.Item>
+				</a>
+				<a class="pointer" href="/albums">
+					<Command.Item>
+						<DiscAlbum class="mr-2 h-4 w-4" />
+						<span>Albums</span>
+					</Command.Item>
+				</a>
+				<a class="pointer" href="/artists">
+					<Command.Item>
+						<SquareUser class="mr-2 h-4 w-4" />
+						<span>Artists</span>
+					</Command.Item>
+				</a>
+				<a class="pointer" href="/playlists">
+					<Command.Item>
+						<ListMusic class="mr-2 h-4 w-4" />
+						<span>Playlists</span>
+					</Command.Item>
+				</a>
+				<a class="pointer" href="/settings">
+					<Command.Item>
+						<Settings class="mr-2 h-4 w-4" />
+						<span>Settings</span>
+					</Command.Item>
+				</a>
 			</Command.Group>
 			<Command.Separator />
-		{/if}
-		{#if $page.url.pathname == '/albums'}
-			<Command.Group heading="Albums">
-				{#each albums as album}
-					<a class="pointer" href={`/album?album=${album.id}`}>
-						<Command.Item>
-							<DiscAlbum class="mr-2 h-4 w-4" />
-							<span>{album.name.replace(/["\[\]]/g, '')}</span>
-						</Command.Item>
-					</a>
-				{/each}
-			</Command.Group>
-			<Command.Separator />
-		{/if}
-		{#if $page.url.pathname == '/artists'}
-			<Command.Group heading="Artists">
-				{#each artists as artist}
-					<a class="pointer" href={`/artist?artist=${artist.id}`}>
-						<Command.Item>
-							<SquareUser class="mr-2 h-4 w-4" />
-							<span>{artist.name.replace(/["\[\]]/g, '')}</span>
-						</Command.Item>
-					</a>
-				{/each}
-			</Command.Group>
-			<Command.Separator />
-		{/if}
-		{#if $page.url.pathname == '/playlists'}
-			<Command.Group heading="Playlists">
-				{#each playlists as playlist}
-					<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-						<Command.Item>
-							<ListMusic class="mr-2 h-4 w-4" />
-							<span>{playlist.name.replace(/["\[\]]/g, '')}</span>
-						</Command.Item>
-					</a>
-				{/each}
-			</Command.Group>
-		{/if}
-	</Command.List>
-</Command.Dialog>
+			{#if $page.url.pathname == '/tracks'}
+				<Command.Group heading="Tracks">
+					{#each songs as track}
+						<TrackWrapper className="" {track} tracks={songs}>
+							<Command.Item>
+								<DiscAlbum class="mr-2 h-4 w-4" />
+								<span>{track.title.replace(/["\[\]]/g, '')}</span>
+							</Command.Item>
+						</TrackWrapper>
+					{/each}
+				</Command.Group>
+				<Command.Separator />
+			{/if}
+			{#if $page.url.pathname == '/albums'}
+				<Command.Group heading="Albums">
+					{#each albums as album}
+						<a class="pointer" href={`/album?album=${album.id}`}>
+							<Command.Item>
+								<DiscAlbum class="mr-2 h-4 w-4" />
+								<span>{album.name.replace(/["\[\]]/g, '')}</span>
+							</Command.Item>
+						</a>
+					{/each}
+				</Command.Group>
+				<Command.Separator />
+			{/if}
+			{#if $page.url.pathname == '/artists'}
+				<Command.Group heading="Artists">
+					{#each artists as artist}
+						<a class="pointer" href={`/artist?artist=${artist.id}`}>
+							<Command.Item>
+								<SquareUser class="mr-2 h-4 w-4" />
+								<span>{artist.name.replace(/["\[\]]/g, '')}</span>
+							</Command.Item>
+						</a>
+					{/each}
+				</Command.Group>
+				<Command.Separator />
+			{/if}
+			{#if $page.url.pathname == '/playlists'}
+				<Command.Group heading="Playlists">
+					{#each playlists as playlist}
+						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
+							<Command.Item>
+								<ListMusic class="mr-2 h-4 w-4" />
+								<span>{playlist.name.replace(/["\[\]]/g, '')}</span>
+							</Command.Item>
+						</a>
+					{/each}
+				</Command.Group>
+			{/if}
+		</Command.List>
+	</Command.Dialog>
 </div>
