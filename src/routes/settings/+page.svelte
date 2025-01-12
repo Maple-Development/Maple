@@ -281,24 +281,26 @@
 				on:change={(e) => createLibrary(e)}
 			/>
 		{:else}
-			<Button variant="secondary" on:click={() => createLibrary()}>Import Music</Button>
+			<Button class="py-6 px-4 md:py-16 md:px-10" variant="secondary" on:click={() => createLibrary()}>Import Music</Button>
 		{/if}
-		<Button variant="destructive" on:click={() => clearLibrary()}>Clear Library</Button>
+		<Button class="py-6 px-4 md:py-16 md:px-10" variant="destructive" on:click={() => clearLibrary()}>Clear Library</Button>
+		<div class="mt-2 justify-center flex flex-col items-center">
+			<h2>Options:</h2>
+			<div>
+				<div class="mb-2 flex flex-row items-center">
+					<Switch class="mr-2" id="devMode" bind:checked={devMode} />
+					<Label for="devMode">Developer Mode</Label>
+				</div>
+				<div class="flex flex-row items-center">
+					<Switch class="mr-2" id="logging" bind:checked={showLogging} />
+					<Label for="logging">Show Logging</Label>
+				</div>
+			</div>
+		</div>
 	</div>
-	<h1 class="text-center text-sm text-muted-foreground">
+	<h1 class="text-center text-sm text-muted">
 		tip: you can upload as many different folders/files as you'd like.
 	</h1>
-</div>
-
-<div class="mt-5 flex flex-col items-center justify-center space-x-2">
-	<div class="mb-2 flex flex-row items-center">
-		<Switch class="mr-2" id="devMode" bind:checked={devMode} />
-		<Label for="devMode">Developer Mode</Label>
-	</div>
-	<div class="mt-1 flex flex-row items-center">
-		<Switch class="mr-2" id="logging" bind:checked={showLogging} />
-		<Label for="logging">Show Logging</Label>
-	</div>
 </div>
 
 {#if devMode}
