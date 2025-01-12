@@ -9,6 +9,15 @@ let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Son
 export const collapsed = writable(false);
 export const curTime = writable([0] as number[]);
 export const setCurTime = writable([0] as number[]);
+export const hideTips = writable(false);
+hideTips.subscribe((value) => {
+	if (value) {
+		if (browser) {
+			localStorage.setItem('hideTips', 'true');
+		}
+	}
+});
+export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
 	onEnded: () => {},
@@ -19,7 +28,7 @@ export const audioPlayer = writable({
 });
 export const recentlyPlayedManager = writable({
 	add: (value: Song) => {
-		if (!recentlyPlayed.some(song => song?.id === value.id)) {
+		if (!recentlyPlayed.some((song) => song?.id === value.id)) {
 			recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [
 				Song?,
 				Song?,
@@ -36,7 +45,7 @@ export const recentlyPlayedManager = writable({
 		}
 	},
 	get: () => {
-		if(!browser) return [];
+		if (!browser) return [];
 		recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
 		return recentlyPlayed;
 	}
@@ -90,16 +99,16 @@ audioPlayer.subscribe((value) => {
 				}
 			} else {
 				if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
-						value.audio.volume = value.volume / 100;
-						value.changeVolume = false;
-						return;
-					} else {
-						value.changeVolume = false;
-						return;
-					}
+					value.audio.volume = value.volume / 100;
+					value.changeVolume = false;
+					return;
+				} else {
+					value.changeVolume = false;
+					return;
 				}
 			}
 		}
+	}
 });
 function createTitle() {
 	const { subscribe, set, update } = writable('');
@@ -116,3 +125,12 @@ function createTitle() {
 }
 
 export const title = createTitle();
+
+if (browser) {
+	const storedhideTips = localStorage.getItem('hideTips');
+	if (storedhideTips && storedhideTips === 'true') {
+		hideTips.set(true);
+	} else {
+		hideTips.set(false);
+	}
+}

@@ -19,6 +19,37 @@
 			if (state.audio instanceof HTMLAudioElement) {
 				state.audio.src = audioUrl;
 				state.audio.play();
+				if ('mediaSession' in navigator) {
+					navigator.mediaSession.metadata = new MediaMetadata({
+						title: song.title,
+						artist: song.artist,
+						album: song.album,
+						artwork: [
+							{
+								src: song.image,
+								sizes: '512x512',
+								type: song.image.split(';')[0].split(':')[1]
+							}
+						]
+					});
+
+					navigator.mediaSession.setActionHandler('play', () => {
+						pausePlay();
+					});
+					navigator.mediaSession.setActionHandler('pause', () => {
+						pausePlay();
+					});
+					navigator.mediaSession.setActionHandler('seekto', (evt) => {
+						if (!evt.seekTime) return;
+						console.log(evt.seekTime);
+					});
+					navigator.mediaSession.setActionHandler('previoustrack', () => {
+						prevSong();
+					});
+					navigator.mediaSession.setActionHandler('nexttrack', () => {
+						nextSong();
+					});
+				}
 				return { ...state, playing: true, onEnded: nextSong };
 			} else {
 				return state;
@@ -56,5 +87,20 @@
 			...store,
 			currentTime: time
 		}));
+	}
+
+	export function pausePlay() {
+		audioPlayer.update((state) => {
+			if (state.audio instanceof HTMLAudioElement) {
+				if (state.playing) {
+					state.audio.pause();
+				} else {
+					state.audio.play();
+				}
+				return { ...state, playing: !state.playing, currentTime: state.audio.currentTime };
+			} else {
+				return state;
+			}
+		});
 	}
 </script>

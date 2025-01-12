@@ -136,7 +136,7 @@
 		<div class="navbar" id="navbar">
 			<DropdownMenu.Root bind:open={showMenu}>
 				<DropdownMenu.Trigger></DropdownMenu.Trigger>
-				<DropdownMenu.Content class="w-56 border border-popover-foreground bg-primary-foreground">
+				<DropdownMenu.Content class="w-56 border-2 border-primary bg-primary-foreground">
 					<DropdownMenu.Label>Options</DropdownMenu.Label>
 					<DropdownMenu.Separator />
 					{#if type == 'playlistTrack'}

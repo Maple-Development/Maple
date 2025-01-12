@@ -102,17 +102,17 @@
 </div>
 
 <div
-	class="my-5 ml-16 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
+	class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 >
 	{#each artists as artist}
-		<div class="flex flex-col items-start">
+		<div class="mr-2 flex flex-col items-start">
 			{#await getImageUrl(artist.image) then image}
 				<ContextMenu type={'artist'} on:delete={(e) => openAlert(artist)}>
 					<a class="pointer" href={`/artist?artist=${artist.id}`}>
 						{#if image !== ''}
-							<img class="h-52 w-52 rounded-[50%]" src={image} alt={artist.name} />
+							<img class="h-44 w-44 rounded-[50%] md:h-52 md:w-52" src={image} alt={artist.name} />
 						{:else}
-							<div class="h-52 w-52 animate-pulse rounded-[50%] bg-gray-500"></div>
+							<div class="h-44 w-44 animate-pulse rounded-[50%] bg-gray-500 md:h-52 md:w-52"></div>
 						{/if}
 					</a>
 				</ContextMenu>

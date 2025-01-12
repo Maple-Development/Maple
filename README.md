@@ -23,13 +23,15 @@
 ## Q&As
 
 Will my library be sent to anyone?
+
 - No! Your library is completely managed on-device using the Origin Private File System (OPFS). If you enable developer controls in settings, you can interface with this OPFS in a rudimentary terminal-style environment!
 
-Help! I have ___ Bug!
-- You can report any bugs in the Issues tab [here](https://github.com/Maple-Development/Maple/issues)!
-> Please note, this site is still early in development. Many features/bugs are known and are actively being worked on. Check our discord [here](https://discord.gg/Wxrp73HVj4) for more information.
+Help! I have \_\_\_ Bug!
 
-If you have any other questions, feel free to DM ``cattn.`` on discord, or email me @ ``Logan@cattn.dev``
+- You can report any bugs in the Issues tab [here](https://github.com/Maple-Development/Maple/issues)!
+  > Please note, this site is still early in development. Many features/bugs are known and are actively being worked on. Check our discord [here](https://discord.gg/Wxrp73HVj4) for more information.
+
+If you have any other questions, feel free to DM `cattn.` on discord, or email me @ `Logan@cattn.dev`
 
 ## What's the inspiration behind it?
 
