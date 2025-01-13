@@ -7,9 +7,9 @@ const PORT = 3000;
 const fs = require('fs');
 const https = require('https');
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.dev/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.dev/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.dev/chain.pem', 'utf8');
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
 
 const credentials = {
 	key: privateKey,
