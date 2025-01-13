@@ -18,6 +18,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
+	private static SERVER = 'http://localhost:3000';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;
@@ -66,6 +67,71 @@ export class OPFS {
 		]);
 	}
 
+	public static async testCreate() {
+		const sampleUser = { username: 'test', password: 'test' };
+		try {
+			const response = await fetch(`${this.SERVER}/login/create`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(sampleUser)
+			});
+			const data = await response.json();
+			return console.log(data);
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	}
+
+	public static async createAccount(username: string, password: string) {
+		try {
+			const response = await fetch(`${this.SERVER}/login/create`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username, password })
+			});
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	}
+
+	public static async testLogin() {
+		const sampleUser = { username: 'test', password: 'test' };
+		try {
+			const response = await fetch(`${this.SERVER}/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(sampleUser)
+			});
+			const data = await response.json();
+			return console.log(data);
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	}
+
+	public static async login(username: string, password: string) {
+		try {
+			const response = await fetch(`${this.SERVER}/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username, password })
+			});
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	}
 	public static async ifExists(path: string) {
 		const exists = await dir(path).exists();
 		return exists;
