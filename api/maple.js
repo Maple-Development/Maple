@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const login = require('./auth/login');
 const app = express();
-const PORT = 3000;
 
 const fs = require('fs');
 const https = require('https');
@@ -20,8 +19,4 @@ const credentials = {
 app.use(cors());
 app.use('/login', login);
 
-const httpsServer = https.createServer(credentials, app);
-
-httpsServer.listen(PORT, () => {
-	console.log('HTTPS Server running on port ' + PORT);
-});
+https.createServer(credentials, app).listen(443)
