@@ -18,7 +18,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
-	private static SERVER = 'http://kolf.pro:3000';
+	private static SERVER = 'http://maple.kolf.pro:3000';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;
