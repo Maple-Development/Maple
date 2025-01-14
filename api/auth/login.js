@@ -27,7 +27,7 @@ router.post('/create', (req, res) => {
         if (row.length > 0) {
             return res.status(400).json({ error: 'Username already exists' });
         }
-
+  
         bcrypt.hash(password, 10, (err, hash) => {
             if (err) {
                 return res.status(500).json({ error: 'Error hashing password' });

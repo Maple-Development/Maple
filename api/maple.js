@@ -6,6 +6,12 @@ const app = express();
 const fs = require('fs');
 const https = require('https');
 
+var ExpressPeerServer = require('peer').ExpressPeerServer;
+
+var options = {
+    debug: true
+}
+
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
@@ -16,7 +22,10 @@ const credentials = {
 	ca: ca
 };
 
+const server = https.createServer(credentials, app);
+
 app.use(cors());
+app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
 
-https.createServer(credentials, app).listen(443)
+server.listen(443);

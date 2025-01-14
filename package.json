@@ -54,6 +54,7 @@
 		"lucide-svelte": "^0.368.0",
 		"music-metadata": "^10.6.0",
 		"opfs-tools": "^0.6.1",
+		"peerjs": "^1.5.4",
 		"svelte-lazy": "^1.2.11",
 		"svelte-radix": "^1.1.0",
 		"tailwind-merge": "^2.2.2",

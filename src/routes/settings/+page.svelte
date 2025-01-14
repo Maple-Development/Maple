@@ -321,7 +321,7 @@
 {/if}
 
 <div class="mt-16 flex flex-col items-center justify-center">
-	<Button class="py-6 px-4 md:py-16 md:px-10" variant="secondary" href="/account">Manage Account</Button>
+	<Button class="py-6 px-4 md:py-16 md:px-10" variant="secondary" href="/account/login">Login</Button>
 </div>
 
 <style>
