@@ -4,11 +4,16 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { collapsed } from '$lib/store';
+	import { collapsed, loadPreferencesStore } from '$lib/store';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title, isSmallDevice } from '$lib/store';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
+	import { onMount } from 'svelte';
+
+	onMount(async () => {
+		loadPreferencesStore.load();
+	});
 
 	let bottomDiv: HTMLDivElement;
 

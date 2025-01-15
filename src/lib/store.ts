@@ -100,6 +100,7 @@ audioPlayer.subscribe((value) => {
 			} else {
 				if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
 					value.audio.volume = value.volume / 100;
+					localStorage.setItem('volume', value.volume.toString());
 					value.changeVolume = false;
 					return;
 				} else {
@@ -111,7 +112,7 @@ audioPlayer.subscribe((value) => {
 	}
 });
 function createTitle() {
-	const { subscribe, set, update } = writable('');
+	const { subscribe, set } = writable('');
 
 	return {
 		subscribe,
@@ -123,6 +124,24 @@ function createTitle() {
 		}
 	};
 }
+
+function loadPreferences() {
+	return {
+		load: () => {
+			if (browser) {
+				const storedVolume = localStorage.getItem('volume');
+				console.log(storedVolume);
+				const volume = parseInt(storedVolume ?? '100');
+				console.log(volume);
+				if (storedVolume) {
+					audioPlayer.update((state) => ({ ...state, volume: volume, changeVolume: true }));
+				}
+			}
+		},
+	}
+}
+
+export const loadPreferencesStore = loadPreferences();
 
 export const title = createTitle();
 
