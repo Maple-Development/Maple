@@ -13,13 +13,26 @@ var options = {
     debug: true
 }
 
+const corsOptions = {
+  origin: true,
+  credentials: true
+};
+
 const server = http.createServer(app);
 
-app.use(cors()); 
+const io = require('socket.io')(server);
+
+app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
 
-server.listen(80, () => {
-    console.log('Server listening on port 80');
+io.on('connection', client => {
+    // eslint-disable-next-line no-unused-vars
+    client.on('event', data => { /* … */ });
+    client.on('disconnect', () => { /* … */ });
+});
+
+server.listen(3000, () => {
+    console.log('Server listening on port 3000');
 });
  

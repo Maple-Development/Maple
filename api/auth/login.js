@@ -1,9 +1,12 @@
 /* eslint-disable no-unused-vars */
-const express = require('express');
+const express = require('express'), cookieParser = require('cookie-parser');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
 
 const connection = mysql.createConnection({
@@ -14,6 +17,12 @@ const connection = mysql.createConnection({
 });
 
 router.use(express.json());
+router.use(cookieParser());
+
+
+function generateToken(user) {
+    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+}
 
 router.post('/create', (req, res) => {
     const { username, password } = req.body;
@@ -41,7 +50,9 @@ router.post('/create', (req, res) => {
                     return res.status(500).json({ error: 'Error creating user' });
                 }
 
-                return res.status(200).json({ message: 'User created successfully' });
+                const token = generateToken({ id, username });
+                res.cookie('token', token, { httpOnly: true, secure: false });
+                return res.status(200).json({ message: 'User created successfully'});
             });
         });
     });
@@ -71,7 +82,7 @@ router.post('/', (req, res) => {
             if (!isMatch) {
                 return res.status(401).json({ error: 'Invalid credentials' });
             }
-
+            console.log(req.headers) 
             return res.status(200).json({status: "Success", user: { id: user.id, username: user.username } });
         });
     });

@@ -1,11 +1,12 @@
 import { writable, get } from 'svelte/store';  
-import { Peer } from "peerjs";
+/* import pkg from 'peerjs';
+const { Peer } = pkg; */
 
 
 export class User {
-    private static SERVER = 'https://maple.kolf.pro'
-    private static user = writable(null as Peer | null);
-
+    private static SERVER = 'http://localhost:3000'
+/*     private static user = writable(null as Peer | null);
+ */
     public static register = async (username: string, password: string) => {
         try {
 			const response = await fetch(`${this.SERVER}/login/create`, {
@@ -24,10 +25,13 @@ export class User {
 
     public static login = async (username: string, password: string) => {
         try {
+            console.log(document.cookie);
+            console.log(this.SERVER + '/login');
             const response = await fetch(`${this.SERVER}/login`, {
+                credentials: 'include',
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password })
             });
@@ -38,7 +42,7 @@ export class User {
         }
     }
 
-    public static createPeer = async (username: string) => {
+    /* public static createPeer = async (username: string) => {
         try {
             const peer = new Peer(username);
             this.user.set(peer);
@@ -50,5 +54,5 @@ export class User {
 
     public static getPeer = () => {
         return get(this.user);
-    }
+    } */
 }
