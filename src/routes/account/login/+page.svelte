@@ -36,3 +36,5 @@
 <div class="mt-16 flex flex-col items-center justify-center">
     <Textarea class="h-48" bind:value={log} placeholder="LOG" disabled />
 </div>  
+
+    <Button class="py-6 px-4 mx-2" variant="secondary" href='/account'>View Account</Button>

@@ -21,7 +21,7 @@ router.use(cookieParser());
 
 
 function generateToken(user) {
-    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+    return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '604800s' });
 }
 
 router.post('/create', (req, res) => {
@@ -50,8 +50,6 @@ router.post('/create', (req, res) => {
                     return res.status(500).json({ error: 'Error creating user' });
                 }
 
-                const token = generateToken({ id, username });
-                res.cookie('token', token, { httpOnly: true, secure: false });
                 return res.status(200).json({ message: 'User created successfully'});
             });
         });
@@ -82,7 +80,9 @@ router.post('/', (req, res) => {
             if (!isMatch) {
                 return res.status(401).json({ error: 'Invalid credentials' });
             }
-            console.log(req.headers) 
+
+            const token = generateToken({ id: user.id});
+            res.cookie('token', token, { httpOnly: true, secure: false });
             return res.status(200).json({status: "Success", user: { id: user.id, username: user.username } });
         });
     });

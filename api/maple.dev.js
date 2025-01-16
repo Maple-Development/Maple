@@ -2,7 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
-const login = require('./auth/login');
+const login = require('./auth/login.js');
+const getPath = require('./get/get.js')
 const app = express();
 
 const http = require('http');
@@ -25,6 +26,7 @@ const io = require('socket.io')(server);
 app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
+app.use('/', getPath);
 
 io.on('connection', client => {
     // eslint-disable-next-line no-unused-vars

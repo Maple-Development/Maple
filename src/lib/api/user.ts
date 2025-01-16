@@ -1,4 +1,5 @@
-import { writable, get } from 'svelte/store';  
+import { writable, get } from 'svelte/store';
+import { UserInfo } from '$lib/store';  
 /* import pkg from 'peerjs';
 const { Peer } = pkg; */
 
@@ -9,11 +10,12 @@ export class User {
  */
     public static register = async (username: string, password: string) => {
         try {
-			const response = await fetch(`${this.SERVER}/login/create`, {
+			const response: any = await fetch(`${this.SERVER}/login/create`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
+                credentials: 'include',
 				body: JSON.stringify({ username, password })
 			});
 			const data = await response.json();
@@ -36,9 +38,25 @@ export class User {
                 body: JSON.stringify({ username, password })
             });
             const data = await response.json();
+            const returnName = data.user.username
+            const id = data.user.id
+            UserInfo.set({ username: returnName, id: id });
             return data;
         } catch (error) {
             return console.error('Error:', error);
+        }
+    }
+
+    public static getUser = async () => {
+        try {
+            const response = await fetch(`${this.SERVER}/user/${get(UserInfo)?.id}`, {
+                credentials: 'include',
+                method: 'GET',
+            });
+            const data = await response.json();
+            return JSON.stringify(data);
+        } catch (error) {
+            return JSON.stringify({ error: 'Failed to retrieve user data' });
         }
     }
 

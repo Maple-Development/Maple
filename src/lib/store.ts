@@ -1,8 +1,20 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
+import { User } from 'lucide-svelte';
+import { get } from 'http';
 
 export const searchType = writable('tracks');
+export const UserInfo = writable({} as any);
+UserInfo.subscribe((value) => {
+	if (browser) {
+		if (!value) return;
+		if (Object.keys(value).length === 0 && value.constructor === Object) return;
+		if (value === undefined) return;
+		console.log(value)
+		localStorage.setItem('UserInfo', JSON.stringify(value));
+	}
+})
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
@@ -151,5 +163,11 @@ if (browser) {
 		hideTips.set(true);
 	} else {
 		hideTips.set(false);
+	}
+
+	const storedUserInfo = localStorage.getItem('UserInfo');
+	if (storedUserInfo) {
+		UserInfo.set(JSON.parse(storedUserInfo));
+		console.log(storedUserInfo);
 	}
 }
