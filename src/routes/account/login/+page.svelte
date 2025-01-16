@@ -23,6 +23,10 @@
 
 </script>
 
+{#await User.isLoggedIn() then user}
+
+{#if !user.isAuthenticated}
+
 <div class="mt-16 flex flex-col items-center justify-center">
     <Input bind:value={username} type="username" placeholder="username" class="max-w-xs my-1" />
     <Input bind:value={password} type="password" placeholder="password" class="max-w-xs my-1" />
@@ -37,4 +41,13 @@
     <Textarea class="h-48" bind:value={log} placeholder="LOG" disabled />
 </div>  
 
+{/if}
+
+{/await}
+
+
+<div class="mt-10 flex items-center justify-center">
     <Button class="py-6 px-4 mx-2" variant="secondary" href='/account'>View Account</Button>
+    <Button class="py-6 px-4 mx-2 text-white" variant="destructive" on:click={User.logOut}>Log Out</Button>
+</div>
+

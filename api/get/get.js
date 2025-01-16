@@ -35,6 +35,14 @@ router.get('/user/:id', (req, res) => {
     });
 });
 
+router.get('/isAuthenticated/:id', (req, res) => {
+    return res.status(200).json({ isAuthenticated: true });
+});
+
+router.get('/logout/:id', (req, res) => {
+    res.clearCookie('token');
+    return res.status(200).json({ message: 'Logout successful' });
+});
 
 
 module.exports = router

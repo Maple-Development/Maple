@@ -60,6 +60,41 @@ export class User {
         }
     }
 
+    public static isLoggedIn = async () => {
+        if (!get(UserInfo)?.id) {
+            return false;
+        }
+        try {
+            const response = await fetch(`${this.SERVER}/isAuthenticated/${get(UserInfo)?.id}`, {
+                credentials: 'include',
+                method: 'GET',
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {   
+            return console.error('Error:', error);
+        }
+    }
+
+    public static logOut = async () => {
+        try {
+            const response = await fetch(`${this.SERVER}/logout/${get(UserInfo)?.id}`, {
+                credentials: 'include',
+                method: 'GET',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                UserInfo.set({});
+                location.reload();
+            } else {
+                return data;
+            }
+            return data;
+        } catch (error) {
+            return console.error('Error:', error);
+        }
+    }
+
     /* public static createPeer = async (username: string) => {
         try {
             const peer = new Peer(username);
