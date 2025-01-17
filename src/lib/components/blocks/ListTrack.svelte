@@ -43,6 +43,9 @@
 	export let playlists: Playlist[] = [];
 	$: playlists = playlists;
 
+	export let keep: boolean = true;
+	$: keep = keep;
+
 	function formatDuration(duration: number): string {
 		const roundedDuration = Math.round(duration);
 		const minutes = Math.floor(roundedDuration / 60);
@@ -57,7 +60,7 @@
 			<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
 				<div class="h-12 w-12 flex-shrink-0 md:h-24 md:w-24">
 					{#await getImageUrl(track.image) then image}
-						<Lazy height={208} keep={true}>
+						<Lazy height={208} keep={keep}>
 							<img class="rounded-md" src={image} alt={track.title} />
 						</Lazy>
 					{:catch error}

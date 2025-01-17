@@ -58,6 +58,7 @@
 		"socket.io-client": "^4.8.1",
 		"svelte-lazy": "^1.2.11",
 		"svelte-radix": "^1.1.0",
+		"svelte-tiny-virtual-list": "^2.1.2",
 		"tailwind-merge": "^2.2.2",
 		"tailwind-variants": "^0.2.1",
 		"uuid": "^11.0.3",

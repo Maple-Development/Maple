@@ -104,6 +104,14 @@
 			console.error('Album not found');
 		}
 	}
+
+	function dokeep() {
+		if (tracks.length > 100) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 </script>
 
 <div class="mt-4 flex h-10 w-full justify-center px-10 md:justify-end">
@@ -162,11 +170,11 @@
 </div>
 
 {#if listType === 'grid'}
-	<GridView {tracks} songs={tracks} on:delete={openAlert} />
+	<GridView keep={dokeep()} {tracks} songs={tracks} on:delete={openAlert} />
 {:else}
 	<div class="mx-4 mb-5 mt-2 flex flex-col">
 		{#each tracks as track}
-			<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
+			<ListTrack keep={dokeep()} {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 		{/each}
 	</div>
 {/if}
