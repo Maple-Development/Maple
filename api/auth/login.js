@@ -6,6 +6,7 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+var validator = require('validator');
 dotenv.config();
 
 
@@ -26,6 +27,24 @@ function generateToken(user) {
 
 router.post('/create', (req, res) => {
     const { username, password } = req.body;
+    const isStrongPassword = validator.isStrongPassword(password, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+        returnScore: false,
+        pointsPerUnique: 1,
+        pointsPerRepeat: 0.5,
+        pointsForContainingLower: 10,
+        pointsForContainingUpper: 10,
+        pointsForContainingNumber: 10,
+        pointsForContainingSymbol: 10,
+    });
+
+    if (!isStrongPassword) {
+        return res.status(400).json({ error: 'Password is not strong enough' });
+    }
 
     connection.query("SELECT username FROM users WHERE username= ?", [username], function (err, row){
         if (err) {
