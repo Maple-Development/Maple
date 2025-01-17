@@ -1,8 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
-import { User } from 'lucide-svelte';
-import { get } from 'http';
 
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);
@@ -105,6 +103,8 @@ audioPlayer.subscribe((value) => {
 				};
 				value.audio.addEventListener('durationchange', durationChangeHandler);
 
+
+
 				if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
 					value.audio.currentTime = value.currentTime;
 				}
@@ -135,6 +135,7 @@ function createTitle() {
 		}
 	};
 }
+
 
 function loadPreferences() {
 	return {

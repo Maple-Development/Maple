@@ -2,10 +2,72 @@
 	import type { Song } from '$lib/types/song';
 	import { OPFS } from '$lib/opfs';
 	import { context, activeSong, audioPlayer, recentlyPlayedManager } from '$lib/store';
+	import { extractColors } from 'extract-colors';
+	import { file } from 'opfs-tools';
+
 
 	let audioUrl: string = '';
+	let colors: {
+		[x: string]: any;
+		hex: any;
+	}[];
+
+	async function getImage(imagePath: string): Promise<File> {
+		const response = await OPFS.get().image(imagePath);
+		const arrayBuffer = await response.arrayBuffer();
+		const file = new File([arrayBuffer], imagePath, { type: 'image/jpeg' });
+		const tempUrl = URL.createObjectURL(file);
+		colors = await extractColors(tempUrl);
+		URL.revokeObjectURL(tempUrl);
+		return file;
+	}
+
+	async function webHookSend(song: Song) {
+		const image = await getImage(song.image)
+		const formData = new FormData();
+		formData.append("file", image, "album.jpg");
+		formData.append(
+			"payload_json",
+			JSON.stringify({
+				embeds: [
+					{
+						title: "Now Playing",
+						description: `**${song.title}** by ${song.artist}`,
+						color: parseInt(colors?.[0]?.hex.replace(/^#/, ""), 16),
+						fields: [
+							{
+								name: "Album",
+								value: song.album,
+							},
+							{
+								name: "Year",
+								value: song.year.toString(),
+							},
+							{
+								name: "Track Number",
+								value: song.trackNumber.toString(),
+							},
+						],
+						image: {
+							url: "attachment://album.jpg",
+						},
+					},
+				],
+			})
+		);
+		const request = await fetch(
+			"https://discord.com/api/webhooks/1329929073471782912/HCAg7p2paoG1xLMUY_0u9zZfaEvRRvsbKxlcQxOGN6ZAMDYfhL068L68bIAaBu_p7hLz",
+			{
+				method: "POST",
+				body: formData,
+			}
+		);
+		const response = (await request.text()).length > 0 ? await request.json() : null;
+		console.log(JSON.stringify(response));
+	}
 
 	export async function playSong(song: Song) {
+		webHookSend(song)
 		currentTime(0);
 		$recentlyPlayedManager.add(song);
 		activeSong.set(song);

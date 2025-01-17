@@ -14,10 +14,6 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-	onMount(async () => {
-		console.log(items);
-	});
-
 	async function getImageUrl(imagePath: string): Promise<string> {
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
@@ -30,7 +26,7 @@
 	export let artists: Artist[] = [];
 	export let playlists: Playlist[] = [];
 	export let tracks: Song[] = [];
-	export let keep: boolean = true;
+	export let keep: boolean = true;	
 	$: keep = keep;
 
 	let items = songs || albums || artists || playlists;

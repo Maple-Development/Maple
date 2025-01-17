@@ -43,7 +43,7 @@ router.post('/create', (req, res) => {
     });
 
     if (!isStrongPassword) {
-        return res.status(400).json({ error: 'Password is not strong enough' });
+        return res.status(400).json({ error: 'Password is not strong enough', passwordStrength: isStrongPassword });
     }
 
     connection.query("SELECT username FROM users WHERE username= ?", [username], function (err, row){

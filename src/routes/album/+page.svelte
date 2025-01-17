@@ -166,9 +166,9 @@
 			const doImage = imageFile !== null;
 			const modifiedAlbum: Album = {
 				id: album.id,
-				name: changedName,
-				artist: changedArtist,
-				year: parseInt(changedYear, 10),
+				name: changedName.replace(/[&<>"']/g, (match) => `&#${match.charCodeAt(0)};`),
+				artist: changedArtist.replace(/[&<>"']/g, (match) => `&#${match.charCodeAt(0)};`),
+				year: parseInt(changedYear.replace(/[^\d]/g, ''), 10),
 				image: doImage ? imageFile : album.image,
 				genre: album.genre,
 				tracks: album.tracks
@@ -176,6 +176,7 @@
 			OPFS.album().edit(modifiedAlbum);
 			let newAlbum = await OPFS.get().album(modifiedAlbum.id.toString());
 			album = newAlbum;
+			console.log(modifiedAlbum);
 		}
 	}
 

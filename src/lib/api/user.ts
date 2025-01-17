@@ -21,7 +21,7 @@ export class User {
 			const data = await response.json();
 			return data;
 		} catch (error) {
-			return console.error('Error:', error);
+			return console.error('Error:', error); 
 		}
     }
 
@@ -85,7 +85,6 @@ export class User {
             const data = await response.json();
             if (response.ok) {
                 UserInfo.set({});
-                location.reload();
             } else {
                 return data;
             }

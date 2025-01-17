@@ -10,6 +10,8 @@
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores'; 
+	import AccTopBar from '$lib/components/AccTopBar.svelte';
 
 	onMount(async () => {
 		loadPreferencesStore.load();
@@ -48,6 +50,7 @@
 <Toaster position="top-right" />
 
 <div class="flex h-screen flex-col overflow-hidden">
+	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account'}
 	{#if !smallDevice}
 		<div class="sticky top-0 z-10 border-b bg-background">
 			<TopBar />
@@ -79,6 +82,28 @@
 			</div>
 		{/if}
 	</div>
+	{:else}
+	{#if !smallDevice}
+		<div class="sticky top-0 z-10 border-b bg-background">
+			<AccTopBar />
+		</div>
+	{:else}
+		<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
+			<AccTopBar />
+		</div>
+	{/if}
+	<div class="flex flex-1 overflow-hidden">
+		{#if !smallDevice}
+			<div class="scrollbar flex-1 overflow-auto">
+				<slot />
+			</div>
+		{:else}
+			<div class="scrollbar mb-36 mt-12 flex-1 overflow-auto">
+				<slot />
+			</div>
+		{/if}
+	</div>
+	{/if}
 	{#if !smallDevice}
 		<div bind:this={bottomDiv} class="sticky bottom-0 z-10 border-t bg-background transition">
 			<BottomBar on:expand={expand} />
