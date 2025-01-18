@@ -6,7 +6,7 @@ const { Peer } = pkg; */
 
 
 export class UserManager {
-    private static SERVER = 'https://maple.kolf.pro'
+    private static SERVER = 'https://maple.kolf.pro:443'
 /*     private static user = writable(null as Peer | null);
  */
     public static register = async (username: string, password: string) => {

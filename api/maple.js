@@ -25,11 +25,16 @@ const credentials = {
 	ca: ca
 };
 
+const corsOptions = {
+	origin: true,
+	credentials: true
+};
+
 const server = https.createServer(credentials, app);
 
 const io = require('socket.io')(server);
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
 app.use('/', getPath);
