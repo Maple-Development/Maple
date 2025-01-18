@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const login = require('./auth/login');
+const getPath = require('./get/get.js')
+const manageUser = require('./user/manageUser.js')
+const publicGet = require('./publicGet/get.js')
 const app = express();
 
 const fs = require('fs');
@@ -24,8 +27,21 @@ const credentials = {
 
 const server = https.createServer(credentials, app);
 
+const io = require('socket.io')(server);
+
 app.use(cors());
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
+app.use('/', getPath);
+app.use('/user/manage', manageUser);
+app.use('/public/get', publicGet);
+
+
+io.on('connection', client => {
+    // eslint-disable-next-line no-unused-vars
+    client.on('event', data => { /* … */ });
+    client.on('disconnect', () => { /* … */ });
+});
 
 server.listen(443);
+ 
