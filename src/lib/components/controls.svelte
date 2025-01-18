@@ -69,7 +69,7 @@
 					},
 				],
 				username: $SavedUser?.name === "" ? "Maple User" : $SavedUser?.name,
-				avatar_url: "http://localhost:3000/public/get/pfp/" + $SavedUser?.id, 
+				avatar_url: "http://maple.kolf.pro/public/get/pfp/" + $SavedUser?.id, 
 			})
 		);
 		const request = await fetch(
