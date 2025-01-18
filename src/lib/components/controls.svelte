@@ -69,7 +69,7 @@
 					},
 				],
 				username: $SavedUser?.name === "" ? "Maple User" : $SavedUser?.name,
-				avatar_url: "https://raw.githubusercontent.com/Cattn/Maple/refs/heads/main/static/placeholder.png", // http://localhost:3000/public/get/2970f6d0-9c7a-4ca3-a109-417085856d10
+				avatar_url: "http://localhost:3000/public/get/pfp/" + $SavedUser?.id, 
 			})
 		);
 		const request = await fetch(

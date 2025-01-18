@@ -41,7 +41,7 @@
         const user = {
             id: userData.id,
             username: userData.username,
-            displayName: displayName,
+            name: displayName,
             pfp: pfpBlob
         }
         try {

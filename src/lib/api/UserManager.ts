@@ -50,7 +50,7 @@ export class UserManager {
 
     public static getUser = async () => {
         try {
-            const response = await fetch(`${this.SERVER}/user/${get(UserInfo)?.id}`, {
+            const response = await fetch(`${this.SERVER}/get/user/${get(UserInfo)?.id}`, {
                 credentials: 'include',
                 method: 'GET',
             });
@@ -140,7 +140,7 @@ export class UserManager {
             return false;
         }
         try {
-            const response = await fetch(`${this.SERVER}/isAuthenticated/${get(UserInfo)?.id}`, {
+            const response = await fetch(`${this.SERVER}/get/isAuthenticated/${get(UserInfo)?.id}`, {
                 credentials: 'include',
                 method: 'GET',
             });
@@ -153,7 +153,7 @@ export class UserManager {
 
     public static logOut = async () => {
         try {
-            const response = await fetch(`${this.SERVER}/logout/${get(UserInfo)?.id}`, {
+            const response = await fetch(`${this.SERVER}/get/logout/${get(UserInfo)?.id}`, {
                 credentials: 'include',
                 method: 'GET',
             });
