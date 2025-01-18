@@ -47,9 +47,22 @@
 <div class="mt-16 flex flex-col items-center justify-center">
     <Input bind:value={username} type="username" placeholder="username" class="max-w-xs my-1" />
     <Input bind:value={password} type="password" placeholder="password" class="max-w-xs my-1" />
+
+    <div class="mt-2 flex flex-col">
+        <h1 class="px-1 text-sm font-semibold text-foreground">Password Requirements:</h1>
+        <div class="ml-2">
+            <ul class="list-disc">
+                <li class="ml-5 text-xs text-muted">At least 8 characters</li>
+                <li class="ml-5 text-xs text-muted">At least 1 lowercase letter</li>
+                <li class="ml-5 text-xs text-muted">At least 1 uppercase letter</li>
+                <li class="ml-5 text-xs text-muted">At least 1 number</li>
+                <li class="ml-5 text-xs text-muted">At least 1 special character</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
-<div class="mt-2 flex items-center justify-center">
+<div class="mt-6 flex items-center justify-center">
 	<Button class="py-6 px-4 mx-2" variant="secondary" on:click={createAccount}>Register User</Button> 
 	<Button class="py-6 px-4 mx-2" variant="secondary" on:click={login}>Login</Button>
 </div>

@@ -44,8 +44,6 @@ router.get('/user/:id', (req, res) => {
     });
 });
 
-module.exports = router;
-
 router.get('/isAuthenticated/:id', (req, res) => {
     return res.status(200).json({ isAuthenticated: true });
 });

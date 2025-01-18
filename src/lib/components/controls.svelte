@@ -3,7 +3,8 @@
 	import { OPFS } from '$lib/opfs';
 	import { context, activeSong, audioPlayer, recentlyPlayedManager } from '$lib/store';
 	import { extractColors } from 'extract-colors';
-	import { file } from 'opfs-tools';
+	import { UserManager } from '$lib/api/UserManager';
+	import { SavedUser } from '$lib/store';
 
 
 	let audioUrl: string = '';
@@ -22,10 +23,24 @@
 		return file;
 	}
 
+	async function base64ToFile(base64: string): Promise<File> {
+		const arrayBuffer = await (await fetch(base64)).arrayBuffer();
+		const file = new File([arrayBuffer], 'image.png', { type: 'image/png' });
+		return file;
+	}
+
 	async function webHookSend(song: Song) {
+		const isLoggedIn = await UserManager.isLoggedIn();
+		let pfp;
+		if (!isLoggedIn) return;
+		if ($SavedUser.pfp !== '' && $SavedUser.pfp !== null) {
+			pfp = await base64ToFile($SavedUser.pfp);
+		}
+
 		const image = await getImage(song.image)
 		const formData = new FormData();
 		formData.append("file", image, "album.jpg");
+		if (pfp) formData.append("file", pfp, "pfp.png");
 		formData.append(
 			"payload_json",
 			JSON.stringify({
@@ -53,6 +68,8 @@
 						},
 					},
 				],
+				username: $SavedUser?.name === "" ? "Maple User" : $SavedUser?.name,
+				avatar_url: "https://raw.githubusercontent.com/Cattn/Maple/refs/heads/main/static/placeholder.png", // http://localhost:3000/public/get/2970f6d0-9c7a-4ca3-a109-417085856d10
 			})
 		);
 		const request = await fetch(
