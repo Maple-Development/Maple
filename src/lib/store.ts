@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
+import type { User } from './types/user';
 
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);
@@ -12,6 +13,7 @@ UserInfo.subscribe((value) => {
 		localStorage.setItem('UserInfo', JSON.stringify(value));
 	}
 })
+export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];

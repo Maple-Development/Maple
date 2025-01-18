@@ -4,7 +4,8 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { collapsed, loadPreferencesStore } from '$lib/store';
+	import { collapsed, loadPreferencesStore, SavedUser } from '$lib/store';
+	import { UserManager } from '$lib/api/UserManager';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title, isSmallDevice } from '$lib/store';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
@@ -13,8 +14,13 @@
 	import { page } from '$app/stores'; 
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
 
+	async function getUserData() {
+        await UserManager.getUser();
+    }
+
 	onMount(async () => {
 		loadPreferencesStore.load();
+		getUserData();
 	});
 
 	let bottomDiv: HTMLDivElement;

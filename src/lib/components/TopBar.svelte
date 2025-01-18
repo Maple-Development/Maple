@@ -8,11 +8,12 @@
 		Search,
 		AudioLines,
 		Home,
-		Settings
+		Settings,
+		User as UserIcon
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
-	import { collapsed, title } from '$lib/store';
+	import { collapsed, SavedUser, title } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
@@ -57,6 +58,18 @@
 			<Search size={20} color="white" />
 			<span class="ml-2">Search</span>
 		</Button>
+	</div>
+	<div>
+		{#if $SavedUser && $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
+			<!-- svelte-ignore a11y-img-redundant-alt -->
+			<img
+				src={$SavedUser.pfp}
+				alt="Profile Picture"
+				class="h-12 w-12 self-center rounded-[50%] p-1 mr-2"
+			/>
+		{:else}
+			<UserIcon color="black" class="h-8 w-8 self-center rounded-[50%] p-2 bg-primary mr-2" />
+		{/if}
 	</div>
 </div>
 

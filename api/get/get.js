@@ -20,20 +20,31 @@ router.use(verifyUser);
 
 
 router.get('/user/:id', (req, res) => {
-    const id = req.user.id;
-    const sql = 'SELECT username, id FROM users WHERE id = ?';
+    const id = req.user.id; 
+    const sql = 'SELECT username, id, name, pfp FROM users WHERE id = ?';
+
     connection.query(sql, [id], (error, results) => {
         if (error) {
-            console.error(error + "ewfewfw ");
+            console.error("Error fetching user:", error);
             return res.status(500).json({ error: 'Error fetching user' });
         }
         if (results.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
+
         const user = results[0];
-        return res.status(200).json(user);
+        const response = {
+            username: user.username,
+            id: user.id,
+            name: user.name,
+            pfp: user.pfp ? user.pfp.toString('base64') : null 
+        };
+
+        return res.status(200).json(response); 
     });
 });
+
+module.exports = router;
 
 router.get('/isAuthenticated/:id', (req, res) => {
     return res.status(200).json({ isAuthenticated: true });

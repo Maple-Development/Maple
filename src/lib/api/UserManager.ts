@@ -1,10 +1,11 @@
-import { writable, get } from 'svelte/store';
-import { UserInfo } from '$lib/store';  
+import { get } from 'svelte/store';
+import { UserInfo, SavedUser } from '$lib/store';  
+import type { User } from '$lib/types/user';
 /* import pkg from 'peerjs';
 const { Peer } = pkg; */
 
 
-export class User {
+export class UserManager {
     private static SERVER = 'http://localhost:3000'
 /*     private static user = writable(null as Peer | null);
  */
@@ -53,12 +54,86 @@ export class User {
                 credentials: 'include',
                 method: 'GET',
             });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
-            return JSON.stringify(data);
+    
+            const returnUser: User = {
+                id: data.id,
+                username: data.username,
+                name: data.name,
+                pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : null
+            };
+            
+            if (response.ok) {
+                SavedUser.set(returnUser);
+            }
+            console.log(returnUser);
+            return returnUser;
         } catch (error) {
-            return JSON.stringify({ error: 'Failed to retrieve user data' });
+            console.error('Error fetching user:', error);
+            return {
+                id: '',
+                username: '',
+                name: '',
+                pfp: null
+            };
         }
-    }
+    };
+    
+
+    public static updateUser = async (user: User): Promise<User | void> => {
+        try {
+            let returnUser: User = {
+                id: user.id,
+                username: user.username,
+                name: user.name,
+                pfp: user.pfp,
+            };
+    
+            
+            if (user.pfp) {
+                const formData = new FormData();
+                formData.append('pfp', user.pfp); 
+                formData.append('id', user.id);
+    
+                const pfpResponse = await fetch(`${this.SERVER}/user/manage/setProfile/${user.id}`, {
+                    credentials: 'include',
+                    method: 'POST',
+                    body: formData, 
+                });
+    
+                const pfpData = await pfpResponse.json();
+                if (pfpData.ok) {
+                    returnUser.pfp = pfpData.pfp; 
+                }
+            }
+    
+           
+            if (user.name) {
+                const nameResponse = await fetch(`${this.SERVER}/user/manage/setDisplayName/${user.id}`, {
+                    credentials: 'include',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ displayName: user.name }),
+                });
+    
+                const nameData = await nameResponse.json();
+                if (nameData.ok) {
+                    returnUser.name = nameData.name; 
+                }
+            }
+    
+            return returnUser; 
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+    
 
     public static isLoggedIn = async () => {
         if (!get(UserInfo)?.id) {
