@@ -56,11 +56,11 @@
 							},
 							{
 								name: "Year",
-								value: song.year.toString(),
+								value: song.year ? song.year.toString() : "N/A", 
 							},
 							{
 								name: "Track Number",
-								value: song.trackNumber.toString(),
+								value: song.trackNumber ? song.trackNumber.toString() : "N/A",
 							},
 						],
 						image: {
@@ -69,7 +69,7 @@
 					},
 				],
 				username: $SavedUser?.name === "" ? "Maple User" : $SavedUser?.name,
-				avatar_url: "http://maple.kolf.pro/public/get/pfp/" + $SavedUser?.id, 
+				avatar_url: "https://maple.kolf.pro/public/get/pfp/" + $SavedUser?.id, 
 			})
 		);
 		const request = await fetch(
@@ -79,7 +79,7 @@
 				body: formData,
 			}
 		);
-		const response = (await request.text()).length > 0 ? await request.json() : null;
+		const response = await request.json();
 		console.log(JSON.stringify(response));
 	}
 
@@ -94,6 +94,7 @@
 			const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
 			audioUrl = URL.createObjectURL(blob);
 		}
+		console.log(song.image)
 		audioPlayer.update((state) => {
 			if (state.audio instanceof HTMLAudioElement) {
 				state.audio.src = audioUrl;
@@ -103,13 +104,6 @@
 						title: song.title,
 						artist: song.artist,
 						album: song.album,
-						artwork: [
-							{
-								src: song.image,
-								sizes: '512x512',
-								type: song.image.split(';')[0].split(':')[1]
-							}
-						]
 					});
 
 					navigator.mediaSession.setActionHandler('play', () => {

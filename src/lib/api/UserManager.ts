@@ -1,12 +1,15 @@
 import { get } from 'svelte/store';
 import { UserInfo, SavedUser } from '$lib/store';  
 import type { User } from '$lib/types/user';
+import { toast } from 'svelte-sonner';
 /* import pkg from 'peerjs';
 const { Peer } = pkg; */
 
 
 export class UserManager {
-    private static SERVER = 'https://maple.kolf.pro:443'
+    private static DevServer = 'http://localhost:3000'
+    private static PRODServer = 'https://maple.kolf.pro:443'
+    private static SERVER = this.DevServer
 /*     private static user = writable(null as Peer | null);
  */
     public static register = async (username: string, password: string) => {
@@ -20,8 +23,10 @@ export class UserManager {
 				body: JSON.stringify({ username, password })
 			});
 			const data = await response.json();
+            toast.success('Account created successfully!');
 			return data;
 		} catch (error) {
+            toast.error('Error creating account: "' + error + '"');
 			return console.error('Error:', error); 
 		}
     }
@@ -42,8 +47,11 @@ export class UserManager {
             const returnName = data.user.username
             const id = data.user.id
             UserInfo.set({ username: returnName, id: id });
+            toast.success('Welcome back, ' + returnName + '!');
+            this.getUser();
             return data;
         } catch (error) {
+            toast.error('Error logging in: "' + error + '"');
             return console.error('Error:', error);
         }
     }
@@ -127,9 +135,11 @@ export class UserManager {
                     returnUser.name = nameData.name; 
                 }
             }
-    
+            
+            toast.success('Profile updated successfully!');
             return returnUser; 
         } catch (error) {
+            toast.error('Error updating profile: "' + error + '"');
             console.error('Error:', error);
         }
     };
@@ -163,8 +173,11 @@ export class UserManager {
             } else {
                 return data;
             }
+            toast.success('Logout successful!');
+            location.reload();
             return data;
         } catch (error) {
+            toast.error('Error logging out: "' + error + '"');
             return console.error('Error:', error);
         }
     }

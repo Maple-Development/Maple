@@ -20,7 +20,9 @@
 
 	onMount(async () => {
 		loadPreferencesStore.load();
-		getUserData();
+		if ($SavedUser.id) {
+			await getUserData();
+		}
 	});
 
 	let bottomDiv: HTMLDivElement;
@@ -56,7 +58,7 @@
 <Toaster position="top-right" />
 
 <div class="flex h-screen flex-col overflow-hidden">
-	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account'}
+	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account' && $page.url.pathname !== '/account/register'}
 	{#if !smallDevice}
 		<div class="sticky top-0 z-10 border-b bg-background">
 			<TopBar />
