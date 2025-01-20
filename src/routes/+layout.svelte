@@ -4,7 +4,7 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { collapsed, loadPreferencesStore, SavedUser } from '$lib/store';
+	import { collapsed, loadPreferencesStore, UserInfo } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title, isSmallDevice } from '$lib/store';
@@ -20,7 +20,7 @@
 
 	onMount(async () => {
 		loadPreferencesStore.load();
-		if ($SavedUser.id) {
+		if ($UserInfo.id) {
 			await getUserData();
 		}
 	});
@@ -58,7 +58,7 @@
 <Toaster position="top-right" />
 
 <div class="flex h-screen flex-col overflow-hidden">
-	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account' && $page.url.pathname !== '/account/register'}
+	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account' && $page.url.pathname !== '/account/register' && $page.url.pathname !== '/account/preferences'}
 	{#if !smallDevice}
 		<div class="sticky top-0 z-10 border-b bg-background">
 			<TopBar />

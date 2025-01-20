@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import { UserInfo, SavedUser } from '$lib/store';  
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
+import { Save } from 'lucide-svelte';
 /* import pkg from 'peerjs';
 const { Peer } = pkg; */
 
@@ -132,15 +133,16 @@ export class UserManager {
     
                 const nameData = await nameResponse.json();
                 if (nameData.ok) {
-                    returnUser.name = nameData.name; 
+                    returnUser.name = nameData.name;  
                 }
             }
-            
+            const newUser = this.getUser();
             toast.success('Profile updated successfully!');
-            return returnUser; 
+            return newUser; 
         } catch (error) {
             toast.error('Error updating profile: "' + error + '"');
             console.error('Error:', error);
+            return console.error('Error:', error);
         }
     };
     
@@ -173,6 +175,8 @@ export class UserManager {
             } else {
                 return data;
             }
+            UserInfo.set({});
+            SavedUser.set({} as User);
             toast.success('Logout successful!');
             location.reload();
             return data;

@@ -5,6 +5,7 @@
 	import { extractColors } from 'extract-colors';
 	import { UserManager } from '$lib/api/UserManager';
 	import { SavedUser } from '$lib/store';
+	import UserSettings from '$lib/preferences/usersettings';
 
 
 	let audioUrl: string = '';
@@ -73,7 +74,7 @@
 			})
 		);
 		const request = await fetch(
-			"https://discord.com/api/webhooks/1329929073471782912/HCAg7p2paoG1xLMUY_0u9zZfaEvRRvsbKxlcQxOGN6ZAMDYfhL068L68bIAaBu_p7hLz",
+			UserSettings.webhook.url,
 			{
 				method: "POST",
 				body: formData,
@@ -84,7 +85,10 @@
 	}
 
 	export async function playSong(song: Song) {
-		webHookSend(song)
+		console.log(UserSettings.webhook.enabled)
+		if (UserSettings.webhook.enabled == "true") {
+			webHookSend(song)
+		}
 		currentTime(0);
 		$recentlyPlayedManager.add(song);
 		activeSong.set(song);

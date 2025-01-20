@@ -5,6 +5,7 @@
     import Input from '$lib/components/ui/input/input.svelte';
     import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { SavedUser } from '$lib/store';
 
     let userData: User = {
         username: '',
@@ -45,7 +46,8 @@
             pfp: pfpBlob
         }
         try {
-            await UserManager.updateUser(user);
+            const updatedUser = await UserManager.updateUser(user);
+            SavedUser.set(updatedUser as User);
             console.log('User updated successfully!');
         } catch (error) {
             console.error('Error updating user:', error);

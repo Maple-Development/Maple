@@ -75,7 +75,7 @@
 					src={$SavedUser.pfp}
 					alt="Profile Picture"
 					class="h-8 w-8 self-center rounded-[50%] mr-2"
-				/>
+				/> 
 				{:else} 
 				<UserIcon color="black" class="h-8 w-8 self-center rounded-[50%] p-1 bg-primary mr-2" />
 				{/if}
@@ -85,7 +85,7 @@
 				<DropdownMenu.Label>My Account</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
-				<DropdownMenu.Item href="/settings">Preferences</DropdownMenu.Item>
+				<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
 				<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}>Log Out</DropdownMenu.Item>
 			  </DropdownMenu.Group>
 			</DropdownMenu.Content> 
