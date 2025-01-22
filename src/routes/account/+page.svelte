@@ -56,8 +56,8 @@
 </script>
 
 <h2 class="text-4xl font-black mt-5 text-center">Account</h2>
-<div class="flex flex-row mt-5 items-start justify-center space-x-40">
-    <div class="flex flex-col items-center justify-center mt-10">
+<div class="flex flex-col items-center justify-center sm:flex-row sm:space-x-40">
+    <div class="flex flex-col items-center justify-center mt-10 sm:mt-0">
         {#if userData.pfp}
         <!-- svelte-ignore a11y-img-redundant-alt -->
         <img src={userData.pfp} alt="Profile Picture" class="h-64 self-center rounded-[50%] p-2" />
@@ -65,21 +65,21 @@
             <UserIcon color="black" class="h-64 w-fit self-center rounded-[50%] p-2 bg-primary" />
         {/if}
         <div class="mt-2 flex flex-col items-center justify-center">
-            <p>Username: {userData.username}</p> 
+            <p class="text-center">Username: {userData.username}</p> 
             {#if userData.name}
-            <p>Display Name: {userData.name}</p>
+            <p class="text-center">Display Name: {userData.name}</p>
             {/if}
-            <p>ID: {userData.id}</p>
+            <p class="text-center">ID: {userData.id}</p>
         </div>
     </div>
-    <div class="flex flex-col justify-center mt-10">
-        <h2 class="text-4xl font-black mt-5">Manage Profile</h2>
-        <p class="text-muted mt-2">Change Display Name</p>
-        <Input class="text-muted" bind:value={displayName} placeholder="Display name"/>
+    <div class="flex flex-col justify-center mt-10 sm:mt-0 mb-6">
+        <h2 class="text-4xl font-black mt-5 text-center">Manage Profile</h2>
+        <p class="text-muted mt-2 text-center">Change Display Name</p>
+        <Input class="text-muted w-full" bind:value={displayName} placeholder="Display name"/>
 
-        <p class="text-muted mt-2">Change Profile Picture</p>
-        <Input type="file" on:change={(e) => handleFileChange(e)} accept="image/*" class="text-muted"/>
+        <p class="text-muted mt-2 text-center">Change Profile Picture</p>
+        <Input type="file" on:change={(e) => handleFileChange(e)} accept="image/*" class="text-muted w-full"/>
 
-        <Button class="py-6 px-4 mx-2 text-white mt-4" variant="secondary" on:click={updateUser}>Submit</Button>
+        <Button class="py-6 px-4 mx-2 text-white mt-4 w-full" variant="secondary" on:click={updateUser}>Submit</Button>
     </div>
 </div>

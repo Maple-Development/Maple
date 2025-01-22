@@ -8,11 +8,12 @@
 		Search,
 		AudioLines,
 		Home,
-		Settings
+		Settings,
+		User as UserIcon
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
-	import { collapsed, title } from '$lib/store';
+	import { collapsed, title, SavedUser } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
@@ -21,6 +22,8 @@
 	import type { Playlist } from '$lib/types/playlist';
 	import { page } from '$app/stores';
 	import TrackWrapper from './TrackWrapper.svelte';
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+	import { UserManager } from '$lib/api/UserManager';
 
 	let songs: Song[] = [];
 	let albums: Album[] = [];
@@ -38,8 +41,8 @@
 	});
 </script>
 
-<div class="relative flex items-center justify-center">
-	<div>
+<div class="flex items-center justify-between">
+	<div class="flex-1 ml-8 flex items-center justify-center">
 		<Button
 			on:click={() => (open = !open)}
 			class="my-2 h-8 max-w-xs text-primary"
@@ -48,6 +51,45 @@
 			<Search size={20} color="white" />
 			<span class="ml-2">Search</span>
 		</Button>
+	</div>
+	<div class="flex items-center justify-end mb-1">
+		{#if $SavedUser.id}
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger class="mt-1">
+				{#if $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
+				<!-- svelte-ignore a11y-img-redundant-alt -->
+				<img
+					src={$SavedUser.pfp}
+					alt="Profile Picture"
+					class="h-8 w-8 self-center rounded-full mr-2"
+				/> 
+				{:else} 
+				<UserIcon color="black" class="h-8 w-8 self-center rounded-full p-1 bg-primary mr-2" />
+				{/if}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content>
+			  <DropdownMenu.Group>
+				<DropdownMenu.Label>My Account</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
+				<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
+				<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}>Log Out</DropdownMenu.Item>
+			  </DropdownMenu.Group>
+			</DropdownMenu.Content> 
+		  </DropdownMenu.Root>
+		{:else}
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger class="mt-1"><UserIcon color="black" class="h-8 w-8 self-center rounded-full p-1 bg-primary mr-2" /></DropdownMenu.Trigger>
+			<DropdownMenu.Content>
+			  <DropdownMenu.Group>
+				<DropdownMenu.Label>My Account</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item href="/account/register">Sign up</DropdownMenu.Item>
+				<DropdownMenu.Item href="/account/login">Login</DropdownMenu.Item>
+			  </DropdownMenu.Group>
+			</DropdownMenu.Content>
+		  </DropdownMenu.Root>
+		{/if}
 	</div>
 </div>
 

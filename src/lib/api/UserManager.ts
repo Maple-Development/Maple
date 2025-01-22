@@ -1,18 +1,16 @@
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { UserInfo, SavedUser } from '$lib/store';  
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
-import { Save } from 'lucide-svelte';
-/* import pkg from 'peerjs';
-const { Peer } = pkg; */
+import { Peer } from 'peerjs';
 
 
 export class UserManager {
     private static DevServer = 'http://localhost:3000'
     private static PRODServer = 'https://maple.kolf.pro:443'
     private static SERVER = this.DevServer
-/*     private static user = writable(null as Peer | null);
- */
+    private static UserPeer = writable(null as Peer | null);
+
     public static register = async (username: string, password: string) => {
         try {
 			const response: any = await fetch(`${this.SERVER}/login/create`, {
@@ -185,18 +183,4 @@ export class UserManager {
             return console.error('Error:', error);
         }
     }
-
-    /* public static createPeer = async (username: string) => {
-        try {
-            const peer = new Peer(username);
-            this.user.set(peer);
-            return peer;
-        } catch (error) {
-            return console.error('Error:', error);
-        }
-    }
-
-    public static getPeer = () => {
-        return get(this.user);
-    } */
 }

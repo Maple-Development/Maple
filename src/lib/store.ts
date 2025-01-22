@@ -2,7 +2,9 @@ import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
 import type { User } from './types/user';
+import { Peer } from 'peerjs';
 
+export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);
 UserInfo.subscribe((value) => {
