@@ -36,11 +36,12 @@ const corsOptions = {
 
 const server = https.createServer(credentials, app);
 
-const socketIO = require('socket.io');
+import { Server } from "socket.io";
 
-const io = socketIO(server, {
+const io = new Server(server, {
 	cors: {
-		origin: "*" 
+		origin: "*",
+		credentials: true
 	}
 });
 
