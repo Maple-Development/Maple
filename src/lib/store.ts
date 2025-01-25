@@ -10,6 +10,7 @@ export const socket = io("https://maple.kolf.pro:443", {
 	transports: ['websocket'],
 	withCredentials: true
 });
+socket.emit('addFriend', { friendId: "e" });
 export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);

@@ -40,7 +40,7 @@ const socketIO = require('socket.io');
 
 const io = socketIO(server, {
 	cors: {
-		origin: "*"
+		origin: "*" 
 	}
 });
 
@@ -91,6 +91,14 @@ io.on('connection', client => {
 		ioTools.addFriend(userId, friendId); 
 	 });
 	client.on('disconnect', () => { /* … */ });
+});
+
+io.on('disconnect', (reason) => {
+	console.log(`Disconnected: ${reason}`);
+  });
+  
+io.on('connect_error', (error) => {
+	console.log(`Connection error: ${error}`);
 });
 
 
