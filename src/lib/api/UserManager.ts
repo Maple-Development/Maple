@@ -7,7 +7,7 @@ import { Peer } from 'peerjs';
 export class UserManager {
     private static DevServer = 'http://localhost:3000'
     private static PRODServer = 'https://maple.kolf.pro:443'
-    private static SERVER = this.DevServer
+    private static SERVER = this.PRODServer
 
     public static register = async (username: string, password: string) => {
         try {

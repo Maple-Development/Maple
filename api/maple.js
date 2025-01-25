@@ -48,35 +48,41 @@ app.use('/user/friends', friends);
 
 
 io.use((socket, next) => {
-  const cookieString = socket.handshake.headers['cookie'];
-  let token = null;
+	console.log('Headers:', socket.handshake.headers);
+	const cookieString = socket.handshake.headers['cookie'];
+	let token = null;
   
-  if (cookieString) {
-	const cookies = cookieString.split(';');
-	const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
-	if (tokenCookie) {
-	  token = tokenCookie.split('=')[1];
+	if (cookieString) {
+	  const cookies = cookieString.split(';');
+	  const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('token='));
+	  if (tokenCookie) {
+		token = tokenCookie.split('=')[1];
+	  }
 	}
-  }
   
-  if (!token) {
-	return next(new Error('Authentication error'));
-  }
-  
-  jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-	if (err) {
-	  console.log(err + "ewfwfwf");
-	  return next(new Error('Authentication error'));
+	if (!token) {
+	  console.error('No token found.');
+	  return next(new Error('Authentication error: Missing token'));
 	}
-	
-	socket.user = decoded;
-	next();
-  });
-});
+  
+	jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+	  if (err) {
+		console.error('JWT verification failed:', err);
+		return next(new Error('Authentication error: Invalid token'));
+	  }
+  
+	  socket.user = decoded;
+	  next();
+	});
+  });  
 
 io.on('connection', client => {
+	console.log('User connected: ' + client.user.id);
 	client.on('addFriend', data => { 
-		ioTools.addFriend(data);
+		console.log("User: " + client.user.id + " wants to add " + data.friendId);
+		const userId = client.user.id;
+		const friendId = data.friendId;
+		ioTools.addFriend(userId, friendId); 
 	 });
 	client.on('disconnect', () => { /* … */ });
 });
