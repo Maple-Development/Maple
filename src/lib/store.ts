@@ -3,7 +3,13 @@ import { browser } from '$app/environment';
 import type { Song } from './types/song';
 import type { User } from './types/user';
 import { Peer } from 'peerjs';
+import { io } from "socket.io-client";
 
+export const socket = io("http://localhost:3000/", {
+	reconnectionDelayMax: 10000, 
+	transports: ['websocket'],
+	withCredentials: true
+});
 export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);
@@ -30,6 +36,19 @@ hideTips.subscribe((value) => {
 		}
 	}
 });
+export const UserPrefs = writable({
+	p2p: false,
+	devMode: false,
+	showLogs: false,
+	updated: false
+})
+UserPrefs.subscribe((value) => {
+	if (browser && value.updated) {
+		console.log(value);
+		localStorage.setItem('UserPrefs', JSON.stringify(value));
+		console.log(localStorage.getItem('UserPrefs'));
+	}
+})
 export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
@@ -145,6 +164,11 @@ function loadPreferences() {
 	return {
 		load: () => {
 			if (browser) {
+				const storedUserPrefs = localStorage.getItem('UserPrefs');
+				if (storedUserPrefs) {
+					UserPrefs.set(JSON.parse(storedUserPrefs));
+					console.log(storedUserPrefs);
+				}
 				const storedVolume = localStorage.getItem('volume');
 				console.log(storedVolume);
 				const volume = parseInt(storedVolume ?? '100');
@@ -172,6 +196,5 @@ if (browser) {
 	const storedUserInfo = localStorage.getItem('UserInfo');
 	if (storedUserInfo) {
 		UserInfo.set(JSON.parse(storedUserInfo));
-		console.log(storedUserInfo);
 	}
 }

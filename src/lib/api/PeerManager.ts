@@ -10,6 +10,6 @@ export class PeerManager {
             return peer;
         } catch (error) {
             return console.error('Error:', error);
-        }
+        } 
     } 
 }

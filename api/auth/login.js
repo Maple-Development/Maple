@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
     user: 'root',
     password: 'admin',
     database: 'maple_auth'
-});
+}); 
 
 router.use(express.json());
 router.use(cookieParser());

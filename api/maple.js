@@ -4,10 +4,14 @@ const login = require('./auth/login');
 const getPath = require('./get/get.js')
 const manageUser = require('./user/manageUser.js')
 const publicGet = require('./publicGet/get.js')
+const friends = require('./user/friends.js');
+const ioTools = require('./iomanager/io.js');
 const app = express();
 
 const fs = require('fs');
 const https = require('https');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
@@ -40,13 +44,43 @@ app.use('/login', login);
 app.use('/get', getPath);
 app.use('/user/manage', manageUser);
 app.use('/public/get', publicGet);
+app.use('/user/friends', friends);
 
+
+io.use((socket, next) => {
+  const cookieString = socket.handshake.headers['cookie'];
+  let token = null;
+  
+  if (cookieString) {
+	const cookies = cookieString.split(';');
+	const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+	if (tokenCookie) {
+	  token = tokenCookie.split('=')[1];
+	}
+  }
+  
+  if (!token) {
+	return next(new Error('Authentication error'));
+  }
+  
+  jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+	if (err) {
+	  console.log(err + "ewfwfwf");
+	  return next(new Error('Authentication error'));
+	}
+	
+	socket.user = decoded;
+	next();
+  });
+});
 
 io.on('connection', client => {
-    // eslint-disable-next-line no-unused-vars
-    client.on('event', data => { /* … */ });
-    client.on('disconnect', () => { /* … */ });
+	client.on('addFriend', data => { 
+		ioTools.addFriend(data);
+	 });
+	client.on('disconnect', () => { /* … */ });
 });
+
 
 server.listen(443);
  

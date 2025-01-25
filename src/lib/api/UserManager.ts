@@ -1,20 +1,18 @@
 import { get, writable } from 'svelte/store';
-import { UserInfo, SavedUser } from '$lib/store';  
+import { UserInfo, SavedUser, socket } from '$lib/store';  
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
 import { Peer } from 'peerjs';
-
 
 export class UserManager {
     private static DevServer = 'http://localhost:3000'
     private static PRODServer = 'https://maple.kolf.pro:443'
     private static SERVER = this.DevServer
-    private static UserPeer = writable(null as Peer | null);
 
     public static register = async (username: string, password: string) => {
         try {
 			const response: any = await fetch(`${this.SERVER}/login/create`, {
-				method: 'POST',
+				method: 'POST', 
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -180,6 +178,14 @@ export class UserManager {
             return data;
         } catch (error) {
             toast.error('Error logging out: "' + error + '"');
+            return console.error('Error:', error);
+        }
+    }
+
+    public static addFriend = async (friend: string) => {
+        try {
+           socket.emit('addFriend', { friendId: friend });
+        } catch (error) {
             return console.error('Error:', error);
         }
     }
