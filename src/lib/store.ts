@@ -5,7 +5,7 @@ import type { User } from './types/user';
 import { Peer } from 'peerjs';
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:3000/", {
+export const socket = io("https://maple.kolf.pro:443", {
 	reconnectionDelayMax: 10000, 
 	transports: ['websocket'],
 	withCredentials: true

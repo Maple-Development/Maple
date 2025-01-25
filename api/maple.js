@@ -36,7 +36,13 @@ const corsOptions = {
 
 const server = https.createServer(credentials, app);
 
-const io = require('socket.io')(server);
+const socketIO = require('socket.io');
+
+const io = socketIO(server, {
+	cors: {
+		origin: "*"
+	}
+});
 
 app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
@@ -76,7 +82,7 @@ io.use((socket, next) => {
 	});
   });  
 
-io.on('connection', client => {
+io.on('connection', client => { 
 	console.log('User connected: ' + client.user.id);
 	client.on('addFriend', data => { 
 		console.log("User: " + client.user.id + " wants to add " + data.friendId);
