@@ -101,7 +101,7 @@ router.post('/', (req, res) => {
             }
 
             const token = generateToken({ id: user.id});
-            res.cookie('token', token, { httpOnly: true, secure: false, expires: new Date(Date.now() + 604800000), sameSite: 'none' });
+            res.cookie('token', token, { httpOnly: true, secure: true, expires: new Date(Date.now() + 604800000), sameSite: 'none' });
             return res.status(200).json({status: "Success", user: { id: user.id, username: user.username } });
         });
     });
