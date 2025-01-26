@@ -16,6 +16,7 @@
 	import { io } from 'socket.io-client';
 	import { browser } from '$app/environment';
 	import { socketManager } from '../lib/socketManager.ts';
+	import UserSettings from '$lib/preferences/usersettings';
 
 	async function getUserData() {
 		await UserManager.getUser();
@@ -32,14 +33,16 @@
 		}
 		if (browser) {
 			if ($isLoggedIn) {
-				const io2 = io('https://maple.kolf.pro:443', {
-					withCredentials: true
-				});
-				socket.set(io2);
-				$socket?.on('connect', () => {
-					console.log('Connected to server');
-				});
-				socketManager();
+				if (UserSettings.preferences.socket) {
+					const io2 = io('https://maple.kolf.pro:443', {
+						withCredentials: true
+					});
+					socket.set(io2);
+					$socket?.on('connect', () => {
+						console.log('Connected to server');
+					});
+					socketManager();
+				}
 			}
 		}
 	});
