@@ -30,8 +30,10 @@ export class UserManager {
 
     public static login = async (username: string, password: string) => {
         try {
-            console.log(document.cookie);
-            console.log(this.SERVER + '/login');
+            console.log('Attempting login with username:', username);
+            console.log('Cookies before login:', document.cookie);
+            console.log('Server endpoint:', this.SERVER + '/login');
+
             const response = await fetch(`${this.SERVER}/login`, {
                 credentials: 'include',
                 method: 'POST',
@@ -40,14 +42,24 @@ export class UserManager {
                 },
                 body: JSON.stringify({ username, password })
             });
+
+            console.log('Response status:', response.status);
             const data = await response.json();
-            const returnName = data.user.username
-            const id = data.user.id
+            console.log('Response data:', data);
+
+            const returnName = data.user.username;
+            const id = data.user.id;
+            console.log('User logged in:', returnName, 'with ID:', id);
+
             UserInfo.set({ username: returnName, id: id });
             toast.success('Welcome back, ' + returnName + '!');
+            console.log('UserInfo has been set:', { username: returnName, id: id });
+
             this.getUser();
+            console.log('Initiated fetching user data');
             return data;
         } catch (error) {
+            console.error('Error during login:', error);
             toast.error('Error logging in: "' + error + '"');
             return console.error('Error:', error);
         }
@@ -144,17 +156,33 @@ export class UserManager {
     
 
     public static isLoggedIn = async () => {
+        console.log('Checking if user is logged in');
         if (!get(UserInfo)?.id) {
+            console.log('UserInfo is empty');
             return false;
         }
         try {
+            console.log('Fetching authentication status');
             const response = await fetch(`${this.SERVER}/get/isAuthenticated/${get(UserInfo)?.id}`, {
                 credentials: 'include',
                 method: 'GET',
+            }).then(async (res) => {
+                const response2 = res.clone();
+                console.log('Response status:', await response2.text());
+                return res;
             });
-            const data = await response.json();
+            console.log('Authentication status:', response);
+            let data;
+            try {
+                data = await response.json();
+            } catch (error) {
+                console.error('Error parsing response:', error);
+            }
+            console.log('Authentication data:', data);
             return data;
         } catch (error) {   
+            console.error('Error logging in:', error);
+            toast.error('Error logging in: "' + error + '"');
             return console.error('Error:', error);
         }
     }

@@ -15,7 +15,11 @@
 
     onMount(async () => {
         const authenticatedS = await UserManager.isLoggedIn();
-        authenticated = authenticatedS.isAuthenticated;
+        if (authenticatedS !== undefined) {
+            authenticated = authenticatedS.isAuthenticated;
+        } else {
+            authenticated = false;
+        }
     });
 
 	async function login() {
@@ -28,7 +32,11 @@
     UserInfo.subscribe(async (value) => {
         if (value) {
             const islogOut = await UserManager.isLoggedIn();
+            if (islogOut !== undefined) {
             authenticated = islogOut.isAuthenticated;
+            } else {
+                authenticated = false;
+            }
         }
     })
 

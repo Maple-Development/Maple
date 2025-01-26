@@ -3,7 +3,9 @@ import { browser } from '$app/environment';
 import type { Song } from './types/song';
 import type { User } from './types/user';
 import { Peer } from 'peerjs';
- 
+import { Socket } from 'socket.io-client';
+
+export const socket = writable(null as Socket | null);
 export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);

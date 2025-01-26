@@ -7,12 +7,14 @@
 	import { collapsed, loadPreferencesStore, UserInfo } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { title, isSmallDevice } from '$lib/store';
+	import { title, isSmallDevice, socket } from '$lib/store';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores'; 
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
+	import { io } from "socket.io-client";
+	import { browser } from '$app/environment';
 
 	async function getUserData() {
         await UserManager.getUser();
@@ -22,6 +24,15 @@
 		loadPreferencesStore.load();
 		if ($UserInfo.id) {
 			await getUserData();
+		}
+		if (browser) {
+			const io2 = io("https://maple.kolf.pro:443", {
+            withCredentials: true
+			});
+			socket.set(io2);
+			$socket?.on('connect', () => {
+            	console.log('Connected to server');
+        	});
 		}
 	});
 

@@ -11,15 +11,23 @@ let logOut = false;
 
 onMount(async () => {
     const islogOut = await UserManager.isLoggedIn();
-    logOut = islogOut.isAuthenticated;
+    if (islogOut !== undefined) {
+            logOut = islogOut.isAuthenticated;
+    } else {
+        logOut = false;
+    }
     console.log(logOut);
     console.log(islogOut);
-})
+});
 
 UserInfo.subscribe(async (value) => {
     if (value) {
         const islogOut = await UserManager.isLoggedIn();
-        logOut = islogOut.isAuthenticated;
+        if (islogOut !== undefined) {
+            logOut = islogOut.isAuthenticated;
+        } else {
+            logOut = false;
+        }
     }
 })
 

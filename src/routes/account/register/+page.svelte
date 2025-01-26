@@ -29,7 +29,11 @@
     UserInfo.subscribe(async (value) => {
         if (value) {
             const islogOut = await UserManager.isLoggedIn();
+            if (islogOut !== undefined) {
             authenticated = islogOut.isAuthenticated;
+            } else {
+            authenticated = false;
+            }
         }
     })
 

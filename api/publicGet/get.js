@@ -14,6 +14,23 @@ const connection = mysql.createConnection({
 router.use(express.json());
 router.use(cookieParser());
 
+router.get('/user/:username', (req, res) => {
+    const username = req.params.username; 
+    const sql = 'SELECT id FROM users WHERE username = ?';
+
+    connection.query(sql, [username], (error, results) => {
+        if (error) {
+            console.error("Error fetching user:", error);
+            return res.status(500).json({ error: 'Error fetching user' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(results[0]);
+    });
+});
+
 
 router.get('/pfp/:id', (req, res) => {
     const id = req.params.id; 
