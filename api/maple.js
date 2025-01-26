@@ -38,7 +38,8 @@ const server = https.createServer(credentials, app);
 
 const io = require('socket.io')(server, {
 	cors: {
-		origin: true
+		origin: true,
+		credentials: true
 	}
 });
 
