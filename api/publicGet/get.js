@@ -16,7 +16,7 @@ router.use(cookieParser());
 
 router.get('/user/:username', (req, res) => {
     const username = req.params.username; 
-    const sql = 'SELECT id FROM users WHERE username = ?';
+    const sql = 'SELECT id, username, name FROM users WHERE username = ?';
 
     connection.query(sql, [username], (error, results) => {
         if (error) {

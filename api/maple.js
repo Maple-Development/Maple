@@ -84,10 +84,14 @@ io.use((socket, next) => {
 io.on('connection', client => { 
 	console.log('User connected: ' + client.user.id);
 	client.on('addFriend', data => { 
-		console.log("User: " + client.user.id + " wants to add " + data.friendId);
 		const userId = client.user.id;
 		const friendId = data.friendId;
-		ioTools.addFriend(userId, friendId); 
+		const friendSocket = ioTools.getSocket(io, friendId);
+		if (friendSocket) {
+			ioTools.addFriend(friendId, userId, friendSocket);
+		} else {
+			client.emit('notFound', { friendId });
+		}
 	 });
 	client.on('disconnect', () => { /* … */ });
 });

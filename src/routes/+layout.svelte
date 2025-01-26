@@ -15,6 +15,7 @@
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
 	import { io } from "socket.io-client";
 	import { browser } from '$app/environment';
+	import { socketManager } from '../lib/socketManager.ts';
 
 	async function getUserData() {
         await UserManager.getUser();
@@ -34,6 +35,7 @@
             	console.log('Connected to server');
         	});
 		}
+		socketManager();
 	});
 
 	let bottomDiv: HTMLDivElement;

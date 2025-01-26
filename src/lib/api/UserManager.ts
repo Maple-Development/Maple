@@ -210,6 +210,25 @@ export class UserManager {
         }
     }
 
+    public static getUserName = async (username: string) => {
+        try {
+            const response = await fetch(`${this.SERVER}/public/get/user/${username}`, {
+                credentials: 'include',
+                method: 'GET',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                return data.id;
+            } else {
+                toast.error('Error fetching username: "' + data.error + '"');
+                return;
+            }
+        } catch (error) {
+            toast.error('Error fetching username: "' + error + '"');
+            return console.error('Error:', error);
+        }
+    }
+
    /*  public static addFriend = async (friend: string) => {
         try {
            socket.emit('addFriend', { friendId: friend });
