@@ -31,6 +31,15 @@ Help! I have \_\_\_ Bug!
 - You can report any bugs in the Issues tab [here](https://github.com/Maple-Development/Maple/issues)!
   > Please note, this site is still early in development. Many features/bugs are known and are actively being worked on. Check our discord [here](https://discord.gg/Wxrp73HVj4) for more information.
 
+How do the account features work?
+
+- By creating an account, and logging in, you unlock the ability to share your currently playing music with a community webhook instance or your own personal webhook. You also can add friends, transfer your library to other devices, and more! All person to person transfers are peer2peer based.
+
+What data is saved on the server?
+
+- Your username, id, hashed & salted password*, pfp, and then friendship status with other users. More information may be stored temporarily, or for other features. Please see our Privacy Policy for more information.
+  > *your plaintext password will NEVER be avalible to anyone, even those with access to our servers.
+
 If you have any other questions, feel free to DM `cattn.` on discord, or email me @ `Logan@cattn.dev`
 
 ## What's the inspiration behind it?
