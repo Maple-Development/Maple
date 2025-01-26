@@ -71,10 +71,6 @@ export class UserManager {
                 credentials: 'include',
                 method: 'GET',
             });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             const data = await response.json();
     
             const returnUser: User = {
@@ -87,10 +83,8 @@ export class UserManager {
             if (response.ok) {
                 SavedUser.set(returnUser);
             }
-            console.log(returnUser);
             return returnUser;
         } catch (error) {
-            console.error('Error fetching user:', error);
             return {
                 id: '',
                 username: '',
@@ -181,9 +175,7 @@ export class UserManager {
             console.log('Authentication data:', data);
             return data;
         } catch (error) {   
-            console.error('Error logging in:', error);
-            toast.error('Error logging in: "' + error + '"');
-            return console.error('Error:', error);
+            return {isAuthenticated: false};
         }
     }
 

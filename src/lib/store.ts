@@ -5,6 +5,7 @@ import type { User } from './types/user';
 import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
 
+export const isLoggedIn = writable(false);
 export const friendNowPlaying = writable({} as any);
 export const socket = writable(null as Socket | null);
 export const UserPeer = writable(null as Peer | null);

@@ -2,22 +2,12 @@
     import { Button } from '$lib/components/ui/button/index.js';
     import { UserManager } from '$lib/api/UserManager';
     import { Input } from "$lib/components/ui/input/index.js";
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-    import { onMount } from 'svelte';
-    import { UserInfo } from '$lib/store';
+    import { isLoggedIn } from '$lib/store';
 	import { goto } from '$app/navigation';
 
     let username = '';
     let password = '';
     let log = '';
-
-    let authenticated = false;
-    $: authenticated = authenticated;
-
-    onMount(async () => {
-        const authenticatedS = await UserManager.isLoggedIn();
-        authenticated = authenticatedS.isAuthenticated;
-    });
 
     async function createAccount() {
 		log = JSON.stringify(await UserManager.register(username, password))
@@ -26,23 +16,9 @@
         goto('/account/login');
 	}
 
-    UserInfo.subscribe(async (value) => {
-        if (value) {
-            const islogOut = await UserManager.isLoggedIn();
-            if (islogOut !== undefined) {
-            authenticated = islogOut.isAuthenticated;
-            } else {
-            authenticated = false;
-            }
-        }
-    })
-
-
 </script>
 
-{#await UserManager.isLoggedIn() then user}
-
-{#if !authenticated}
+{#if !$isLoggedIn}
 
 <h1 class="text-5xl text-center mt-10 font-black">
     Create Account
@@ -71,6 +47,4 @@
 </div> 
 
 {/if}
-
-{/await}
 

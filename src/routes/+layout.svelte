@@ -7,7 +7,7 @@
 	import { collapsed, loadPreferencesStore, UserInfo } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Toaster } from '$lib/components/ui/sonner';
-	import { title, isSmallDevice, socket } from '$lib/store';
+	import { title, isSmallDevice, socket, isLoggedIn } from '$lib/store';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
 	import { onMount } from 'svelte';
@@ -27,6 +27,7 @@
 			await getUserData();
 		}
 		if (browser) {
+			if ($isLoggedIn) {
 			const io2 = io("https://maple.kolf.pro:443", {
             withCredentials: true
 			});
@@ -34,8 +35,13 @@
 			$socket?.on('connect', () => {
             	console.log('Connected to server');
         	});
+			socketManager();
 		}
-		socketManager();
+		}
+		const authStatus = await UserManager.isLoggedIn();
+		if (authStatus !== undefined) {
+			isLoggedIn.set(authStatus.isAuthenticated);
+		}
 	});
 
 	let bottomDiv: HTMLDivElement;

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button/index.js';
     import { onMount } from 'svelte';
-    import { title, socket, friendNowPlaying } from '$lib/store';
+    import { title, socket, friendNowPlaying, isLoggedIn } from '$lib/store';
     import { toast } from 'svelte-sonner';
     import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
     import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus } from 'lucide-svelte';
@@ -13,20 +13,11 @@
     import type { Song } from '$lib/types/song';
     import type { Playlist } from '$lib/types/playlist';
 
-    let authenticated = false;
-    $: authenticated = authenticated;
-
     let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
     let selectedFriend = "";
 
     onMount(async () => {
-        const authenticatedS = await UserManager.isLoggedIn();
-        if (authenticatedS !== undefined) {
-            authenticated = authenticatedS.isAuthenticated;
-        } else {
-            authenticated = false;
-        }
         tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		title.set('Tracks');
@@ -40,7 +31,7 @@
 
 </script>
 
-{#if !authenticated}
+{#if !$isLoggedIn}
 
 <h1 class="text-5xl text-center mt-10 font-black">
     You are not logged in!

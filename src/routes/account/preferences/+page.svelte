@@ -1,9 +1,8 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button/index.js';
-    import { UserManager } from '$lib/api/UserManager';
     import { Input } from "$lib/components/ui/input/index.js";
     import { onMount } from 'svelte';
-    import { UserInfo } from '$lib/store';
+    import { isLoggedIn } from '$lib/store';
     import { Switch } from "$lib/components/ui/switch/index.js";
     import UserSettings from '$lib/preferences/usersettings';
     import { Settings } from '$lib/preferences/fetch';
@@ -14,31 +13,10 @@
     let doWebhooks = true;
     let webhookUrl = "";
 
-    let authenticated = false;
-    $: authenticated = authenticated;
-
     onMount(async () => {
-        const authenticatedS = await UserManager.isLoggedIn();
-        if (authenticatedS !== undefined) {
-            authenticated = authenticatedS.isAuthenticated;
-        } else {
-            authenticated = false;
-        }
         webhookUrl = UserSettings.webhook.url;
         doWebhooks = UserSettings.webhook.enabled == "true";
     });
-
-    UserInfo.subscribe(async (value) => {
-        if (value) {
-            const islogOut = await UserManager.isLoggedIn();
-            if (islogOut !== undefined) {
-            authenticated = islogOut.isAuthenticated;
-            } else {
-            authenticated = false;
-            }
-        }
-    })
-
 
     function updateSettings() {
         console.log(doWebhooks);
@@ -54,9 +32,7 @@
 
 </script>
 
-{#await UserManager.isLoggedIn() then user}
-
-{#if !authenticated}
+{#if !$isLoggedIn}
 
 <h1 class="text-5xl text-center mt-10 font-black">
     You are not logged in!
@@ -108,6 +84,4 @@
 </div>
 
 {/if}
-
-{/await}
 

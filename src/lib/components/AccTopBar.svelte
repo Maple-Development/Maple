@@ -3,33 +3,8 @@ import {
     ArrowLeft,
 	User
 } from 'lucide-svelte';
-import { onMount } from 'svelte';
 import { UserManager } from '$lib/api/UserManager';
-import { UserInfo, SavedUser } from '$lib/store';
-
-let logOut = false;
-
-onMount(async () => {
-    const islogOut = await UserManager.isLoggedIn();
-    if (islogOut !== undefined) {
-            logOut = islogOut.isAuthenticated;
-    } else {
-        logOut = false;
-    }
-    console.log(logOut);
-    console.log(islogOut);
-});
-
-UserInfo.subscribe(async (value) => {
-    if (value) {
-        const islogOut = await UserManager.isLoggedIn();
-        if (islogOut !== undefined) {
-            logOut = islogOut.isAuthenticated;
-        } else {
-            logOut = false;
-        }
-    }
-})
+import { SavedUser, isLoggedIn } from '$lib/store';
 
 import Button from './ui/button/button.svelte';
 
@@ -43,7 +18,7 @@ import Button from './ui/button/button.svelte';
         <h1 class="ml-2 text-lg font-bold text-muted-foreground">Back</h1>
     </div>
     <div class="flex items-center">
-        {#if logOut === true}
+        {#if $isLoggedIn === true}
             <Button variant="link" class="my-1 h-10" on:click={UserManager.logOut}>Log Out</Button>
         {/if}
         {#if $SavedUser && $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
