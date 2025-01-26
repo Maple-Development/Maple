@@ -2,6 +2,7 @@
 
 module.exports = {
     addFriend: function (user, friend, socket) {
+        console.log('Adding friend', user, friend);
         socket.broadcast.to(friend.id).emit('friendRequest', { id: user });
         console.log('Friend request sent');
     },
