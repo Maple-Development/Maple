@@ -131,7 +131,7 @@
 		title.set('Settings');
 		p2p = UserSettings.preferences.p2p;
 		devMode = UserSettings.preferences.devMode;
-		showLogging = UserSettings.preferences.showLogs;
+		showLogging = UserSettings.preferences.showLogging;
 		socket = UserSettings.preferences.socket;
 	});
 
@@ -280,11 +280,20 @@
 	}
 
 	function updatePrefs() {
-		UserSettings.preferences.p2p = p2p;
-		UserSettings.preferences.devMode = devMode;
-		UserSettings.preferences.showLogs = showLogging;
-		UserSettings.preferences.socket = socket;
-		toast.success('Settings updated');
+		preferences.set('p2p', p2p);
+		preferences.set('devMode', devMode);
+		preferences.set('showLogging', showLogging);
+		preferences.set('socket', socket);
+		toast.success('Settings updated',
+			{
+				action: {
+					label: 'Refresh now?',
+					onClick: () => {
+						window.location.reload();
+					}
+				},
+			}
+		);
 	}
 </script>
 
@@ -358,7 +367,7 @@
 	</div>
 {/if}
 
-{#if UserSettings.preferences.showLogs}
+{#if UserSettings.preferences.showLogging}
 	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea class="h-48" bind:value={errorText} placeholder="LOG" disabled />
 	</div>

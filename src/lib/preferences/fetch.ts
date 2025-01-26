@@ -13,6 +13,8 @@ export class Settings {
 		}
 		if (value) {
 			return JSON.parse(value);
+		} else {
+			return null;
 		}
 	}
 
