@@ -3,24 +3,7 @@ import { browser } from '$app/environment';
 import type { Song } from './types/song';
 import type { User } from './types/user';
 import { Peer } from 'peerjs';
-import { io } from "socket.io-client";
-
-export const socket = io("https://maple.kolf.pro:443", {
-	reconnectionDelayMax: 10000, 
-	transports: ['websocket'],
-	withCredentials: true
-});
-
-socket.on('connect', () => {
-    console.log('Connected to server');
-    socket.emit('addFriend', { friendId: "e" });
-});
-
-socket.on('connect_error', (error) => {
-    console.error('Connection error:', error);
-});
-
-socket.emit('addFriend', { friendId: "e" });
+ 
 export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as any);

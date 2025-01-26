@@ -7,6 +7,7 @@
     import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus } from 'lucide-svelte';
     import { Separator } from "$lib/components/ui/separator";
     import { UserManager } from '$lib/api/UserManager';
+    import { io } from "socket.io-client";
 
     import { OPFS } from '$lib/opfs';
     import type { Song } from '$lib/types/song';
@@ -24,11 +25,28 @@
         tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		title.set('Tracks');
-    });
+
+        const socket = io("https://maple.kolf.pro:443", {
+            withCredentials: true
+        });
+
+        console.log('check 1', socket);
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            socket.emit('addFriend', { friendId: "e" });
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+        });
+
+        socket.emit('addFriend', { friendId: "e" });
+                toast.success('Added friend!');
+            });
 
     async function addFriend() {
-        UserManager.addFriend("Nail");
-        toast.success('Added friend!');
+
     }
 
 </script>

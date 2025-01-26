@@ -1,6 +1,7 @@
 {
 	"name": "umla",
 	"version": "0.0.1",
+	"proxy": "https://maple.kolf.pro:443",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",

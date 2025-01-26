@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store';
-import { UserInfo, SavedUser, socket } from '$lib/store';  
+import { UserInfo, SavedUser } from '$lib/store';  
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
 import { Peer } from 'peerjs';
@@ -182,12 +182,12 @@ export class UserManager {
         }
     }
 
-    public static addFriend = async (friend: string) => {
+   /*  public static addFriend = async (friend: string) => {
         try {
            socket.emit('addFriend', { friendId: friend });
         } catch (error) {
             toast.error('Error adding friend: "' + error + '"');
             return console.error('Error:', error);
         }
-    }
+    } */
 }
