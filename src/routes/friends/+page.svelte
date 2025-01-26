@@ -33,7 +33,7 @@
     });
 
     async function addFriend() {
-        const selectedUser = await UserManager.getUserName(selectedFriend);
+        const selectedUser = (await UserManager.getUserName(selectedFriend)).id;
         $socket?.emit('addFriend', { friendId: selectedUser });
         toast.success('Friend request sent to: ' + selectedFriend);  
     }

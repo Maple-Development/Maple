@@ -10,9 +10,8 @@ export const socketManager = () => {
         let socket = get(importedSocket);
 
         socket?.on('friendRequest', async (data) => {
-            console.log(data);
             const id = data.id;
-            const friend = await UserManager.getUserName(id);
+            const friend = await UserManager.getUserbyId(id);
             toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')');
         });
 

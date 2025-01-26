@@ -217,14 +217,34 @@ export class UserManager {
                 method: 'GET',
             });
             const data = await response.json();
+            console.log(data);
             if (response.ok) {
-                return data.id;
+                return data;
             } else {
                 toast.error('Error fetching username: "' + data.error + '"');
                 return;
             }
         } catch (error) {
             toast.error('Error fetching username: "' + error + '"');
+            return console.error('Error:', error);
+        }
+    }
+
+    public static getUserbyId = async (id: string) => {
+        try {
+            const response = await fetch(`${this.SERVER}/public/get/user/id/${id}`, {
+                credentials: 'include',
+                method: 'GET',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                return data;
+            } else {
+                toast.error('Error fetching user: "' + data.error + '"');
+                return;
+            }
+        } catch (error) {
+            toast.error('Error fetching user: "' + error + '"');
             return console.error('Error:', error);
         }
     }
