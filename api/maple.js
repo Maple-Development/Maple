@@ -95,11 +95,9 @@ io.on('connection', client => {
 	 });
 
 	 client.on('nowPlaying', async data => {
-		console.log(data);
 		const userId = client.user.id;
 		const friendId = data.friendId;
 		const friendSocket = await ioTools.getSocket(io, friendId);
-		console.log(friendSocket.id);
 		if (friendSocket) {
 			ioTools.nowPlaying(userId, friendSocket, io, data.nowPlaying);
 		}

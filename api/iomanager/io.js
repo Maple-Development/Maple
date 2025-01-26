@@ -16,7 +16,6 @@ module.exports = {
     },
 
     nowPlaying: function(user, socket, io, nowPlaying) {
-        console.log(nowPlaying);
         io.to(socket.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
     }
 };

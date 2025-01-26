@@ -44,7 +44,7 @@
 			album: song.album,
 		}
 
-		const friendId = await UserManager.getUserName("nail")
+		const friendId = (await UserManager.getUserName("nail")).id
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying, friendId: friendId });
 
