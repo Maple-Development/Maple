@@ -15,7 +15,7 @@
 	import { title } from '$lib/store';
 	import { Separator } from '$lib/components/ui/separator';
 	import { browser } from '$app/environment';
-	import UserSettings from '$lib/preferences/UserSettings';
+	import UserSettings from '$lib/preferences/usersettings';
 	import { Settings } from '$lib/preferences/fetch';
 	import { Users } from 'lucide-svelte';
 
