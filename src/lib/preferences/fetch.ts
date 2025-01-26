@@ -12,13 +12,13 @@ export class Settings {
 			value = localStorage.getItem(`${this.type}.${key}`);
 		}
 		if (value) {
-			return value;
+			return JSON.parse(value);
 		}
 	}
 
 	set(key: string, value: any) {
 		if (browser) {
-			localStorage.setItem(`${this.type}.${key}`, value);
+			localStorage.setItem(`${this.type}.${key}`, JSON.stringify(value));
 		}
 	}
 }

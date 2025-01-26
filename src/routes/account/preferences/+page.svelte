@@ -15,11 +15,11 @@
 
 	onMount(async () => {
 		webhookUrl = UserSettings.webhook.url;
-		doWebhooks = UserSettings.webhook.enabled == 'true';
+		doWebhooks = UserSettings.webhook.enabled;
 	});
 
 	function updateSettings() {
-		webhookSettings.set('enabled', doWebhooks.toString());
+		webhookSettings.set('enabled', doWebhooks);
 		if (webhookUrl != '') {
 			webhookSettings.set('url', webhookUrl);
 		} else {

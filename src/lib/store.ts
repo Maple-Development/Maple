@@ -33,17 +33,6 @@ hideTips.subscribe((value) => {
 		}
 	}
 });
-export const UserPrefs = writable({
-	p2p: false,
-	devMode: false,
-	showLogs: false,
-	updated: false
-});
-UserPrefs.subscribe((value) => {
-	if (browser && value.updated) {
-		localStorage.setItem('UserPrefs', JSON.stringify(value));
-	}
-});
 export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
@@ -156,10 +145,6 @@ function loadPreferences() {
 	return {
 		load: () => {
 			if (browser) {
-				const storedUserPrefs = localStorage.getItem('UserPrefs');
-				if (storedUserPrefs) {
-					UserPrefs.set(JSON.parse(storedUserPrefs));
-				}
 				const storedVolume = localStorage.getItem('volume');
 				const volume = parseInt(storedVolume ?? '100');
 				if (storedVolume) {

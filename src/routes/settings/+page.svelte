@@ -12,14 +12,20 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { title, UserPrefs } from '$lib/store';
+	import { title } from '$lib/store';
 	import { Separator } from '$lib/components/ui/separator';
 	import { browser } from '$app/environment';
+	import UserSettings from '$lib/preferences/UserSettings';
+	import { Settings } from '$lib/preferences/fetch';
+	import { Users } from 'lucide-svelte';
+
+	let preferences = new Settings('preferences');
 
 	let errorText = 'LOG will appear here';
 	let devMode = false;
 	let showLogging = false;
-	let p2p = false;
+	let p2p = true;
+	let socket = true;
 
 	let deferredPrompt;
 	async function createLibrary(mobileFiles: FileList) {
@@ -123,12 +129,10 @@
 		getLength();
 		findDevice();
 		title.set('Settings');
-	});
-
-	UserPrefs.subscribe((value) => {
-		p2p = $UserPrefs.p2p;
-		devMode = $UserPrefs.devMode;
-		showLogging = $UserPrefs.showLogs;
+		p2p = UserSettings.preferences.p2p;
+		devMode = UserSettings.preferences.devMode;
+		showLogging = UserSettings.preferences.showLogs;
+		socket = UserSettings.preferences.socket;
 	});
 
 	let device = 'chrome';
@@ -276,12 +280,10 @@
 	}
 
 	function updatePrefs() {
-		UserPrefs.set({
-			devMode: devMode,
-			showLogs: showLogging,
-			p2p: p2p,
-			updated: true
-		});
+		UserSettings.preferences.p2p = p2p;
+		UserSettings.preferences.devMode = devMode;
+		UserSettings.preferences.showLogs = showLogging;
+		UserSettings.preferences.socket = socket;
 		toast.success('Settings updated');
 	}
 </script>
@@ -326,6 +328,10 @@
 					<Switch class="mr-2" id="p2p" bind:checked={p2p} />
 					<Label for="p2p">Enable P2P Transfer</Label>
 				</div>
+				<div class="mb-2 mt-2 flex flex-row items-center">
+					<Switch class="mr-2" id="p2p" bind:checked={socket} />
+					<Label for="p2p">Enable Socket.io Communication</Label>
+				</div>
 				<div class="flex flex-col items-center justify-center">
 					<Button
 						on:click={updatePrefs}
@@ -341,7 +347,7 @@
 	</h1>
 </div>
 
-{#if $UserPrefs.devMode}
+{#if UserSettings.preferences.devMode}
 	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea
 			on:keydown={handleKeydown}
@@ -352,7 +358,7 @@
 	</div>
 {/if}
 
-{#if $UserPrefs.showLogs}
+{#if UserSettings.preferences.showLogs}
 	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea class="h-48" bind:value={errorText} placeholder="LOG" disabled />
 	</div>
