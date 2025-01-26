@@ -52,7 +52,6 @@ app.use('/public/get', publicGet);
 app.use('/user/friends', friends);
 
 io.use((socket, next) => {
-	console.log('Headers:', socket.handshake.headers);
 	const cookieString = socket.handshake.headers['cookie'];
 	let token = null;
 
@@ -65,13 +64,11 @@ io.use((socket, next) => {
 	}
 
 	if (!token) {
-		console.error('No token found.');
 		return next(new Error('Authentication error: Missing token'));
 	}
 
 	jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
 		if (err) {
-			console.error('JWT verification failed:', err);
 			return next(new Error('Authentication error: Invalid token'));
 		}
 

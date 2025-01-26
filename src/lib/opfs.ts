@@ -275,7 +275,6 @@ export class OPFS {
 				}
 				this.albumsCache[index] = album;
 				await this.writeCache('/albums/albums.json', this.albumsCache);
-				console.log(album);
 			}
 		},
 
@@ -313,7 +312,6 @@ export class OPFS {
 				}
 				this.artistsCache[index] = artist;
 				await this.writeCache('/artists/artists.json', this.artistsCache);
-				console.log(artist);
 			}
 		},
 
@@ -338,7 +336,6 @@ export class OPFS {
 			if (index !== -1) {
 				this.playlistsCache[index] = playlist;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
-				console.log(playlist);
 			}
 		},
 

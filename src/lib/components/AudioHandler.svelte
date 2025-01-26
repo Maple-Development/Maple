@@ -7,7 +7,6 @@
 	export let volume: any;
 	export function setVolume(e: any) {
 		volume = e;
-		console.log(volume);
 	}
 
 	if (browser) {

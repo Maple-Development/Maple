@@ -46,7 +46,6 @@
 		try {
 			const updatedUser = await UserManager.updateUser(user);
 			SavedUser.set(updatedUser as User);
-			console.log('User updated successfully!');
 		} catch (error) {
 			console.error('Error updating user:', error);
 		}

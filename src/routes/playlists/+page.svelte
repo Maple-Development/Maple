@@ -111,7 +111,6 @@
 			addedSongs = addedSongs.filter((s) => s !== song.id);
 			curSongs = curSongs.filter((s) => s.id !== song.id);
 		}
-		console.log(addedSongs);
 	}
 
 	$: isToggled = (song: Song) => addedSongs.includes(song.id);

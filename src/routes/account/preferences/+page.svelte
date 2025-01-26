@@ -19,7 +19,6 @@
 	});
 
 	function updateSettings() {
-		console.log(doWebhooks);
 		webhookSettings.set('enabled', doWebhooks.toString());
 		if (webhookUrl != '') {
 			webhookSettings.set('url', webhookUrl);

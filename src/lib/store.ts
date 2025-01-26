@@ -15,7 +15,6 @@ UserInfo.subscribe((value) => {
 	if (browser) {
 		if (!value) return;
 		if (value === undefined) return;
-		console.log(value);
 		localStorage.setItem('UserInfo', JSON.stringify(value));
 	}
 });
@@ -42,9 +41,7 @@ export const UserPrefs = writable({
 });
 UserPrefs.subscribe((value) => {
 	if (browser && value.updated) {
-		console.log(value);
 		localStorage.setItem('UserPrefs', JSON.stringify(value));
-		console.log(localStorage.getItem('UserPrefs'));
 	}
 });
 export const isSmallDevice = writable(false);
@@ -162,12 +159,9 @@ function loadPreferences() {
 				const storedUserPrefs = localStorage.getItem('UserPrefs');
 				if (storedUserPrefs) {
 					UserPrefs.set(JSON.parse(storedUserPrefs));
-					console.log(storedUserPrefs);
 				}
 				const storedVolume = localStorage.getItem('volume');
-				console.log(storedVolume);
 				const volume = parseInt(storedVolume ?? '100');
-				console.log(volume);
 				if (storedVolume) {
 					audioPlayer.update((state) => ({ ...state, volume: volume, changeVolume: true }));
 				}

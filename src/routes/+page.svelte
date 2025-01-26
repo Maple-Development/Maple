@@ -35,7 +35,6 @@
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		onboard = await OPFS.ifExists('tracks');
-		console.log(onboard);
 		title.set('Home');
 	});
 	import * as Command from '$lib/components/ui/command';

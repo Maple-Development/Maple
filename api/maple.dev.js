@@ -43,7 +43,6 @@ app.use('/public/get', publicGet);
 app.use('/user/friends', friends);
 
 io.use((socket, next) => {
-	console.log('Headers:', socket.handshake.headers);
 	const cookieString = socket.handshake.headers['cookie'];
 	let token = null;
 
@@ -56,13 +55,11 @@ io.use((socket, next) => {
 	}
 
 	if (!token) {
-		console.error('No token found.');
 		return next(new Error('Authentication error: Missing token'));
 	}
 
 	jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
 		if (err) {
-			console.error('JWT verification failed:', err);
 			return next(new Error('Authentication error: Invalid token'));
 		}
 
@@ -74,7 +71,6 @@ io.use((socket, next) => {
 io.on('connection', (client) => {
 	console.log('User connected: ' + client.user.id);
 	client.on('addFriend', (data) => {
-		console.log('User: ' + client.user.id + ' wants to add ' + data.friendId);
 		const userId = client.user.id;
 		const friendId = data.friendId;
 		ioTools.addFriend(userId, friendId);

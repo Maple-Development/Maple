@@ -282,7 +282,6 @@
 			p2p: p2p,
 			updated: true
 		});
-		console.log($UserPrefs);
 		toast.success('Settings updated');
 	}
 </script>

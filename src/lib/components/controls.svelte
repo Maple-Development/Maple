@@ -87,11 +87,9 @@
 			body: formData
 		});
 		const response = await request.json();
-		console.log(JSON.stringify(response));
 	}
 
 	export async function playSong(song: Song) {
-		console.log(UserSettings.webhook.enabled);
 		if (UserSettings.webhook.enabled == 'true') {
 			webHookSend(song);
 		}
@@ -104,7 +102,6 @@
 			const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
 			audioUrl = URL.createObjectURL(blob);
 		}
-		console.log(song.image);
 		audioPlayer.update((state) => {
 			if (state.audio instanceof HTMLAudioElement) {
 				state.audio.src = audioUrl;
@@ -124,7 +121,6 @@
 					});
 					navigator.mediaSession.setActionHandler('seekto', (evt) => {
 						if (!evt.seekTime) return;
-						console.log(evt.seekTime);
 					});
 					navigator.mediaSession.setActionHandler('previoustrack', () => {
 						prevSong();

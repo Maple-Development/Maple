@@ -60,7 +60,6 @@
 		changedYear = album?.year?.toString() ?? '';
 		playlists = await OPFS.get().playlists();
 
-		console.log(album);
 	});
 
 	async function refresh(albumName: string) {
@@ -176,7 +175,6 @@
 			OPFS.album().edit(modifiedAlbum);
 			let newAlbum = await OPFS.get().album(modifiedAlbum.id.toString());
 			album = newAlbum;
-			console.log(modifiedAlbum);
 		}
 	}
 

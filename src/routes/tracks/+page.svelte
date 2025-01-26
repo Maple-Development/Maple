@@ -91,7 +91,6 @@
 	}) {
 		open = true;
 		selectedSong = e.detail;
-		console.log('work');
 	}
 
 	async function deleteTrack() {
