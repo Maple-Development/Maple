@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
 
 module.exports = {
-    addFriend: function (user, friend, socket) {
+    addFriend: function (user, friend, socket, io) {
         console.log('Adding friend', user, friend);
-        console.log(socket);
-        socket.broadcast.to(socket.id).emit('friendRequest', { id: user });
+        io.to(socket.id).emit('friendRequest', { id: user });
         console.log('Friend request sent');
     },
 

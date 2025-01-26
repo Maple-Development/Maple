@@ -88,7 +88,7 @@ io.on('connection', client => {
 		const friendId = data.friendId;
 		const friendSocket = await ioTools.getSocket(io, friendId);
 		if (friendSocket) {
-			ioTools.addFriend(userId, friendId, friendSocket);
+			ioTools.addFriend(userId, friendId, friendSocket, io);
 		} else {
 			client.emit('notFound', { friendId });
 		}
