@@ -93,6 +93,15 @@ io.on('connection', client => {
 			client.emit('notFound', { friendId });
 		}
 	 });
+
+	 client.on('nowPlaying', async data => {
+		const userId = client.user.id;
+		const friendId = data.friendId;
+		const friendSocket = await ioTools.getSocket(io, friendId);
+		if (friendSocket) {
+			ioTools.nowPlaying(userId, friendSocket, io, data.nowPlaying);
+		}
+	 });
 	client.on('disconnect', () => { /* … */ });
 });
 

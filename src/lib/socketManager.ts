@@ -1,4 +1,4 @@
-import { socket as importedSocket } from '$lib/store';
+import { socket as importedSocket, friedNowPlaying } from '$lib/store';
 import { get } from 'svelte/store';
 import { toast } from 'svelte-sonner';
 import { browser } from '$app/environment';
@@ -17,6 +17,13 @@ export const socketManager = () => {
 
         socket?.on('notFound', async (data) => {
             toast.error('Friend request failed: User not found');
+        });
+
+        socket?.on('nowPlaying', async (data) => {
+            const id = data.id;
+            const friend = await UserManager.getUserbyId(id);
+            toast.success('Now playing: ' + friend.name + ' (' + friend.username + ')');
+            friedNowPlaying.set(data.nowPlaying);
         });
     }
 }

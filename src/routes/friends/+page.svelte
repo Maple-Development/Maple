@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button/index.js';
     import { onMount } from 'svelte';
-    import { title, socket } from '$lib/store';
+    import { title, socket, friedNowPlaying as friendSong } from '$lib/store';
     import { toast } from 'svelte-sonner';
     import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
     import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus } from 'lucide-svelte';
@@ -19,6 +19,14 @@
     let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
     let selectedFriend = "";
+
+    let friendNowPlaying = {
+        title: $friendSong.title ? $friendSong.title : "Nothing Playing",
+        artist: $friendSong.artist ? $friendSong.artist : "...",
+        album: $friendSong.album ? $friendSong.album : "...",
+    }
+
+    $: friendNowPlaying = friendNowPlaying;
 
     onMount(async () => {
         const authenticatedS = await UserManager.isLoggedIn();
@@ -171,6 +179,15 @@
         </div>
     </div>
 </div>
+
+
+    <div class="ml-2 flex flex-col justify-center items-center mt-2">
+        <div class="flex flex-col justify-center items-center p-5 bg-primary rounded-lg">
+            <h1>{friendNowPlaying.title}</h1>
+            <h1>{friendNowPlaying.artist}</h1>
+            <h1>{friendNowPlaying.album}</h1>
+        </div>
+    </div>
 
 {/if}
 

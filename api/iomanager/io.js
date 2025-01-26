@@ -2,9 +2,7 @@
 
 module.exports = {
     addFriend: function (user, friend, socket, io) {
-        console.log('Adding friend', user, friend);
         io.to(socket.id).emit('friendRequest', { id: user });
-        console.log('Friend request sent');
     },
 
     getSocket: async function (io, id) {
@@ -15,5 +13,9 @@ module.exports = {
             }
         }
         return null;
+    },
+
+    nowPlaying: function(user, socket, io, nowPlaying) {
+        io.to(socket.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
     }
 };

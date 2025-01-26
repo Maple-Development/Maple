@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Song } from '$lib/types/song';
 	import { OPFS } from '$lib/opfs';
-	import { context, activeSong, audioPlayer, recentlyPlayedManager } from '$lib/store';
+	import { context, activeSong, audioPlayer, recentlyPlayedManager, socket } from '$lib/store';
 	import { extractColors } from 'extract-colors';
 	import { UserManager } from '$lib/api/UserManager';
 	import { SavedUser } from '$lib/store';
@@ -37,6 +37,16 @@
 		if ($SavedUser.pfp !== '' && $SavedUser.pfp !== null) {
 			pfp = await base64ToFile($SavedUser.pfp);
 		}
+
+		let friendPlaying = {
+			title: song.title,
+			artist: song.artist,
+			album: song.album,
+		}
+
+		const friendId = await UserManager.getUserName("nail")
+
+		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying, friendId: friendId });
 
 		const image = await getImage(song.image)
 		const formData = new FormData();
