@@ -83,10 +83,10 @@ io.use((socket, next) => {
 
 io.on('connection', client => { 
 	console.log('User connected: ' + client.user.id);
-	client.on('addFriend', data => { 
+	client.on('addFriend', async data => { 
 		const userId = client.user.id;
 		const friendId = data.friendId;
-		const friendSocket = ioTools.getSocket(io, friendId);
+		const friendSocket = await ioTools.getSocket(io, friendId);
 		if (friendSocket) {
 			ioTools.addFriend(friendId, userId, friendSocket);
 		} else {
