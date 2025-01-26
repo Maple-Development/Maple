@@ -15,10 +15,10 @@ UserInfo.subscribe((value) => {
 	if (browser) {
 		if (!value) return;
 		if (value === undefined) return;
-		console.log(value)
+		console.log(value);
 		localStorage.setItem('UserInfo', JSON.stringify(value));
 	}
-})
+});
 export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
@@ -39,14 +39,14 @@ export const UserPrefs = writable({
 	devMode: false,
 	showLogs: false,
 	updated: false
-})
+});
 UserPrefs.subscribe((value) => {
 	if (browser && value.updated) {
 		console.log(value);
 		localStorage.setItem('UserPrefs', JSON.stringify(value));
 		console.log(localStorage.getItem('UserPrefs'));
 	}
-})
+});
 export const isSmallDevice = writable(false);
 export const audioPlayer = writable({
 	audio: browser ? new Audio() : null,
@@ -124,8 +124,6 @@ audioPlayer.subscribe((value) => {
 				};
 				value.audio.addEventListener('durationchange', durationChangeHandler);
 
-
-
 				if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
 					value.audio.currentTime = value.currentTime;
 				}
@@ -157,7 +155,6 @@ function createTitle() {
 	};
 }
 
-
 function loadPreferences() {
 	return {
 		load: () => {
@@ -175,8 +172,8 @@ function loadPreferences() {
 					audioPlayer.update((state) => ({ ...state, volume: volume, changeVolume: true }));
 				}
 			}
-		},
-	}
+		}
+	};
 }
 
 export const loadPreferencesStore = loadPreferences();

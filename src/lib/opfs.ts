@@ -66,7 +66,7 @@ export class OPFS {
 			)
 		]);
 	}
-	
+
 	public static async ifExists(path: string) {
 		const exists = await dir(path).exists();
 		return exists;

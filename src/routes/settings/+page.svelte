@@ -13,9 +13,8 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { title, UserPrefs } from '$lib/store';
-	import { Separator } from "$lib/components/ui/separator";
+	import { Separator } from '$lib/components/ui/separator';
 	import { browser } from '$app/environment';
-
 
 	let errorText = 'LOG will appear here';
 	let devMode = false;
@@ -130,7 +129,7 @@
 		p2p = $UserPrefs.p2p;
 		devMode = $UserPrefs.devMode;
 		showLogging = $UserPrefs.showLogs;
-	})
+	});
 
 	let device = 'chrome';
 	function findDevice() {
@@ -301,27 +300,39 @@
 				on:change={(e) => createLibrary(e)}
 			/>
 		{:else}
-			<Button class="py-6 px-4 md:py-16 md:px-10" variant="secondary" on:click={() => createLibrary()}>Import Music</Button>
+			<Button
+				class="px-4 py-6 md:px-10 md:py-16"
+				variant="secondary"
+				on:click={() => createLibrary()}>Import Music</Button
+			>
 		{/if}
-		<Button class="py-6 px-4 md:py-16 md:px-10" variant="destructive" on:click={() => clearLibrary()}>Clear Library</Button>
-		<div class="mt-2 justify-center flex flex-col items-center">
+		<Button
+			class="px-4 py-6 md:px-10 md:py-16"
+			variant="destructive"
+			on:click={() => clearLibrary()}>Clear Library</Button
+		>
+		<div class="mt-2 flex flex-col items-center justify-center">
 			<h2>Dev Options:</h2>
 			<div class="mb-2 mt-2">
 				<div class="mb-2 flex flex-row items-center">
 					<Switch class="mr-2" id="devMode" bind:checked={devMode} />
 					<Label for="devMode">Developer Mode</Label>
 				</div>
-				<div class="flex flex-row items-center mb-2">
+				<div class="mb-2 flex flex-row items-center">
 					<Switch class="mr-2" id="logging" bind:checked={showLogging} />
 					<Label for="logging">Show Logging</Label>
 				</div>
 				<Separator />
-				<div class="mb-2 flex flex-row items-center mt-2">
+				<div class="mb-2 mt-2 flex flex-row items-center">
 					<Switch class="mr-2" id="p2p" bind:checked={p2p} />
 					<Label for="p2p">Enable P2P Transfer</Label>
 				</div>
 				<div class="flex flex-col items-center justify-center">
-					<Button on:click={updatePrefs} class="py-6 px-8 mx-2 w-max text-white mt-2" variant="secondary">Save Settings</Button>
+					<Button
+						on:click={updatePrefs}
+						class="mx-2 mt-2 w-max px-8 py-6 text-white"
+						variant="secondary">Save Settings</Button
+					>
 				</div>
 			</div>
 		</div>
@@ -332,7 +343,7 @@
 </div>
 
 {#if $UserPrefs.devMode}
-	<div class="mx-10 mt-10 font-['VT323'] mb-6">
+	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea
 			on:keydown={handleKeydown}
 			class="h-48"
@@ -343,7 +354,7 @@
 {/if}
 
 {#if $UserPrefs.showLogs}
-	<div class="mx-10 mt-10 font-['VT323'] mb-6">
+	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea class="h-48" bind:value={errorText} placeholder="LOG" disabled />
 	</div>
 {/if}

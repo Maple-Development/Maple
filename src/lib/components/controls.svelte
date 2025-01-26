@@ -7,7 +7,6 @@
 	import { SavedUser } from '$lib/store';
 	import UserSettings from '$lib/preferences/usersettings';
 
-
 	let audioUrl: string = '';
 	let colors: {
 		[x: string]: any;
@@ -41,63 +40,60 @@
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
-			album: song.album,
-		}
+			album: song.album
+		};
 
-		const friendId = (await UserManager.getUserName("nail")).id
+		const friendId = (await UserManager.getUserName('nail')).id;
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying, friendId: friendId });
 
-		const image = await getImage(song.image)
+		const image = await getImage(song.image);
 		const formData = new FormData();
-		formData.append("file", image, "album.jpg");
-		if (pfp) formData.append("file", pfp, "pfp.png");
+		formData.append('file', image, 'album.jpg');
+		if (pfp) formData.append('file', pfp, 'pfp.png');
 		formData.append(
-			"payload_json",
+			'payload_json',
 			JSON.stringify({
 				embeds: [
 					{
-						title: "Now Playing",
+						title: 'Now Playing',
 						description: `**${song.title}** by ${song.artist}`,
-						color: parseInt(colors?.[0]?.hex.replace(/^#/, ""), 16),
+						color: parseInt(colors?.[0]?.hex.replace(/^#/, ''), 16),
 						fields: [
 							{
-								name: "Album",
-								value: song.album,
+								name: 'Album',
+								value: song.album
 							},
 							{
-								name: "Year",
-								value: song.year ? song.year.toString() : "N/A", 
+								name: 'Year',
+								value: song.year ? song.year.toString() : 'N/A'
 							},
 							{
-								name: "Track Number",
-								value: song.trackNumber ? song.trackNumber.toString() : "N/A",
-							},
+								name: 'Track Number',
+								value: song.trackNumber ? song.trackNumber.toString() : 'N/A'
+							}
 						],
 						image: {
-							url: "attachment://album.jpg",
-						},
-					},
+							url: 'attachment://album.jpg'
+						}
+					}
 				],
-				username: $SavedUser?.name === "" ? "Maple User" : $SavedUser?.name,
-				avatar_url: "https://maple.kolf.pro/public/get/pfp/" + $SavedUser?.id, 
+				username: $SavedUser?.name === '' ? 'Maple User' : $SavedUser?.name,
+				avatar_url: 'https://maple.kolf.pro/public/get/pfp/' + $SavedUser?.id
 			})
 		);
-		const request = await fetch(
-			UserSettings.webhook.url,
-			{
-				method: "POST",
-				body: formData,
-			}
-		);
+		const request = await fetch(UserSettings.webhook.url, {
+			method: 'POST',
+			body: formData
+		});
 		const response = await request.json();
 		console.log(JSON.stringify(response));
 	}
 
 	export async function playSong(song: Song) {
-		console.log(UserSettings.webhook.enabled)
-		if (UserSettings.webhook.enabled == "true") {
-			webHookSend(song)
+		console.log(UserSettings.webhook.enabled);
+		if (UserSettings.webhook.enabled == 'true') {
+			webHookSend(song);
 		}
 		currentTime(0);
 		$recentlyPlayedManager.add(song);
@@ -108,7 +104,7 @@
 			const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
 			audioUrl = URL.createObjectURL(blob);
 		}
-		console.log(song.image)
+		console.log(song.image);
 		audioPlayer.update((state) => {
 			if (state.audio instanceof HTMLAudioElement) {
 				state.audio.src = audioUrl;
@@ -117,7 +113,7 @@
 					navigator.mediaSession.metadata = new MediaMetadata({
 						title: song.title,
 						artist: song.artist,
-						album: song.album,
+						album: song.album
 					});
 
 					navigator.mediaSession.setActionHandler('play', () => {

@@ -1,24 +1,24 @@
-import { browser } from "$app/environment";
+import { browser } from '$app/environment';
 
 export class Settings {
-    private type: string;
-    constructor(type: string) {
-        this.type = type;
-    }
+	private type: string;
+	constructor(type: string) {
+		this.type = type;
+	}
 
-    get(key: string) {
-        let value;
-        if (browser) {
-            value = localStorage.getItem(`${this.type}.${key}`);
-        }
-        if (value) {
-            return value;
-        }  
-    }
+	get(key: string) {
+		let value;
+		if (browser) {
+			value = localStorage.getItem(`${this.type}.${key}`);
+		}
+		if (value) {
+			return value;
+		}
+	}
 
-    set(key: string, value: any) {
-        if (browser) {
-            localStorage.setItem(`${this.type}.${key}`, value);   
-        }
-    }
+	set(key: string, value: any) {
+		if (browser) {
+			localStorage.setItem(`${this.type}.${key}`, value);
+		}
+	}
 }

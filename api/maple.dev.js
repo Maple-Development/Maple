@@ -17,21 +17,21 @@ require('dotenv').config();
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 var options = {
-    debug: true
+	debug: true
 };
 
 const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true
+	origin: 'http://localhost:5173',
+	credentials: true
 };
 
-const server = http.createServer(app); 
+const server = http.createServer(app);
 
 const io = require('socket.io')(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        credentials: true
-    }
+	cors: {
+		origin: 'http://localhost:5173',
+		credentials: true
+	}
 });
 
 app.use(cors(corsOptions));
@@ -42,47 +42,48 @@ app.use('/user/manage', manageUser);
 app.use('/public/get', publicGet);
 app.use('/user/friends', friends);
 
-
 io.use((socket, next) => {
-    console.log('Headers:', socket.handshake.headers);
-    const cookieString = socket.handshake.headers['cookie'];
-    let token = null;
-  
-    if (cookieString) {
-      const cookies = cookieString.split(';');
-      const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('token='));
-      if (tokenCookie) {
-        token = tokenCookie.split('=')[1];
-      }
-    }
-  
-    if (!token) {
-      console.error('No token found.');
-      return next(new Error('Authentication error: Missing token'));
-    }
-  
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-      if (err) {
-        console.error('JWT verification failed:', err);
-        return next(new Error('Authentication error: Invalid token'));
-      }
-  
-      socket.user = decoded;
-      next();
-    });
-  });  
+	console.log('Headers:', socket.handshake.headers);
+	const cookieString = socket.handshake.headers['cookie'];
+	let token = null;
 
-io.on('connection', client => {
-    console.log('User connected: ' + client.user.id);
-    client.on('addFriend', data => { 
-        console.log("User: " + client.user.id + " wants to add " + data.friendId);
-        const userId = client.user.id;
-        const friendId = data.friendId;
-        ioTools.addFriend(userId, friendId); 
-     });
-    client.on('disconnect', () => { /* … */ });
+	if (cookieString) {
+		const cookies = cookieString.split(';');
+		const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('token='));
+		if (tokenCookie) {
+			token = tokenCookie.split('=')[1];
+		}
+	}
+
+	if (!token) {
+		console.error('No token found.');
+		return next(new Error('Authentication error: Missing token'));
+	}
+
+	jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+		if (err) {
+			console.error('JWT verification failed:', err);
+			return next(new Error('Authentication error: Invalid token'));
+		}
+
+		socket.user = decoded;
+		next();
+	});
+});
+
+io.on('connection', (client) => {
+	console.log('User connected: ' + client.user.id);
+	client.on('addFriend', (data) => {
+		console.log('User: ' + client.user.id + ' wants to add ' + data.friendId);
+		const userId = client.user.id;
+		const friendId = data.friendId;
+		ioTools.addFriend(userId, friendId);
+	});
+	client.on('disconnect', () => {
+		/* … */
+	});
 });
 
 server.listen(3000, () => {
-    console.log('Server listening on port 3000');
+	console.log('Server listening on port 3000');
 });

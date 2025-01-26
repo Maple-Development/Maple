@@ -37,8 +37,8 @@ How do the account features work?
 
 What data is saved on the server?
 
-- Your username, id, hashed & salted password*, pfp, and then friendship status with other users. More information may be stored temporarily, or for other features. Please see our Privacy Policy for more information.
-  > *your plaintext password will NEVER be avalible to anyone, even those with access to our servers.
+- Your username, id, hashed & salted password\*, pfp, and then friendship status with other users. More information may be stored temporarily, or for other features. Please see our Privacy Policy for more information.
+  > \*your plaintext password will NEVER be avalible to anyone, even those with access to our servers.
 
 If you have any other questions, feel free to DM `cattn.` on discord, or email me @ `Logan@cattn.dev`
 

@@ -10,9 +10,7 @@
 		Home,
 		Settings,
 		User as UserIcon,
-
 		User
-
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
@@ -26,8 +24,7 @@
 	import type { Playlist } from '$lib/types/playlist';
 	import { page } from '$app/stores';
 	import TrackWrapper from './TrackWrapper.svelte';
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	let songs: Song[] = [];
 	let albums: Album[] = [];
@@ -67,41 +64,48 @@
 	</div>
 	<div>
 		{#if $SavedUser.id}
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class="mt-1">
-				{#if $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
-				<!-- svelte-ignore a11y-img-redundant-alt -->
-				<img
-					src={$SavedUser.pfp}
-					alt="Profile Picture"
-					class="h-8 w-8 self-center rounded-[50%] mr-2"
-				/> 
-				{:else} 
-				<UserIcon color="black" class="h-8 w-8 self-center rounded-[50%] p-1 bg-primary mr-2" />
-				{/if}
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-			  <DropdownMenu.Group>
-				<DropdownMenu.Label>My Account</DropdownMenu.Label>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
-				<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
-				<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}>Log Out</DropdownMenu.Item>
-			  </DropdownMenu.Group>
-			</DropdownMenu.Content> 
-		  </DropdownMenu.Root>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class="mt-1">
+					{#if $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
+						<!-- svelte-ignore a11y-img-redundant-alt -->
+						<img
+							src={$SavedUser.pfp}
+							alt="Profile Picture"
+							class="mr-2 h-8 w-8 self-center rounded-[50%]"
+						/>
+					{:else}
+						<UserIcon color="black" class="mr-2 h-8 w-8 self-center rounded-[50%] bg-primary p-1" />
+					{/if}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.Label>My Account</DropdownMenu.Label>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
+						<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
+						<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}
+							>Log Out</DropdownMenu.Item
+						>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		{:else}
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class="mt-1"><UserIcon color="black" class="h-8 w-8 self-center rounded-[50%] p-1 bg-primary mr-2" /></DropdownMenu.Trigger>
-			<DropdownMenu.Content>
-			  <DropdownMenu.Group>
-				<DropdownMenu.Label>My Account</DropdownMenu.Label>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Item href="/account/register">Sign up</DropdownMenu.Item>
-				<DropdownMenu.Item href="/account/login">Login</DropdownMenu.Item>
-			  </DropdownMenu.Group>
-			</DropdownMenu.Content>
-		  </DropdownMenu.Root>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class="mt-1"
+					><UserIcon
+						color="black"
+						class="mr-2 h-8 w-8 self-center rounded-[50%] bg-primary p-1"
+					/></DropdownMenu.Trigger
+				>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.Label>My Account</DropdownMenu.Label>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item href="/account/register">Sign up</DropdownMenu.Item>
+						<DropdownMenu.Item href="/account/login">Login</DropdownMenu.Item>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		{/if}
 	</div>
 </div>

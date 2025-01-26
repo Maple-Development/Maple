@@ -72,15 +72,15 @@
 			{/if}
 		</Button>
 		{#if $SavedUser.id}
-		<Button
-			class="my-1 mr-5 flex w-fit flex-row items-center justify-start bg-transparent pl-4 pr-2 hover:bg-secondary"
-			href="/friends"
-		>
-			<Users size={20} class="mr-2 text-foreground" />
-			{#if $collapsed}
-				<h1 class="hidden px-1 text-foreground md:block">Friends</h1>
-			{/if}
-		</Button>
+			<Button
+				class="my-1 mr-5 flex w-fit flex-row items-center justify-start bg-transparent pl-4 pr-2 hover:bg-secondary"
+				href="/friends"
+			>
+				<Users size={20} class="mr-2 text-foreground" />
+				{#if $collapsed}
+					<h1 class="hidden px-1 text-foreground md:block">Friends</h1>
+				{/if}
+			</Button>
 		{/if}
 		<Button
 			class="my-1 mr-5 flex w-fit flex-row items-center justify-start bg-transparent pl-4 pr-2 hover:bg-secondary"

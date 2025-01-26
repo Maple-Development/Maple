@@ -26,7 +26,7 @@
 	export let artists: Artist[] = [];
 	export let playlists: Playlist[] = [];
 	export let tracks: Song[] = [];
-	export let keep: boolean = true;	
+	export let keep: boolean = true;
 	$: keep = keep;
 
 	let items = songs || albums || artists || playlists;
@@ -57,7 +57,7 @@
 					on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 				>
 					<TrackWrapper className="" {track} {tracks}>
-						<Lazy height={208} keep={keep}>
+						<Lazy height={208} {keep}>
 							<img class="h-44 w-44 rounded-sm md:h-52 md:w-52" src={image} alt={track.title} />
 						</Lazy>
 					</TrackWrapper>

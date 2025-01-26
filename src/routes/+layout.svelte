@@ -11,36 +11,36 @@
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores'; 
+	import { page } from '$app/stores';
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
-	import { io } from "socket.io-client";
+	import { io } from 'socket.io-client';
 	import { browser } from '$app/environment';
 	import { socketManager } from '../lib/socketManager.ts';
 
 	async function getUserData() {
-        await UserManager.getUser();
-    }
+		await UserManager.getUser();
+	}
 
 	onMount(async () => {
 		loadPreferencesStore.load();
 		if ($UserInfo.id) {
 			await getUserData();
 		}
-		if (browser) {
-			if ($isLoggedIn) {
-			const io2 = io("https://maple.kolf.pro:443", {
-            withCredentials: true
-			});
-			socket.set(io2);
-			$socket?.on('connect', () => {
-            	console.log('Connected to server');
-        	});
-			socketManager();
-		}
-		}
 		const authStatus = await UserManager.isLoggedIn();
 		if (authStatus !== undefined) {
 			isLoggedIn.set(authStatus.isAuthenticated);
+		}
+		if (browser) {
+			if ($isLoggedIn) {
+				const io2 = io('https://maple.kolf.pro:443', {
+					withCredentials: true
+				});
+				socket.set(io2);
+				$socket?.on('connect', () => {
+					console.log('Connected to server');
+				});
+				socketManager();
+			}
 		}
 	});
 
@@ -78,58 +78,58 @@
 
 <div class="flex h-screen flex-col overflow-hidden">
 	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account' && $page.url.pathname !== '/account/register' && $page.url.pathname !== '/account/preferences'}
-	{#if !smallDevice}
-		<div class="sticky top-0 z-10 border-b bg-background">
-			<TopBar />
-		</div>
-	{:else}
-		<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
-			<MobileTopBar />
-		</div>
-	{/if}
-	<div class="flex flex-1 overflow-hidden">
 		{#if !smallDevice}
-			{#if $collapsed}
-				<div class="border-1 w-16 flex-none border-r transition-all duration-500 sm:w-36 md:w-36">
-					<SideBar />
+			<div class="sticky top-0 z-10 border-b bg-background">
+				<TopBar />
+			</div>
+		{:else}
+			<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
+				<MobileTopBar />
+			</div>
+		{/if}
+		<div class="flex flex-1 overflow-hidden">
+			{#if !smallDevice}
+				{#if $collapsed}
+					<div class="border-1 w-16 flex-none border-r transition-all duration-500 sm:w-36 md:w-36">
+						<SideBar />
+					</div>
+				{:else}
+					<div class="border-1 w-16 flex-none border-r transition-all duration-500 sm:w-16 md:w-16">
+						<SideBar />
+					</div>
+				{/if}
+			{/if}
+			{#if !smallDevice}
+				<div class="scrollbar flex-1 overflow-auto">
+					<slot />
 				</div>
 			{:else}
-				<div class="border-1 w-16 flex-none border-r transition-all duration-500 sm:w-16 md:w-16">
-					<SideBar />
+				<div class="scrollbar mb-36 mt-12 flex-1 overflow-auto">
+					<slot />
 				</div>
 			{/if}
-		{/if}
-		{#if !smallDevice}
-			<div class="scrollbar flex-1 overflow-auto">
-				<slot />
-			</div>
-		{:else}
-			<div class="scrollbar mb-36 mt-12 flex-1 overflow-auto">
-				<slot />
-			</div>
-		{/if}
-	</div>
-	{:else}
-	{#if !smallDevice}
-		<div class="sticky top-0 z-10 border-b bg-background">
-			<AccTopBar />
 		</div>
 	{:else}
-		<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
-			<AccTopBar />
-		</div>
-	{/if}
-	<div class="flex flex-1 overflow-hidden">
 		{#if !smallDevice}
-			<div class="scrollbar flex-1 overflow-auto">
-				<slot />
+			<div class="sticky top-0 z-10 border-b bg-background">
+				<AccTopBar />
 			</div>
 		{:else}
-			<div class="scrollbar mb-36 mt-12 flex-1 overflow-auto">
-				<slot />
+			<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
+				<AccTopBar />
 			</div>
 		{/if}
-	</div>
+		<div class="flex flex-1 overflow-hidden">
+			{#if !smallDevice}
+				<div class="scrollbar flex-1 overflow-auto">
+					<slot />
+				</div>
+			{:else}
+				<div class="scrollbar mb-36 mt-12 flex-1 overflow-auto">
+					<slot />
+				</div>
+			{/if}
+		</div>
 	{/if}
 	{#if !smallDevice}
 		<div bind:this={bottomDiv} class="sticky bottom-0 z-10 border-t bg-background transition">
