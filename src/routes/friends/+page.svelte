@@ -157,7 +157,7 @@
 								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
 									<UserCheck size={20} color="white" />
 								</Button>
-								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-red-700 px-1 hover:bg-red-800">
+								<Button on:click={() => UserManager.rejectRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-red-700 px-1 hover:bg-red-800">
 									<UserX size={20} color="white" />
 								</Button>
 							</div>
