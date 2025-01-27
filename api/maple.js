@@ -4,7 +4,6 @@ const login = require('./auth/login');
 const getPath = require('./get/get.js');
 const manageUser = require('./user/manageUser.js');
 const publicGet = require('./publicGet/get.js');
-const friends = require('./user/friends.js');
 const ioTools = require('./iomanager/io.js');
 const socket = require('./socket');
 const app = express();
@@ -45,6 +44,8 @@ const ioOptions = {
 };
 
 const io = socket.init(server, ioOptions);
+
+const friends = require('./user/friends.js');
 
 app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
