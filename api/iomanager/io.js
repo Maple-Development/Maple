@@ -39,10 +39,8 @@ module.exports = {
 				'ON DUPLICATE KEY UPDATE playing = VALUES(playing)',
 				[user, JSON.stringify(nowPlaying)]
 			);
-			console.log(friends);
-			friends.forEach((friend) => {
-				console.log(friend.friend_id);
-				const client = this.getSocket(io, friend.friend_id)
+			friends.forEach(async (friend) => {
+				const client = await this.getSocket(io, friend.friend_id)
 				if (client) {
 					io.to(client.id).emit('nowPlaying', { nowPlaying: JSON.stringify(nowPlaying), id: user });
 				}
