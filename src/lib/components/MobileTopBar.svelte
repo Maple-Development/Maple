@@ -72,6 +72,7 @@
 						<DropdownMenu.Label>My Account</DropdownMenu.Label>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
+						<DropdownMenu.Item href="/friends">Friends</DropdownMenu.Item>
 						<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
 						<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}
 							>Log Out</DropdownMenu.Item

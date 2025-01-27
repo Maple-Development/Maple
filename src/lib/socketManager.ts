@@ -44,7 +44,8 @@ export const socketManager = () => {
 
 		socket?.on('nowPlaying', async (data) => {
 			console.log(data);
-			friendNowPlaying.set(data.nowPlaying);
+			refreshFriends();
+			refreshRequests();
 		});
 	}
 };

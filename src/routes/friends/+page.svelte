@@ -5,7 +5,7 @@
 	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser, pendingRequests, friends } from '$lib/store';
 	import { toast } from 'svelte-sonner';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus, UserX } from 'lucide-svelte';
+	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus, UserX, Music2 } from 'lucide-svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -34,13 +34,15 @@
 {#if !$isLoggedIn}
 	<h1 class="mt-10 text-center text-5xl font-black">You are not logged in!</h1>
 
-	<Button href="/account/login" class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary">
-		Login
-	</Button>
+	<div class="justify-center items-center flex">
+		<Button href="/account/login" class="mt-2">
+			Login
+		</Button>
+	</div>
 {:else}
 	<h1 class="mt-10 text-center text-3xl font-black">Friends</h1>
 
-	<div class="mx-[10%] mt-10 flex flex-col rounded-lg border-4 border-border md:mx-[30%]">
+	<div class="mx-[0%] mt-10 flex flex-col rounded-lg border-4 border-border md:mx-[30%]">
 		<div class=" mx-2 my-1 ml-2 rounded-lg">
 			<div class="flex flex-col">
 				<div class="flex flex-row justify-between">
@@ -68,14 +70,22 @@
 		{#if $friends}
 				{#each $friends as friend}
 					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
-						<div class="flex flex-row">
-							<img
-								src="https://maple.kolf.pro/public/get/pfp/{friend.id}"
-								on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
-								alt="pfp"
-								class="my-auto h-10 w-10 ml-1 rounded-full"
-							/>
-							<h2 class="inter-normal my-auto py-2 text-lg ml-2">{friend.name || friend.username} - {friend.username}</h2>
+						<div class="flex flex-col">
+							<div class="flex flex-row">
+								<img
+									src="https://maple.kolf.pro/public/get/pfp/{friend.id}"
+									on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
+									alt="pfp"
+									class="my-auto h-10 w-10 ml-1 rounded-full"
+								/>
+								<h2 class="inter-normal my-auto py-2 text-lg ml-2">{friend.name || friend.username} - {friend.username}</h2>
+							</div>
+							<div class="flex flex-row ml-12">
+								{#if friend.nowPlaying}
+									<Music2 size={20} class="my-auto ml-2" color="green" />
+									<h2 class="font-medium my-1 py-1 text-sm ml-2">{friend.nowPlaying.title || 'Unknown Track'} - {friend.nowPlaying.artist || 'Unknown Artist'}</h2>
+								{/if}
+							</div>
 						</div>
 						<div class="ml-2 flex items-center">
 							<Button class="mx-1 my-1 h-10 w-10 px-1">
@@ -139,14 +149,6 @@
 				{/each}
 			{/if}
 		{/if}
-	</div>
-
-	<div class="ml-2 mt-2 flex flex-col items-center justify-center">
-		<div class="flex flex-col items-center justify-center rounded-lg bg-primary p-5">
-			<h1>{$friendNowPlaying.title || 'No song playing'}</h1>
-			<h1>{$friendNowPlaying.artist || '...'}</h1>
-			<h1>{$friendNowPlaying.album || '...'}</h1>
-		</div>
 	</div>
 {/if}
 

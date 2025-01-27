@@ -14,7 +14,7 @@
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
-	import { collapsed, SavedUser, title } from '$lib/store';
+	import { collapsed, SavedUser, title, isSmallDevice } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
 	import { OPFS } from '$lib/opfs';

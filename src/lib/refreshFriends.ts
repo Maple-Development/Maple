@@ -27,7 +27,8 @@ async function sortFriends(unsorted: any) {
 		const newFriend: AddedFriend = {
 			id: friendData.id,
 			name: friendData.name,
-			username: friendData.username
+			username: friendData.username,
+            nowPlaying: friendData.nowPlaying,
         }
 		friends.set([...get(friends), newFriend]);
 	});
