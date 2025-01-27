@@ -1,5 +1,4 @@
 <script lang="ts">
-	//@ts-nocheck
 	import '../app.pcss';
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
@@ -25,7 +24,7 @@
 
 	onMount(async () => {
 		loadPreferencesStore.load();
-		if ($UserInfo.id) {
+		if ($UserInfo.id !== null) {
 			await getUserData();
 		}
 		const authStatus = await UserManager.isLoggedIn();
@@ -64,7 +63,7 @@
 		}
 	}
 	let smallDevice = false;
-	const attachListener = () => {
+	const attachListener = (p0: any) => {
 		const mediaQuery = window.matchMedia('(max-width: 640px)');
 		smallDevice = mediaQuery.matches;
 		isSmallDevice.set(smallDevice);
