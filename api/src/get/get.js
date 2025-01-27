@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-import express from 'express';
-
-import cookieParser from 'cookie-parser';
-import mysql from 'mysql2';
-import authenticateToken from '../middleware/authToken';
-import verifyUser from '../middleware/verifyUser';
+const express = require('express'),
+	cookieParser = require('cookie-parser');
+const mysql = require('mysql2');
+const authenticateToken = require('../middleware/authToken');
+const verifyUser = require('../middleware/verifyUser');
 
 const router = express.Router();
 
@@ -54,4 +53,4 @@ router.get('/logout/:id', (req, res) => {
 	return res.status(200).json({ message: 'Logout successful' });
 });
 
-export default router;
+module.exports = router;

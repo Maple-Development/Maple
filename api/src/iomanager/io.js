@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import mysql from 'mysql2';
+const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
 	host: 'localhost',
@@ -8,8 +8,8 @@ const connection = mysql.createConnection({
 	database: 'maple_auth'
 });
 
-const exported = {
-    addFriend: function (user, friend, socket, io) {
+module.exports = {
+	addFriend: function (user, friend, socket, io) {
 		try {
 		io.to(socket.id).emit('friendRequest', { id: user });
 		} catch (error) {
@@ -17,7 +17,7 @@ const exported = {
 		}
 	},
 
-    getSocket: async function (io, id) {
+	getSocket: async function (io, id) {
 		try {
 			const clients = await io.fetchSockets();
 			for (const client of clients) {
@@ -32,7 +32,7 @@ const exported = {
 		}
 	},
 
-    nowPlaying: function (user, friends, io, nowPlaying) {
+	nowPlaying: function (user, friends, io, nowPlaying) {
 		try {
 			connection.promise().query(
 				'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ' +
@@ -50,20 +50,11 @@ const exported = {
 		}
 	},
 
-    emit: function (socket, event, data, io) {
+	emit: function (socket, event, data, io) {
 		try {
 			io.to(socket.id).emit(event, data);
 		} catch (error) {
 			console.error(error);
 		}
-	}
+	},
 };
-
-export default exported;
-
-export const {
-    addFriend,
-    getSocket,
-    nowPlaying,
-    emit
-} = exported;
