@@ -3,8 +3,8 @@ import express from 'express';
 
 import cookieParser from 'cookie-parser';
 import mysql from 'mysql2';
-import authenticateToken from '../middleware/authToken';
-import verifyUser from '../middleware/verifyUser';
+import authenticateToken from '../middleware/authToken.js';
+import verifyUser from '../middleware/verifyUser.js';
 
 const router = express.Router();
 

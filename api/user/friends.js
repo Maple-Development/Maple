@@ -3,9 +3,9 @@ import express from 'express';
 
 import cookieParser from 'cookie-parser';
 import mysql from 'mysql2';
-import authenticateToken from '../middleware/authToken';
-import verifyUser from '../middleware/verifyUser';
-import socket from '../socket';
+import authenticateToken from '../middleware/authToken.js';
+import verifyUser from '../middleware/verifyUser.js';
+import socket from '../socket.js';
 import ioTools from '../iomanager/io.js';
 
 const router = express.Router();
