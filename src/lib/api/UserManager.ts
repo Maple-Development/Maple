@@ -209,6 +209,7 @@ export class UserManager {
 				if (data.nowPlaying) {
 					friendNowPlaying.set(data.nowPlaying);
 				}
+				console.log(data);
 				return data;
 			} else {
 				toast.error('Error fetching user: "' + data.error + '"');
