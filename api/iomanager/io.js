@@ -38,7 +38,8 @@ module.exports = {
 				'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ' +
 				'ON DUPLICATE KEY UPDATE playing = VALUES(playing)',
 				[user, JSON.stringify(nowPlaying)]
-			);			
+			);
+			console.log(friends);
 			friends.forEach((friend) => {
 				console.log(friend.friend_id);
 				const client = this.getSocket(io, friend.friend_id)
