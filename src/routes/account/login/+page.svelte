@@ -7,10 +7,8 @@
 
 	let username = '';
 	let password = '';
-	let log = '';
 
 	async function login() {
-		log = JSON.stringify(await UserManager.login(username, password));
 		username = '';
 		password = '';
 		goto('/');
