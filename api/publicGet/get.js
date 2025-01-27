@@ -52,7 +52,7 @@ router.get('/user/id/:id', async (req, res) => {
 
 	const userObject = userResults[0];
 	if (nowPlayingResults.length > 0) {
-	  userObject.nowPlaying = JSON.parse(nowPlayingResults[0].playing);
+	  userObject.nowPlaying = nowPlayingResults[0].playing;
 	}
 
 	res.status(200).json(userObject);
