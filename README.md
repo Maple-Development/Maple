@@ -10,6 +10,8 @@
     <a href="https://maple.kolf.pro/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
 </p>
 
+> Need Help? Join our [Development Server](https://discord.gg/Wxrp73HVj4)
+
 <p align="center">
     Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
 </p>
