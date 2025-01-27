@@ -70,7 +70,7 @@ router.post('/accept/:id', async (req, res) => {
   
 	  await connection.promise().query(
 		'DELETE FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
-		[id, friendId]
+		[friendId, id]
 	  );
   
 	  await connection.promise().query(
