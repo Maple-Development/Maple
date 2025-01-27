@@ -20,6 +20,10 @@
 - Upload your music library
 - That's it!
 
+## How do Accounts work?
+
+Accounts give you access to social, and other online features! Want to know what your friends are listening to? Share your music to your discord server? Have access to a public API to get your recent listening history? All of that & More is unlocked when you make an account! No email required + free!.
+
 ## Q&As
 
 Will my library be sent to anyone?
@@ -82,6 +86,11 @@ Response:
     id: id,
     username: username,
     name?: name,
+    nowPlaying?: {
+        title: title,
+        artist: artist,
+        album: album
+    }
 }
 ```
 
