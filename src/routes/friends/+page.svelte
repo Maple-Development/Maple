@@ -12,20 +12,23 @@
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
 	import type { Playlist } from '$lib/types/playlist';
+	import type { PendingRequest } from '$lib/types/preq';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
 	let selectedFriend = '';
+	let pendingRequests: PendingRequest[] = [];
 
 	onMount(async () => {
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		title.set('Tracks');
+		pendingRequests = await UserManager.getRequests();
 	});
 
 	async function addFriend() {
 		const selectedUser = (await UserManager.getUserName(selectedFriend)).id;
-		$socket?.emit('addFriend', { friendId: selectedUser });
+		UserManager.addFriend(selectedUser);
 		toast.success('Friend request sent to: ' + selectedFriend);
 	}
 </script>
@@ -149,17 +152,23 @@
 			</div>
 		</div>
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
-		<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
-			<div class="flex flex-row">
-				<UserPlus size={40} class="my-auto px-2 py-2" />
-				<h2 class="inter-normal my-auto py-2 text-lg">Nail</h2>
-			</div>
-			<div class="ml-2 flex items-center">
-				<Button class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
-					<UserCheck size={20} color="white" />
-				</Button>
-			</div>
-		</div>
+		{#if pendingRequests}
+			{#if pendingRequests.length > 0}
+				{#each pendingRequests as request}
+					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
+						<div class="flex flex-row">
+							<UserPlus size={40} class="my-auto px-2 py-2" />
+							<h2 class="inter-normal my-auto py-2 text-lg">{request.friend_id}</h2>
+						</div>
+						<div class="ml-2 flex items-center">
+							<Button class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
+								<UserCheck size={20} color="white" />
+							</Button>
+						</div>
+					</div>
+				{/each}
+			{/if}
+		{/if}
 	</div>
 
 	<div class="ml-2 mt-2 flex flex-col items-center justify-center">

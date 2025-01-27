@@ -11,11 +11,30 @@ export const socketManager = () => {
 		socket?.on('friendRequest', async (data) => {
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
-			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')');
+			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')',
+				{
+					action: {
+						label: 'Accept',
+						onClick: () => {
+							UserManager.acceptRequest(id);
+						}
+					},
+				}
+			);
 		});
 
 		socket?.on('notFound', async (data) => {
 			toast.error('Friend request failed: User not found');
+		});
+
+		socket?.on('error', async (data) => {
+			toast.error(data);
+		});
+
+		socket?.on('requestAccepted', async (data) => {
+			const id = data.id;
+			const friend = await UserManager.getUserbyId(id);
+			toast.success(friend.name + ' (' + friend.username + ') accepted your friend request!');
 		});
 
 		socket?.on('nowPlaying', async (data) => {

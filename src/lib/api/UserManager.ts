@@ -216,6 +216,73 @@ export class UserManager {
 		}
 	};
 
+	public static acceptRequest = async (id: string) => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/friends/accept/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: JSON.stringify({ friendId: id })
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error accepting request: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static rejectRequest = async (id: string) => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/decline/reject/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: JSON.stringify({ friendId: id })
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error rejecting request: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static addFriend = async (id: string) => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/friends/add/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: JSON.stringify({ friendId: id })
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error adding friend: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static getRequests = async () => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/friends/get/requests/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'GET'
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error getting requests: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
 	/*  public static addFriend = async (friend: string) => {
         try {
            socket.emit('addFriend', { friendId: friend });

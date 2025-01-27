@@ -79,16 +79,6 @@ io.use((socket, next) => {
 
 io.on('connection', (client) => {
 	console.log('User connected: ' + client.user.id);
-	client.on('addFriend', async (data) => {
-		const userId = client.user.id;
-		const friendId = data.friendId;
-		const friendSocket = await ioTools.getSocket(io, friendId);
-		if (friendSocket) {
-			ioTools.addFriend(userId, friendId, friendSocket, io);
-		} else {
-			client.emit('notFound', { friendId });
-		}
-	});
 
 	client.on('nowPlaying', async (data) => {
 		const userId = client.user.id;
@@ -112,3 +102,5 @@ io.on('connect_error', (error) => {
 });
 
 server.listen(443);
+
+module.exports = io;
