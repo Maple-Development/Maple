@@ -238,7 +238,7 @@ export class UserManager {
 
 	public static rejectRequest = async (id: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/user/decline/reject/${get(UserInfo)?.id}`, {
+			const response = await fetch(`${this.SERVER}/user/friends/decline/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'POST',
 				headers: {
@@ -304,6 +304,26 @@ export class UserManager {
 			}
 		} catch (error) {
 			toast.error('Error getting friends: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static removeFriend = async (id: string) => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/friends/remove/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ friendId: id })
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error removing friend: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};

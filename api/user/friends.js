@@ -155,6 +155,25 @@ router.post('/decline/:id', (req, res) => {
 	});
 });
 
+router.post('/remove/:id', (req, res) => {
+	const id = req.params.id;
+	const friendId = req.body.friendId;
+
+	if (!friendId) {
+		return res.status(400).json({ error: 'Friend ID is required.' });
+	}
+
+	const sql = 'DELETE FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)';
+
+	connection.query(sql, [id, friendId, friendId, id], (error, results) => {
+		if (error) {
+			console.error(error);
+			return res.status(500).json({ error: 'Error removing friend' });
+		}
+		return res.status(200).json({ message: 'Friend removed successfully' });
+	});
+})
+
 router.get('/get/requests/:id', (req, res) => {
 	const id = req.params.id;
 

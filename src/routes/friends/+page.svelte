@@ -5,7 +5,7 @@
 	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser } from '$lib/store';
 	import { toast } from 'svelte-sonner';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus } from 'lucide-svelte';
+	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus, UserX } from 'lucide-svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -117,7 +117,7 @@
 								<DropdownMenu.Content class="w-56">
 									<DropdownMenu.Label>Manage Friend</DropdownMenu.Label>
 									<DropdownMenu.Separator />
-									<DropdownMenu.Item>Remove Friend</DropdownMenu.Item>
+									<DropdownMenu.Item on:click={() => UserManager.removeFriend(friend.id)}>Remove Friend</DropdownMenu.Item>
 									<DropdownMenu.Item>Transfer Library</DropdownMenu.Item>
 									<DropdownMenu.Sub>
 										<DropdownMenu.SubTrigger>
@@ -156,6 +156,9 @@
 							<div class="ml-2 flex items-center">
 								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
 									<UserCheck size={20} color="white" />
+								</Button>
+								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-red-700 px-1 hover:bg-red-800">
+									<UserX size={20} color="white" />
 								</Button>
 							</div>
 						</div>
