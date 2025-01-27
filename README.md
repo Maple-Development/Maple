@@ -7,7 +7,7 @@
 </h3>
 
 <p align="center">
-    <a href="https://maple.cattn.dev/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
+    <a href="https://maple.kolf.pro/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
 </p>
 
 <p align="center">
