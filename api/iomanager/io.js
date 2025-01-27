@@ -38,8 +38,8 @@ module.exports = {
 				const client = this.getSocket(io, friend.friend_id)
 				if (client) {
 					connection.promise().query(
-						'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ON DUPLICATE KEY UPDATE playing = ?',
-						[user, JSON.stringify(nowPlaying), JSON.stringify(nowPlaying)]
+						'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ON DUPLICATE KEY UPDATE playing = VALUES(playing)',
+						[user, JSON.stringify(nowPlaying)]
 					);
 					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
 				}
