@@ -42,7 +42,7 @@ module.exports = {
 			friends.forEach(async (friend) => {
 				const client = await this.getSocket(io, friend.friend_id)
 				if (client) {
-					io.to(client.id).emit('nowPlaying', { nowPlaying: JSON.stringify(nowPlaying), id: user });
+					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
 				}
 			})
 		} catch (error) {
