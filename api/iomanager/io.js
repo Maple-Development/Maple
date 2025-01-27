@@ -44,7 +44,7 @@ module.exports = {
 				console.log(friend.friend_id);
 				const client = this.getSocket(io, friend.friend_id)
 				if (client) {
-					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
+					io.to(client.id).emit('nowPlaying', { nowPlaying: JSON.stringify(nowPlaying), id: user });
 				}
 			})
 		} catch (error) {
