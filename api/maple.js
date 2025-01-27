@@ -45,7 +45,7 @@ const credentials = {
 };
 
 const corsOptions = {
-	origin: 'https://beta.cattn.dev/',
+	origin: 'https://beta.cattn.dev',
 	credentials: true
   };
 
@@ -53,7 +53,7 @@ const server = https.createServer(credentials, app);
 
 const ioOptions = {
 	cors: {
-		origin: "https://beta.cattn.dev/",
+		origin: "https://beta.cattn.dev",
 		credentials: true
 	}
 };
