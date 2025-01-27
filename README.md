@@ -42,6 +42,95 @@ What data is saved on the server?
 
 If you have any other questions, feel free to DM `cattn.` on discord, or email me @ `Logan@cattn.dev`
 
+## API Documentation
+
+### ``GET`` - ``/public/get/user/:username``
+Returns a user based on the given username.
+
+Request Example:
+```js
+const response = await fetch(`${this.SERVER}/public/get/user/${username}`, {
+    credentials: 'include',
+    method: 'GET'
+});
+const data = await response.json();
+```
+
+Response:
+```
+{
+    id: id,
+    username: username,
+    name?: name,
+}
+```
+
+### ``GET`` - ``/public/get/user/id/:id``
+Returns a user based on the given id.
+
+Request Example:
+```js
+const response = await fetch(`${this.SERVER}/public/get/user/id/${id}`, {
+    method: 'GET'
+});
+const data = await response.json();
+```
+
+Response:
+```
+{
+    id: id,
+    username: username,
+    name?: name,
+}
+```
+
+### ``GET`` - ``/public/get/pfp/:id``
+Returns a profile picture based on the given id.
+
+Request Example:
+```js
+const response = await fetch(`${this.SERVER}/public/get/pfp/${id}`, {
+    method: 'GET'
+});
+const data = await response.json();
+```
+
+Response:
+```
+{
+    id: id,
+    username: username,
+    name?: name,
+}
+```
+
+### ``POST`` - ``/user/friends/add/:id``
+Add a given user to your friends list by ID.
+
+REQUIRED: ``Login Token``*
+
+Request Example:
+```js
+const response = await fetch(`${this.SERVER}/user/friends/add/${id}`, {
+    credentials: 'include',
+    method: 'POST'
+});
+const data = await response.json();
+```
+
+Response: ``200``
+```
+{ message: 'Request sent successfully' }
+```
+
+Response: ``500``
+```
+{ error: 'Error adding friend' }
+```
+
+### * How do I get login token?
+> Typically you can only get a login token by logging in on our site, however if you extract this cookie you can use it from another site to login.
 ## What's the inspiration behind it?
 
 Maple was inspired by various experiences, such as being on a plane without internet. While I had my music with me, I found local tools like Windows Media Player lacking. This project not only aims to solve that issue but also serves as a learning experience for me.
