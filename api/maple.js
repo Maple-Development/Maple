@@ -6,6 +6,7 @@ const manageUser = require('./user/manageUser.js');
 const publicGet = require('./publicGet/get.js');
 const friends = require('./user/friends.js');
 const ioTools = require('./iomanager/io.js');
+const socket = require('./socket');
 const app = express();
 
 const fs = require('fs');
@@ -36,12 +37,14 @@ const corsOptions = {
 
 const server = https.createServer(credentials, app);
 
-const io = require('socket.io')(server, {
+const ioOptions = {
 	cors: {
 		origin: true,
 		credentials: true
 	}
-});
+};
+
+const io = socket.init(server, ioOptions);
 
 app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
@@ -102,5 +105,3 @@ io.on('connect_error', (error) => {
 });
 
 server.listen(443);
-
-module.exports = { io };

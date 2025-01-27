@@ -4,10 +4,12 @@ cookieParser = require('cookie-parser');
 const mysql = require('mysql2');
 const authenticateToken = require('../middleware/authToken');
 const verifyUser = require('../middleware/verifyUser');
-const { io } = require('../maple.js');
+const socket = require('../socket');
 const ioTools = require('../iomanager/io.js');
 
 const router = express.Router();
+
+const io = socket.getIO();
 
 const connection = mysql.createConnection({
 	host: 'localhost',
