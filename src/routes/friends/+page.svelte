@@ -155,17 +155,19 @@
 		{#if pendingRequests}
 			{#if pendingRequests.length > 0}
 				{#each pendingRequests as request}
-					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
-						<div class="flex flex-row">
-							<UserPlus size={40} class="my-auto px-2 py-2" />
-							<h2 class="inter-normal my-auto py-2 text-lg">{request.friend_id}</h2>
+					{#await UserManager.getUserName(request.user_id) then user}
+						<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
+							<div class="flex flex-row">
+								<UserPlus size={40} class="my-auto px-2 py-2" />
+								<h2 class="inter-normal my-auto py-2 text-lg">{user.name}</h2>
+							</div>
+							<div class="ml-2 flex items-center">
+								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
+									<UserCheck size={20} color="white" />
+								</Button>
+							</div>
 						</div>
-						<div class="ml-2 flex items-center">
-							<Button class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">
-								<UserCheck size={20} color="white" />
-							</Button>
-						</div>
-					</div>
+					{/await}
 				{/each}
 			{/if}
 		{/if}

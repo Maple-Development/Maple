@@ -32,17 +32,30 @@ router.post('/add/:id', async (req, res) => {
   }
 
   try {
+	const [alreadyFriends] = await connection.promise().query(
+		'SELECT * FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
+		[id, friendId, friendId, id]
+	  );
+  
+	  if (alreadyFriends.length > 0) {
+		const userSocket = await ioTools.getSocket(io, id);
+		if (userSocket) {
+		  ioTools.emit(userSocket, "error", 'You are already friends', io);
+		}
+		return res.status(409).json({ error: 'You are already friends.' });
+	}
+
 	const [existingRequests] = await connection.promise().query(
-	  'SELECT * FROM pending_requests WHERE user_id = ? AND friend_id = ?',
-	  [id, friendId]
+	  'SELECT * FROM pending_requests WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
+	  [id, friendId, friendId, id]
 	);
 
 	if (existingRequests.length > 0) {
 	  const userSocket = await ioTools.getSocket(io, id);
 	  if (userSocket) {
-		ioTools.emit(userSocket, "error", 'Friend request already sent', io);
+		ioTools.emit(userSocket, "error", 'Friend request already sent/pending', io);
 	  }
-	  return res.status(409).json({ error: 'Friend request already sent.' });
+	  return res.status(409).json({ error: 'Friend request already sent/pending.' });
 	}
 
 	await connection.promise().query(
@@ -70,7 +83,6 @@ router.post('/accept/:id', async (req, res) => {
   }
 
   try {
-	// Check if they are already friends
 	const [alreadyFriends] = await connection.promise().query(
 	  'SELECT * FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
 	  [id, friendId, friendId, id]
