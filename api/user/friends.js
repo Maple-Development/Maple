@@ -57,7 +57,7 @@ router.post('/accept/:id', async (req, res) => {
 	try {
 	  const [pendingResults] = await connection.promise().query(
 		'SELECT * FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
-		[id, friendId]
+		[friendId, id]
 	  );
   
 	  if (pendingResults.length === 0) {
