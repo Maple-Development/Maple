@@ -91,7 +91,6 @@
 	}) {
 		open = true;
 		selectedSong = e.detail;
-		console.log('work');
 	}
 
 	async function deleteTrack() {
@@ -102,6 +101,14 @@
 			toast.success(`Deleted ${selectedSong.title} from library`);
 		} else {
 			console.error('Album not found');
+		}
+	}
+
+	function dokeep() {
+		if (tracks.length > 100) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 </script>
@@ -152,7 +159,7 @@
 				>
 			</DropdownMenu.RadioGroup>
 		</DropdownMenu.Content>
-	</DropdownMenu.Root> 
+	</DropdownMenu.Root>
 	<Button
 		class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
 		on:click={() => swapListType()}
@@ -162,11 +169,11 @@
 </div>
 
 {#if listType === 'grid'}
-	<GridView {tracks} songs={tracks} on:delete={openAlert} />
+	<GridView keep={dokeep()} {tracks} songs={tracks} on:delete={openAlert} />
 {:else}
 	<div class="mx-4 mb-5 mt-2 flex flex-col">
 		{#each tracks as track}
-			<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
+			<ListTrack keep={dokeep()} {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 		{/each}
 	</div>
 {/if}

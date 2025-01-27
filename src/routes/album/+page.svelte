@@ -60,7 +60,6 @@
 		changedYear = album?.year?.toString() ?? '';
 		playlists = await OPFS.get().playlists();
 
-		console.log(album);
 	});
 
 	async function refresh(albumName: string) {
@@ -166,9 +165,9 @@
 			const doImage = imageFile !== null;
 			const modifiedAlbum: Album = {
 				id: album.id,
-				name: changedName,
-				artist: changedArtist,
-				year: parseInt(changedYear, 10),
+				name: changedName.replace(/[&<>"']/g, (match) => `&#${match.charCodeAt(0)};`),
+				artist: changedArtist.replace(/[&<>"']/g, (match) => `&#${match.charCodeAt(0)};`),
+				year: parseInt(changedYear.replace(/[^\d]/g, ''), 10),
 				image: doImage ? imageFile : album.image,
 				genre: album.genre,
 				tracks: album.tracks

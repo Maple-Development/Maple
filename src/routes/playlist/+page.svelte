@@ -53,7 +53,6 @@
 		let params = new URLSearchParams(document.location.search);
 		playlistName = params.get('playlist') ?? '';
 		playlist = await OPFS.get().playlist(playlistName);
-		console.log(playlist);
 		sortTracks();
 		if (playlist && playlist.name) {
 			title.set(playlist.name);
@@ -84,13 +83,11 @@
 			const newTracks: Song[] = [];
 			for (const track of playlist.tracks) {
 				const trackData = await OPFS.get().track(track as string);
-				console.log(trackData);
 				if (trackData) {
 					newTracks.push(trackData);
 				}
 			}
 			tracks = newTracks; // trigger re-render
-			console.log(tracks);
 		}
 	}
 
@@ -236,7 +233,6 @@
 			addedSongs = addedSongs.filter((s) => s !== song.id);
 			tracks = tracks.filter((s) => s.id !== song.id);
 		}
-		console.log(addedSongs);
 	}
 
 	$: isToggled = (song: Song) => addedSongs.includes(song.id);

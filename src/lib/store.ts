@@ -1,8 +1,28 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
+import type { User } from './types/user';
+import type { PendingRequest } from './types/preq';
+import type { AddedFriend } from './types/addedfriends';
+import { Peer } from 'peerjs';
+import { Socket } from 'socket.io-client';
 
+export const pendingRequests = writable([] as PendingRequest[]);
+export const friends = writable([] as AddedFriend[]);
+export const isLoggedIn = writable(false);
+export const friendNowPlaying = writable({} as any);
+export const socket = writable(null as Socket | null);
+export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
+export const UserInfo = writable(null as any);
+UserInfo.subscribe((value) => {
+	if (browser) {
+		if (!value) return;
+		if (value === undefined) return;
+		localStorage.setItem('UserInfo', JSON.stringify(value));
+	}
+});
+export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
@@ -100,6 +120,7 @@ audioPlayer.subscribe((value) => {
 			} else {
 				if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
 					value.audio.volume = value.volume / 100;
+					localStorage.setItem('volume', value.volume.toString());
 					value.changeVolume = false;
 					return;
 				} else {
@@ -111,7 +132,7 @@ audioPlayer.subscribe((value) => {
 	}
 });
 function createTitle() {
-	const { subscribe, set, update } = writable('');
+	const { subscribe, set } = writable('');
 
 	return {
 		subscribe,
@@ -124,6 +145,22 @@ function createTitle() {
 	};
 }
 
+function loadPreferences() {
+	return {
+		load: () => {
+			if (browser) {
+				const storedVolume = localStorage.getItem('volume');
+				const volume = parseInt(storedVolume ?? '100');
+				if (storedVolume) {
+					audioPlayer.update((state) => ({ ...state, volume: volume, changeVolume: true }));
+				}
+			}
+		}
+	};
+}
+
+export const loadPreferencesStore = loadPreferences();
+
 export const title = createTitle();
 
 if (browser) {
@@ -132,5 +169,10 @@ if (browser) {
 		hideTips.set(true);
 	} else {
 		hideTips.set(false);
+	}
+
+	const storedUserInfo = localStorage.getItem('UserInfo');
+	if (storedUserInfo) {
+		UserInfo.set(JSON.parse(storedUserInfo));
 	}
 }
