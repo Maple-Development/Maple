@@ -103,4 +103,4 @@ io.on('connect_error', (error) => {
 
 server.listen(443);
 
-module.io = io;
+module.exports = { io };

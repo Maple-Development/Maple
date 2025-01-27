@@ -4,8 +4,7 @@ cookieParser = require('cookie-parser');
 const mysql = require('mysql2');
 const authenticateToken = require('../middleware/authToken');
 const verifyUser = require('../middleware/verifyUser');
-const maple = require('../maple.js');
-const io = maple.io;
+const { io } = require('../maple.js');
 const ioTools = require('../iomanager/io.js');
 
 const router = express.Router();
