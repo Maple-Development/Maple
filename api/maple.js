@@ -94,24 +94,22 @@ io.on('connection', (client) => {
 	console.log('User connected: ' + client.user.id);
 
 	client.on('nowPlaying', async (data) => {
-		const id = client.user.id;
-		
-		const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
+        const id = client.user.id;
+        
+        const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
-		const allFriends = connection.query(sql, [id, id], (error, results) => {
-			if (error) {
-				console.error(error);
-				return null;
-			}
-			return results;
-		});
+        try {
+            const [allFriends] = await connection.promise().query(sql, [id, id]);
+            const sorted = sortFriends(allFriends, id);
 
-		const sorted = sortFriends(allFriends, id);
+            if (allFriends !== null && allFriends.length > 0) {
+                ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
 
-		if (allFriends !== null) {
-			ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
-		}
-	});
 	client.on('disconnect', () => {
 		/* … */
 	});
