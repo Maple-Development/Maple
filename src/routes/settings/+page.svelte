@@ -13,8 +13,19 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { title } from '$lib/store';
+	import { Separator } from '$lib/components/ui/separator';
+	import { browser } from '$app/environment';
+	import UserSettings from '$lib/preferences/usersettings';
+	import { Settings } from '$lib/preferences/fetch';
+	import { Users } from 'lucide-svelte';
+
+	let preferences = new Settings('preferences');
 
 	let errorText = 'LOG will appear here';
+	let devMode = false;
+	let showLogging = false;
+	let p2p = true;
+	let socket = true;
 
 	let deferredPrompt;
 	async function createLibrary(mobileFiles: FileList) {
@@ -118,6 +129,10 @@
 		getLength();
 		findDevice();
 		title.set('Settings');
+		p2p = UserSettings.preferences.p2p;
+		devMode = UserSettings.preferences.devMode;
+		showLogging = UserSettings.preferences.showLogging;
+		socket = UserSettings.preferences.socket;
 	});
 
 	let device = 'chrome';
@@ -264,8 +279,22 @@
 		getLength();
 	}
 
-	let devMode = false;
-	let showLogging = false;
+	function updatePrefs() {
+		preferences.set('p2p', p2p);
+		preferences.set('devMode', devMode);
+		preferences.set('showLogging', showLogging);
+		preferences.set('socket', socket);
+		toast.success('Settings updated',
+			{
+				action: {
+					label: 'Refresh now?',
+					onClick: () => {
+						window.location.reload();
+					}
+				},
+			}
+		);
+	}
 </script>
 
 <div class="mt-16 flex flex-col items-center justify-center">
@@ -281,19 +310,43 @@
 				on:change={(e) => createLibrary(e)}
 			/>
 		{:else}
-			<Button class="py-6 px-4 md:py-16 md:px-10" variant="secondary" on:click={() => createLibrary()}>Import Music</Button>
+			<Button
+				class="px-4 py-6 md:px-10 md:py-16"
+				variant="secondary"
+				on:click={() => createLibrary()}>Import Music</Button
+			>
 		{/if}
-		<Button class="py-6 px-4 md:py-16 md:px-10" variant="destructive" on:click={() => clearLibrary()}>Clear Library</Button>
-		<div class="mt-2 justify-center flex flex-col items-center">
-			<h2>Options:</h2>
-			<div>
+		<Button
+			class="px-4 py-6 md:px-10 md:py-16"
+			variant="destructive"
+			on:click={() => clearLibrary()}>Clear Library</Button
+		>
+		<div class="mt-2 flex flex-col items-center justify-center">
+			<h2>Dev Options:</h2>
+			<div class="mb-2 mt-2">
 				<div class="mb-2 flex flex-row items-center">
 					<Switch class="mr-2" id="devMode" bind:checked={devMode} />
 					<Label for="devMode">Developer Mode</Label>
 				</div>
-				<div class="flex flex-row items-center">
+				<div class="mb-2 flex flex-row items-center">
 					<Switch class="mr-2" id="logging" bind:checked={showLogging} />
 					<Label for="logging">Show Logging</Label>
+				</div>
+				<Separator />
+				<div class="mb-2 mt-2 flex flex-row items-center">
+					<Switch class="mr-2" id="p2p" bind:checked={p2p} />
+					<Label for="p2p">Enable P2P Transfer</Label>
+				</div>
+				<div class="mb-2 mt-2 flex flex-row items-center">
+					<Switch class="mr-2" id="p2p" bind:checked={socket} />
+					<Label for="p2p">Enable Socket.io Communication</Label>
+				</div>
+				<div class="flex flex-col items-center justify-center">
+					<Button
+						on:click={updatePrefs}
+						class="mx-2 mt-2 w-max px-8 py-6 text-white"
+						variant="secondary">Save Settings</Button
+					>
 				</div>
 			</div>
 		</div>
@@ -303,8 +356,8 @@
 	</h1>
 </div>
 
-{#if devMode}
-	<div class="mx-10 mt-10 font-['VT323']">
+{#if UserSettings.preferences.devMode}
+	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea
 			on:keydown={handleKeydown}
 			class="h-48"
@@ -314,8 +367,8 @@
 	</div>
 {/if}
 
-{#if showLogging}
-	<div class="mx-10 mt-10 font-['VT323']">
+{#if UserSettings.preferences.showLogging}
+	<div class="mx-10 mb-6 mt-10 font-['VT323']">
 		<Textarea class="h-48" bind:value={errorText} placeholder="LOG" disabled />
 	</div>
 {/if}

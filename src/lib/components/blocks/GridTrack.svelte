@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
-	import { onMount } from 'svelte';
 	import ContextMenu from '../ui/context-menu/context-menu.svelte';
 	import TrackWrapper from '../TrackWrapper.svelte';
 	// @ts-ignore

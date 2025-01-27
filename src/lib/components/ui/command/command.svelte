@@ -1,4 +1,6 @@
 <script>
+	// @ts-nocheck
+
 	import { Command as CommandPrimitive } from 'cmdk-sv';
 	import { cn } from '$lib/utils.js';
 	export let value = undefined;

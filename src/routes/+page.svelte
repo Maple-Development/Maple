@@ -35,7 +35,6 @@
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		onboard = await OPFS.ifExists('tracks');
-		console.log(onboard);
 		title.set('Home');
 	});
 	import * as Command from '$lib/components/ui/command';
@@ -256,8 +255,7 @@
 						<div class="p-5">
 							<h2 class="text-sm font-medium text-secondary-foreground">Tip #3: Context Menus</h2>
 							<p class="text-sm font-medium text-muted-foreground">
-								Filters allow you to organize the different sections of your library by various
-								attributes. (try it below!)
+								Right clicking a song will bring up options, such as deleting or adding to a playlist! (try it below!)
 							</p>
 							<div class="flex flex-col items-center justify-center">
 								<ContextMenu type={'track'}>

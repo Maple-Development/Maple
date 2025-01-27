@@ -14,10 +14,6 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-	onMount(async () => {
-		console.log(items);
-	});
-
 	async function getImageUrl(imagePath: string): Promise<string> {
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
@@ -30,6 +26,8 @@
 	export let artists: Artist[] = [];
 	export let playlists: Playlist[] = [];
 	export let tracks: Song[] = [];
+	export let keep: boolean = true;
+	$: keep = keep;
 
 	let items = songs || albums || artists || playlists;
 
@@ -59,7 +57,7 @@
 					on:addTrackToPlaylist={(e) => addTrackToPlaylist(track, e.detail.playlist)}
 				>
 					<TrackWrapper className="" {track} {tracks}>
-						<Lazy height={208} keep={true}>
+						<Lazy height={208} {keep}>
 							<img class="h-44 w-44 rounded-sm md:h-52 md:w-52" src={image} alt={track.title} />
 						</Lazy>
 					</TrackWrapper>

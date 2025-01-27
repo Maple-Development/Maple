@@ -8,11 +8,14 @@
 		Search,
 		AudioLines,
 		Home,
-		Settings
+		Settings,
+		User as UserIcon,
+		User
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
-	import { collapsed, title } from '$lib/store';
+	import { collapsed, SavedUser, title, isSmallDevice } from '$lib/store';
+	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
@@ -21,6 +24,8 @@
 	import type { Playlist } from '$lib/types/playlist';
 	import { page } from '$app/stores';
 	import TrackWrapper from './TrackWrapper.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Tooltip from "$lib/components/ui/tooltip";
 
 	let songs: Song[] = [];
 	let albums: Album[] = [];
@@ -40,12 +45,17 @@
 
 <div class="relative flex items-center justify-between">
 	<div class="flex items-center">
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => ($collapsed = !$collapsed)}
-		>
-			<PanelRightOpen size={20} color="white" />
-		</Button>
+		<Tooltip.Root>
+			<Button
+				class="my-1 w-fit ml-1 bg-transparent px-4 hover:bg-secondary"
+				href="/"
+			>
+				<Home size={22} class="text-foreground" />
+				{#if $collapsed}
+					<h1 class="hidden px-1 text-foreground md:block">Home</h1>
+				{/if}
+			</Button>
+		  </Tooltip.Root>
 		<h1 class="ml-2 text-xl font-bold text-muted-foreground">{$title}</h1>
 	</div>
 	<div class="absolute left-1/2 -translate-x-1/2 transform">
@@ -57,6 +67,52 @@
 			<Search size={20} color="white" />
 			<span class="ml-2">Search</span>
 		</Button>
+	</div>
+	<div>
+		{#if $SavedUser.id}
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class="mt-1">
+					{#if $SavedUser.pfp !== null && $SavedUser.pfp !== undefined}
+						<!-- svelte-ignore a11y-img-redundant-alt -->
+						<img
+							src={$SavedUser.pfp}
+							alt="Profile Picture"
+							class="mr-2 h-8 w-8 self-center rounded-[50%]"
+						/>
+					{:else}
+						<UserIcon color="black" class="mr-2 h-8 w-8 self-center rounded-[50%] bg-primary p-1" />
+					{/if}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.Label>My Account</DropdownMenu.Label>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item href="/account">Manage Account</DropdownMenu.Item>
+						<DropdownMenu.Item href="/account/preferences">Preferences</DropdownMenu.Item>
+						<DropdownMenu.Item class="bg-red-500 text-black" on:click={() => UserManager.logOut()}
+							>Log Out</DropdownMenu.Item
+						>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		{:else}
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class="mt-1"
+					><UserIcon
+						color="black"
+						class="mr-2 h-8 w-8 self-center rounded-[50%] bg-primary p-1"
+					/></DropdownMenu.Trigger
+				>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.Label>My Account</DropdownMenu.Label>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item href="/account/register">Sign up</DropdownMenu.Item>
+						<DropdownMenu.Item href="/account/login">Login</DropdownMenu.Item>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		{/if}
 	</div>
 </div>
 

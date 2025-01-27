@@ -18,6 +18,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
+	private static SERVER = 'https://maple.kolf.pro:3000';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;
@@ -274,7 +275,6 @@ export class OPFS {
 				}
 				this.albumsCache[index] = album;
 				await this.writeCache('/albums/albums.json', this.albumsCache);
-				console.log(album);
 			}
 		},
 
@@ -312,7 +312,6 @@ export class OPFS {
 				}
 				this.artistsCache[index] = artist;
 				await this.writeCache('/artists/artists.json', this.artistsCache);
-				console.log(artist);
 			}
 		},
 
@@ -337,7 +336,6 @@ export class OPFS {
 			if (index !== -1) {
 				this.playlistsCache[index] = playlist;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
-				console.log(playlist);
 			}
 		},
 
