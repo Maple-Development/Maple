@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="resources/maple_main_icon.png" width="128" alt="Maple Icon"/>
+    <img src="https://raw.githubusercontent.com/Cattn/Maple/d3edeef4f7bce80170f58220a677d1fecc7c40f2/resources/maple_main_icon.png" width="128" alt="Maple Icon"/>
 </p>
 
 <h3 align="center">
