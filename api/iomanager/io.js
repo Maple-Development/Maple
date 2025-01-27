@@ -39,7 +39,7 @@ module.exports = {
 				if (client) {
 					connection.promise().query(
 						'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ON DUPLICATE KEY UPDATE playing = ?',
-						[user.id, nowPlaying, nowPlaying]
+						[user.id, JSON.stringify(nowPlaying), JSON.stringify(nowPlaying)]
 					);
 					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
 				}
