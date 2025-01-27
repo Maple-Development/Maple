@@ -12,6 +12,7 @@
 		username = '';
 		password = '';
 		goto('/');
+		await UserManager.login(username, password);
 		window.location.reload();
 		title.set('Login');
 	}
