@@ -90,7 +90,7 @@
 	}
 
 	export async function playSong(song: Song) {
-		if (UserSettings.webhook.enabled == 'true') {
+		if (UserSettings.webhook.enabled) {
 			webHookSend(song);
 		}
 		currentTime(0);

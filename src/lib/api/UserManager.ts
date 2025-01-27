@@ -292,6 +292,22 @@ export class UserManager {
 		}
 	};
 
+	public static getFriends = async () => {
+		try {
+			const response = await fetch(`${this.SERVER}/user/friends/get/friends/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'GET'
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error getting friends: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
 	/*  public static addFriend = async (friend: string) => {
         try {
            socket.emit('addFriend', { friendId: friend });

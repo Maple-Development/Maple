@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
-	import { title, socket, friendNowPlaying, isLoggedIn } from '$lib/store';
+	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser } from '$lib/store';
 	import { toast } from 'svelte-sonner';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus } from 'lucide-svelte';
@@ -13,18 +13,34 @@
 	import type { Song } from '$lib/types/song';
 	import type { Playlist } from '$lib/types/playlist';
 	import type { PendingRequest } from '$lib/types/preq';
+	import type { AddedFriend } from '$lib/types/addedfriends';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
 	let selectedFriend = '';
 	let pendingRequests: PendingRequest[] = [];
+	let fetchedFriends: any = [];
+	let friends: AddedFriend[] = [];
 
 	onMount(async () => {
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		title.set('Tracks');
 		pendingRequests = await UserManager.getRequests();
+		fetchedFriends = await UserManager.getFriends();
+		sortFriends(fetchedFriends);
 	});
+
+	async function sortFriends(unsorted: any) {
+		let newFriends = unsorted.map((friend: { user_id: any; friend_id: any; }) => {
+			if (friend.user_id === $SavedUser.id) {
+				return { user_id: $SavedUser.id, friend_id: friend.friend_id };
+			} else {
+				return { user_id: $SavedUser.id, friend_id: friend.user_id };
+			}
+		});
+		console.log(newFriends);
+	}
 
 	async function addFriend() {
 		const selectedUser = (await UserManager.getUserName(selectedFriend)).id;
@@ -51,7 +67,7 @@
 						<h2 class="inter-normal my-auto py-2 text-lg">Add Friend</h2>
 						<Input
 							bind:value={selectedFriend}
-							placeholder="Username"
+							placeholder="friend username"
 							class="my-auto ml-2 w-48 px-2 py-2"
 						/>
 					</div>
@@ -67,48 +83,54 @@
 			</div>
 		</div>
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
-		<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
-			<div class="flex flex-row">
-				<User size={40} class="my-auto px-2 py-2" />
-				<h2 class="inter-normal my-auto py-2 text-lg">Cattn</h2>
-			</div>
-			<div class="ml-2 flex items-center">
-				<Button class="mx-1 my-1 h-10 w-10 px-1">
-					<AudioLines size={20} color="white" />
-				</Button>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder>
-						<Button class="mx-1 my-1 h-10 w-10 bg-transparent px-1" builders={[builder]}>
-							<EllipsisVertical size={20} color="white" />
-						</Button>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content class="w-56">
-						<DropdownMenu.Label>Manage Friend</DropdownMenu.Label>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item>Remove Friend</DropdownMenu.Item>
-						<DropdownMenu.Item>Transfer Library</DropdownMenu.Item>
-						<DropdownMenu.Sub>
-							<DropdownMenu.SubTrigger>
-								<span>Send Playlist</span>
-							</DropdownMenu.SubTrigger>
-							<DropdownMenu.SubContent side="right">
-								{#if playlists.length > 0}
-									{#each playlists as playlist}
-										<DropdownMenu.Item>
-											<span>{playlist.name}</span>
-										</DropdownMenu.Item>
-									{/each}
-								{:else}
-									<DropdownMenu.Item disabled>
-										<span>No Playlists</span>
-									</DropdownMenu.Item>
-								{/if}
-							</DropdownMenu.SubContent>
-						</DropdownMenu.Sub>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			</div>
-		</div>
+		{#if friends}
+			{#if friends.length > 0}
+				{#each friends as friend}
+					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
+						<div class="flex flex-row">
+							<User size={40} class="my-auto px-2 py-2" />
+							<h2 class="inter-normal my-auto py-2 text-lg">Cattn</h2>
+						</div>
+						<div class="ml-2 flex items-center">
+							<Button class="mx-1 my-1 h-10 w-10 px-1">
+								<AudioLines size={20} color="white" />
+							</Button>
+							<DropdownMenu.Root>
+								<DropdownMenu.Trigger asChild let:builder>
+									<Button class="mx-1 my-1 h-10 w-10 bg-transparent px-1" builders={[builder]}>
+										<EllipsisVertical size={20} color="white" />
+									</Button>
+								</DropdownMenu.Trigger>
+								<DropdownMenu.Content class="w-56">
+									<DropdownMenu.Label>Manage Friend</DropdownMenu.Label>
+									<DropdownMenu.Separator />
+									<DropdownMenu.Item>Remove Friend</DropdownMenu.Item>
+									<DropdownMenu.Item>Transfer Library</DropdownMenu.Item>
+									<DropdownMenu.Sub>
+										<DropdownMenu.SubTrigger>
+											<span>Send Playlist</span>
+										</DropdownMenu.SubTrigger>
+										<DropdownMenu.SubContent side="right">
+											{#if playlists.length > 0}
+												{#each playlists as playlist}
+													<DropdownMenu.Item>
+														<span>{playlist.name}</span>
+													</DropdownMenu.Item>
+												{/each}
+											{:else}
+												<DropdownMenu.Item disabled>
+													<span>No Playlists</span>
+												</DropdownMenu.Item>
+											{/if}
+										</DropdownMenu.SubContent>
+									</DropdownMenu.Sub>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
+						</div>
+					</div>
+				{/each}
+			{/if}
+		{/if}
 		<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
 			<div class="flex flex-row">
 				<User size={40} class="my-auto px-2 py-2" />
@@ -155,11 +177,11 @@
 		{#if pendingRequests}
 			{#if pendingRequests.length > 0}
 				{#each pendingRequests as request}
-					{#await UserManager.getUserName(request.user_id) then user}
+					{#await UserManager.getUserbyId(request.user_id) then user}
 						<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
 							<div class="flex flex-row">
 								<UserPlus size={40} class="my-auto px-2 py-2" />
-								<h2 class="inter-normal my-auto py-2 text-lg">{user.name}</h2>
+								<h2 class="inter-normal my-auto py-2 text-lg">{user.name} - {user.username}</h2>
 							</div>
 							<div class="ml-2 flex items-center">
 								<Button on:click={() => UserManager.acceptRequest(request.user_id)} class="mx-1 my-1 h-10 w-10 bg-green-700 px-1 hover:bg-green-800">

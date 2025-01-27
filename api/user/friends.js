@@ -169,6 +169,20 @@ router.get('/get/requests/:id', (req, res) => {
 	});
 });
 
+router.get('/get/friends/:id', (req, res) => {
+	const id = req.params.id;
+
+	const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
+
+	connection.query(sql, [id, id], (error, results) => {
+		if (error) {
+			console.error(error);
+			return res.status(500).json({ error: 'Error fetching friends' });
+		}
+		return res.status(200).json(results);
+	});
+});
+
 
 
 module.exports = router;
