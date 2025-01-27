@@ -1,4 +1,5 @@
-import mysql from 'mysql2';
+/* eslint-disable no-unused-vars */
+const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
 	host: 'localhost',
@@ -7,7 +8,7 @@ const connection = mysql.createConnection({
 	database: 'maple_auth'
 });
 
-export default {
+module.exports = {
 	addFriend: function (user, friend, socket, io) {
 		try {
 		io.to(socket.id).emit('friendRequest', { id: user });

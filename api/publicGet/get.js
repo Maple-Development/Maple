@@ -1,7 +1,7 @@
-import express from 'express';
-
-import cookieParser from 'cookie-parser';
-import mysql from 'mysql2';
+/* eslint-disable no-unused-vars */
+const express = require('express'),
+	cookieParser = require('cookie-parser');
+const mysql = require('mysql2');
 
 const router = express.Router();
 
@@ -86,4 +86,4 @@ router.get('/pfp/:id', (req, res) => {
 	});
 });
 
-export default router;
+module.exports = router;

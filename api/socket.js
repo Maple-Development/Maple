@@ -1,9 +1,8 @@
-import { Server } from "socket.io";
 let io;
 
-export default {
+module.exports = {
   init: (server, options) => {
-    io = new Server(server, options);
+    io = require('socket.io')(server, options);
     return io;
   },
   getIO: () => {
