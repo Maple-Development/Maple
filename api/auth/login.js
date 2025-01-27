@@ -106,6 +106,7 @@ router.post('/', (req, res) => {
 				httpOnly: true,
 				secure: true,
 				expires: new Date(Date.now() + 604800000),
+				sameSite: 'Lax'
 			});
 			return res
 				.status(200)
