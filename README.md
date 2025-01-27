@@ -44,7 +44,7 @@ If you have any other questions, feel free to DM `cattn.` on discord, or email m
 
 ## API Documentation
 
-### ``GET`` - ``/user/:username``
+### ``GET`` - ``/public/get/user/:username``
 Returns a user based on the given username.
 
 Request Example:
@@ -65,7 +65,7 @@ Response:
 }
 ```
 
-### ``GET`` - ``/user/id/:id``
+### ``GET`` - ``/public/get/user/id/:id``
 Returns a user based on the given id.
 
 Request Example:
@@ -85,7 +85,7 @@ Response:
 }
 ```
 
-### ``GET`` - ``/pfp/:id``
+### ``GET`` - ``/public/get/pfp/:id``
 Returns a profile picture based on the given id.
 
 Request Example:
