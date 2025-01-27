@@ -8,4 +8,4 @@ function checkUsername(req, res, next) {
 	next();
 }
 
-export default checkUsername;
+module.exports = checkUsername;

@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-import express from 'express';
-
-import cookieParser from 'cookie-parser';
-import mysql from 'mysql2';
-import authenticateToken from '../middleware/authToken.js';
-import verifyUser from '../middleware/verifyUser.js';
-import socket from '../socket.js';
-import ioTools from '../iomanager/io.js';
+const express = require('express'),
+cookieParser = require('cookie-parser');
+const mysql = require('mysql2');
+const authenticateToken = require('../middleware/authToken');
+const verifyUser = require('../middleware/verifyUser');
+const socket = require('../socket');
+const ioTools = require('../iomanager/io.js');
 
 const router = express.Router();
 
@@ -207,4 +206,4 @@ router.get('/get/friends/:id', (req, res) => {
 
 
 
-export default router;
+module.exports = router;

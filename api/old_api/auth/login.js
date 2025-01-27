@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
-import express from 'express';
-
-import cookieParser from 'cookie-parser';
-import mysql from 'mysql2';
-import bcrypt from 'bcrypt';
+const express = require('express'),
+	cookieParser = require('cookie-parser');
+const mysql = require('mysql2');
+const bcrypt = require('bcrypt');
 const router = express.Router();
-import { v4 as uuidv4 } from 'uuid';
-import jwt from 'jsonwebtoken';
-import 'dotenv/config'
-import validator from 'validator';
+const { v4: uuidv4 } = require('uuid');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+var validator = require('validator');
+dotenv.config();
 
 const connection = mysql.createConnection({
 	host: 'localhost',
@@ -115,4 +115,4 @@ router.post('/', (req, res) => {
 	});
 });
 
-export default router;
+module.exports = router;
