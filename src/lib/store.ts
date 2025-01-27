@@ -2,9 +2,13 @@ import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Song } from './types/song';
 import type { User } from './types/user';
+import type { PendingRequest } from './types/preq';
+import type { AddedFriend } from './types/addedfriends';
 import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
 
+export const pendingRequests = writable([] as PendingRequest[]);
+export const friends = writable([] as AddedFriend[]);
 export const isLoggedIn = writable(false);
 export const friendNowPlaying = writable({} as any);
 export const socket = writable(null as Socket | null);

@@ -248,6 +248,7 @@ export class UserManager {
 			});
 			const data = await response.json();
 			if (response.ok) {
+				toast.success('Request declined successfully!');
 				return data;
 			}
 		} catch (error) {
@@ -320,6 +321,7 @@ export class UserManager {
 			});
 			const data = await response.json();
 			if (response.ok) {
+				toast.success('Friend removed successfully!');
 				return data;
 			}
 		} catch (error) {

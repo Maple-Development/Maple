@@ -2,7 +2,7 @@
 	//@ts-nocheck
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
-	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser } from '$lib/store';
+	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser, pendingRequests, friends } from '$lib/store';
 	import { toast } from 'svelte-sonner';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus, UserX } from 'lucide-svelte';
@@ -19,37 +19,12 @@
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
 	let selectedFriend = '';
-	let pendingRequests: PendingRequest[] = [];
-	let fetchedFriends: any = [];
-	let friends: AddedFriend[] = [];
 
 	onMount(async () => {
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
 		title.set('Tracks');
-		pendingRequests = await UserManager.getRequests();
-		fetchedFriends = await UserManager.getFriends();
-		sortFriends(fetchedFriends);
 	});
-
-	async function sortFriends(unsorted: any) {
-		let newFriends = unsorted.map((friend: { user_id: any; friend_id: any; }) => {
-			if (friend.user_id === $SavedUser.id) {
-				return { user_id: $SavedUser.id, friend_id: friend.friend_id };
-			} else {
-				return { user_id: $SavedUser.id, friend_id: friend.user_id };
-			}
-		});
-		newFriends.forEach(async (friend: any) => {
-			const friendData = await UserManager.getUserbyId(friend.friend_id);
-			const newFriend: AddedFriend = {
-				id: friendData.id,
-				name: friendData.name,
-				username: friendData.username
-			}
-			friends = [...friends, newFriend];
-		});
-	}
 
 	async function addFriend() {
 		const selectedUser = (await UserManager.getUserName(selectedFriend)).id;
@@ -92,8 +67,8 @@
 			</div>
 		</div>
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
-		{#if friends}
-				{#each friends as friend}
+		{#if $friends}
+				{#each $friends as friend}
 					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
 						<div class="flex flex-row">
 							<img
@@ -144,9 +119,9 @@
 				{/each}
 		{/if}
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
-		{#if pendingRequests}
-			{#if pendingRequests.length > 0}
-				{#each pendingRequests as request}
+		{#if $pendingRequests}
+			{#if $pendingRequests.length > 0}
+				{#each $pendingRequests as request}
 					{#await UserManager.getUserbyId(request.user_id) then user}
 						<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
 							<div class="flex flex-row">

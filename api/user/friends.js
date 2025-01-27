@@ -120,8 +120,10 @@ router.post('/accept/:id', async (req, res) => {
 	);
 
 	const userSocket = await ioTools.getSocket(io, id);
-	if (userSocket) {
-	  ioTools.emit(userSocket, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+	if (userSocket && id !== friendId) {
+		ioTools.emit(userSocket, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+	} else if (userSocket) {
+		ioTools.emit(userSocket, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
 	}
 
 	const friendSocket = await ioTools.getSocket(io, friendId);
