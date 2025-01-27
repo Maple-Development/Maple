@@ -46,67 +46,54 @@ router.post('/add/:id', (req, res) => {
 	});
 });
 
-router.post('/accept/:id', (req, res) => {
+router.post('/accept/:id', async (req, res) => {
 	const id = req.params.id;
 	const friendId = req.body.friendId;
-
+  
 	if (!friendId) {
-		return res.status(400).json({ error: 'Friend ID is required.' });
+	  return res.status(400).json({ error: 'Friend ID is required.' });
 	}
+  
+	try {
+	  const [pendingResults] = await connection.promise().query(
+		'SELECT * FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
+		[id, friendId]
+	  );
+  
+	  if (pendingResults.length === 0) {
+		const userSocket = await ioTools.getSocket(io, id);
+		if (userSocket) {
+		  ioTools.emit(userSocket, "error", 'Friend request not found', io);
+		}
+		return res.status(404).json({ error: 'Friend request not found' });
+	  }
+  
+	  await connection.promise().query(
+		'DELETE FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
+		[id, friendId]
+	  );
+  
+	  await connection.promise().query(
+		'INSERT INTO friends_db (user_id, friend_id) VALUES (?, ?)', 
+		[id, friendId]
+	  );
+  
+	  const userSocket = await ioTools.getSocket(io, id);
+	  if (userSocket) {
+		ioTools.emit(userSocket, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+	  }
 
-	const isPending = 'SELECT * FROM pending_requests WHERE user_id = ? AND friend_id = ?';
-	connection.query(isPending, [id, friendId], async (error, results) => {
-		if (error) {
-			console.error(error);
-			return res.status(500).json({ error: 'Error accepting friend request' });
-		}
-		if (results.length === 0) {
-			const user = await ioTools.getSocket(io, id);
-			if (user) {
-				const data = "error";
-				const message = 'Friend request not found';
-				ioTools.emit(user, data, message, io);
-			}
-			return res.status(404).json({ error: 'Friend request not found' });
-		}
-	});
-
-	const sql1 = 'DELETE FROM pending_requests WHERE user_id = ? AND friend_id = ?';
-	connection.query(sql1, [id, friendId], (error, results) => {
-		if (error) {
-			console.error(error);
-			return res.status(500).json({ error: 'Error accepting friend request' });
-		}
-	});
-
-	const sql = 'INSERT INTO friends_db (user_id, friend_id) VALUES (?, ?)';
-	connection.query(sql, [id, friendId], async (error, results) => {
-		if (error) {
-			console.error(error);
-			return res.status(500).json({ error: 'Error accepting friend request' });
-		}
-		const user = await ioTools.getSocket(io, id);
-		if (user) {
-			const data = "requestAccepted";
-			const message = {
-				id: friendId,
-				message: 'Friend request accepted!'
-			};
-			ioTools.emit(user, data, message, io);
-		}
-		const friendSocket = await ioTools.getSocket(io, friendId);
-		if (friendSocket) {
-			const data = "requestAccepted";
-			const message = {
-				id: id,
-				message: 'Friend request accepted!'
-			};
-			ioTools.emit(friendSocket, data, message, io);
-		}
-		return res.status(200).json({ message: 'Friend request accepted successfully' });
-	});
+	  const friendSocket = await ioTools.getSocket(io, friendId);
+	  if (friendSocket) {
+		ioTools.emit(friendSocket, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
+	  }
+  
+	  return res.status(200).json({ message: 'Friend request accepted successfully' });
+	} catch (error) {
+	  console.error(error);
+	  return res.status(500).json({ error: 'Error processing friend request' });
+	}
 });
-
 
 router.post('/decline/:id', (req, res) => {
 	const id = req.params.id;

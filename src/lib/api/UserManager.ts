@@ -221,6 +221,9 @@ export class UserManager {
 			const response = await fetch(`${this.SERVER}/user/friends/accept/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				body: JSON.stringify({ friendId: id })
 			});
 			const data = await response.json();
@@ -238,6 +241,9 @@ export class UserManager {
 			const response = await fetch(`${this.SERVER}/user/decline/reject/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				body: JSON.stringify({ friendId: id })
 			});
 			const data = await response.json();
@@ -255,6 +261,9 @@ export class UserManager {
 			const response = await fetch(`${this.SERVER}/user/friends/add/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				body: JSON.stringify({ friendId: id })
 			});
 			const data = await response.json();

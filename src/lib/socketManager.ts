@@ -32,6 +32,7 @@ export const socketManager = () => {
 		});
 
 		socket?.on('requestAccepted', async (data) => {
+			console.log(data);
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
 			toast.success(friend.name + ' (' + friend.username + ') accepted your friend request!');
