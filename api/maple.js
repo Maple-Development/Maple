@@ -45,9 +45,16 @@ const credentials = {
 };
 
 const corsOptions = {
-	origin: "https://maple.kolf.pro/",
+	origin: function (origin, callback) {
+	  const allowedOrigins = ["https://maple.kolf.pro", `https://${process.env.HOST_NAME}`];
+	  if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+		callback(null, true);
+	  } else {
+		callback(new Error('Not allowed by CORS'));
+	  }
+	},
 	credentials: true
-};
+  };
 
 const server = https.createServer(credentials, app);
 
