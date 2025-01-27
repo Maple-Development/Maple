@@ -40,6 +40,7 @@ module.exports = {
 				[user, JSON.stringify(nowPlaying)]
 			);			
 			friends.forEach((friend) => {
+				console.log(friend.friend_id);
 				const client = this.getSocket(io, friend.friend_id)
 				if (client) {
 					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
