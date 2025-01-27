@@ -73,7 +73,7 @@
 						<div class="flex flex-col">
 							<div class="flex flex-row">
 								<img
-									src="https://maple.kolf.pro/public/get/pfp/{friend.id}"
+									src="https://maple.kolf.pro:3000/public/get/pfp/{friend.id}"
 									on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
 									alt="pfp"
 									class="my-auto h-10 w-10 ml-1 rounded-full"

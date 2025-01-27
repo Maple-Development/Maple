@@ -77,7 +77,7 @@
 					}
 				],
 				username: $SavedUser?.name === '' ? 'Maple User' : $SavedUser?.name,
-				avatar_url: 'https://maple.kolf.pro/public/get/pfp/' + $SavedUser?.id
+				avatar_url: 'https://maple.kolf.pro:3000/public/get/pfp/' + $SavedUser?.id
 			})
 		);
 		const request = await fetch(UserSettings.webhook.url, {

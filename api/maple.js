@@ -45,7 +45,7 @@ const credentials = {
 };
 
 const corsOptions = {
-	origin: true,
+	origin: "https://maple.kolf.pro/",
 	credentials: true
 };
 
@@ -53,7 +53,7 @@ const server = https.createServer(credentials, app);
 
 const ioOptions = {
 	cors: {
-		origin: true,
+		origin: "https://maple.kolf.pro/",
 		credentials: true
 	}
 };
@@ -141,4 +141,4 @@ function sortFriends(unsorted, id) {
 	return newFriends;
 }
 
-server.listen(443);
+server.listen(3000);
