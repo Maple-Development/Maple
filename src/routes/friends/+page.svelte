@@ -1,4 +1,5 @@
 <script lang="ts">
+	//@ts-nocheck
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser } from '$lib/store';
@@ -39,7 +40,15 @@
 				return { user_id: $SavedUser.id, friend_id: friend.user_id };
 			}
 		});
-		console.log(newFriends);
+		newFriends.forEach(async (friend: any) => {
+			const friendData = await UserManager.getUserbyId(friend.friend_id);
+			const newFriend: AddedFriend = {
+				id: friendData.id,
+				name: friendData.name,
+				username: friendData.username
+			}
+			friends = [...friends, newFriend];
+		});
 	}
 
 	async function addFriend() {
@@ -84,12 +93,16 @@
 		</div>
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
 		{#if friends}
-			{#if friends.length > 0}
 				{#each friends as friend}
 					<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
 						<div class="flex flex-row">
-							<User size={40} class="my-auto px-2 py-2" />
-							<h2 class="inter-normal my-auto py-2 text-lg">Cattn</h2>
+							<img
+								src="https://maple.kolf.pro/public/get/pfp/{friend.id}"
+								on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
+								alt="pfp"
+								class="my-auto h-10 w-10 ml-1 rounded-full"
+							/>
+							<h2 class="inter-normal my-auto py-2 text-lg ml-2">{friend.name || friend.username} - {friend.username}</h2>
 						</div>
 						<div class="ml-2 flex items-center">
 							<Button class="mx-1 my-1 h-10 w-10 px-1">
@@ -129,50 +142,7 @@
 						</div>
 					</div>
 				{/each}
-			{/if}
 		{/if}
-		<div class="mx-2 my-1 ml-2 flex flex-row justify-between rounded-lg hover:bg-secondary">
-			<div class="flex flex-row">
-				<User size={40} class="my-auto px-2 py-2" />
-				<h2 class="inter-normal my-auto py-2 text-lg">Nail</h2>
-			</div>
-			<div class="ml-2 flex items-center">
-				<Button class="mx-1 my-1 h-10 w-10 px-1">
-					<AudioLines size={20} color="white" />
-				</Button>
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder>
-						<Button class="mx-1 my-1 h-10 w-10 bg-transparent px-1" builders={[builder]}>
-							<EllipsisVertical size={20} color="white" />
-						</Button>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content class="w-56">
-						<DropdownMenu.Label>Manage Friend</DropdownMenu.Label>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item>Remove Friend</DropdownMenu.Item>
-						<DropdownMenu.Item>Transfer Library</DropdownMenu.Item>
-						<DropdownMenu.Sub>
-							<DropdownMenu.SubTrigger>
-								<span>Send Playlist</span>
-							</DropdownMenu.SubTrigger>
-							<DropdownMenu.SubContent side="right">
-								{#if playlists.length > 0}
-									{#each playlists as playlist}
-										<DropdownMenu.Item>
-											<span>{playlist.name}</span>
-										</DropdownMenu.Item>
-									{/each}
-								{:else}
-									<DropdownMenu.Item disabled>
-										<span>No Playlists</span>
-									</DropdownMenu.Item>
-								{/if}
-							</DropdownMenu.SubContent>
-						</DropdownMenu.Sub>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			</div>
-		</div>
 		<Separator class="my-2 ml-4 mr-4 w-auto" />
 		{#if pendingRequests}
 			{#if pendingRequests.length > 0}
