@@ -43,9 +43,6 @@ export const socketManager = () => {
 		});
 
 		socket?.on('nowPlaying', async (data) => {
-			const id = data.id;
-			const friend = await UserManager.getUserbyId(id);
-			toast.success('Now playing: ' + friend.name + ' (' + friend.username + ')');
 			friendNowPlaying.set(data.nowPlaying);
 		});
 	}
