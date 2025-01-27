@@ -1,11 +1,9 @@
-import { socket as importedSocket, friendNowPlaying, friends, pendingRequests, SavedUser } from '$lib/store';
+import { socket as importedSocket, friendNowPlaying } from '$lib/store';
 import { get } from 'svelte/store';
 import { toast } from 'svelte-sonner';
 import { browser } from '$app/environment';
 import { UserManager } from './api/UserManager';
-import type { AddedFriend } from './types/addedfriends';
-
-let fetchedFriends: [] = [];
+import { refreshFriends, refreshRequests } from './refreshFriends';
 
 export const socketManager = () => {
 	if (browser) {
@@ -24,7 +22,7 @@ export const socketManager = () => {
 					},
 				}
 			);
-			pendingRequests.set(data);
+			refreshRequests();
 		});
 
 		socket?.on('notFound', async (data) => {
@@ -40,8 +38,8 @@ export const socketManager = () => {
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
 			toast.success(friend.name + ' (' + friend.username + ') accepted your friend request!');
-			fetchedFriends = await UserManager.getFriends();
-			sortFriends(fetchedFriends);
+			refreshFriends();
+			refreshRequests();
 		});
 
 		socket?.on('nowPlaying', async (data) => {
@@ -52,23 +50,3 @@ export const socketManager = () => {
 		});
 	}
 };
-
-
-async function sortFriends(unsorted: any) {
-	let newFriends = unsorted.map((friend: { user_id: any; friend_id: any; }) => {
-		if (friend.user_id === get(SavedUser).id) {
-			return { user_id: get(SavedUser).id, friend_id: friend.friend_id };
-		} else {
-			return { user_id: get(SavedUser).id, friend_id: friend.user_id };
-		}
-	});
-	newFriends.forEach(async (friend: any) => {
-		const friendData = await UserManager.getUserbyId(friend.friend_id);
-		const newFriend: AddedFriend = {
-			id: friendData.id,
-			name: friendData.name,
-			username: friendData.username
-		}
-		friends.set([...get(friends), newFriend]);
-	});
-}

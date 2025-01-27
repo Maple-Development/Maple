@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { isLoggedIn } from '$lib/store';
+	import { isLoggedIn, title } from '$lib/store';
 	import { goto } from '$app/navigation';
 
 	let username = '';
@@ -14,6 +14,8 @@
 		username = '';
 		password = '';
 		goto('/account/login');
+
+		title.set('Create Account');
 	}
 </script>
 

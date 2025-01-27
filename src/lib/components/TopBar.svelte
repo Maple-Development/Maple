@@ -25,6 +25,7 @@
 	import { page } from '$app/stores';
 	import TrackWrapper from './TrackWrapper.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as Tooltip from "$lib/components/ui/tooltip";
 
 	let songs: Song[] = [];
 	let albums: Album[] = [];
@@ -44,12 +45,17 @@
 
 <div class="relative flex items-center justify-between">
 	<div class="flex items-center">
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => ($collapsed = !$collapsed)}
-		>
-			<PanelRightOpen size={20} color="white" />
-		</Button>
+		<Tooltip.Root>
+			<Button
+				class="my-1 w-fit ml-1 bg-transparent px-4 hover:bg-secondary"
+				href="/"
+			>
+				<Home size={22} class="text-foreground" />
+				{#if $collapsed}
+					<h1 class="hidden px-1 text-foreground md:block">Home</h1>
+				{/if}
+			</Button>
+		  </Tooltip.Root>
 		<h1 class="ml-2 text-xl font-bold text-muted-foreground">{$title}</h1>
 	</div>
 	<div class="absolute left-1/2 -translate-x-1/2 transform">

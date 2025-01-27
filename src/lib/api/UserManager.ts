@@ -1,8 +1,9 @@
-import { get, writable } from 'svelte/store';
+import { get } from 'svelte/store';
 import { UserInfo, SavedUser } from '$lib/store';
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
 import { Peer } from 'peerjs';
+import { refreshRequests, refreshFriends } from '$lib/refreshFriends';
 
 export class UserManager {
 	private static DevServer = 'http://localhost:3000';
@@ -249,6 +250,8 @@ export class UserManager {
 			const data = await response.json();
 			if (response.ok) {
 				toast.success('Request declined successfully!');
+				refreshRequests();
+				refreshFriends();
 				return data;
 			}
 		} catch (error) {
@@ -322,6 +325,7 @@ export class UserManager {
 			const data = await response.json();
 			if (response.ok) {
 				toast.success('Friend removed successfully!');
+				refreshFriends();
 				return data;
 			}
 		} catch (error) {

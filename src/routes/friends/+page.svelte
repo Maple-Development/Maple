@@ -23,7 +23,7 @@
 	onMount(async () => {
 		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
 		playlists = await OPFS.get().playlists();
-		title.set('Tracks');
+		title.set('Friends');
 	});
 
 	async function addFriend() {

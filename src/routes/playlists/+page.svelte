@@ -61,6 +61,10 @@
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
 		const blob = new Blob([arrayBuffer]);
+		const respons2e = await fetch(URL.createObjectURL(blob));
+		if (respons2e.headers.get('Content-Length') === '0') {
+			return '';
+		}
 		return URL.createObjectURL(blob);
 	}
 
@@ -166,15 +170,23 @@
 		{#each playlists as playlist}
 			<div class="flex flex-col items-start">
 				{#await getImageUrl(playlist.image) then image}
+				{#if image}
 					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
 						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
 							<img
-								src={image}
+							src={image}
 								class="h-44 w-44 rounded-sm object-cover md:h-52 md:w-52"
 								alt={playlist.name}
 							/>
 						</a>
 					</ContextMenu>
+				{:else if image === ''}
+					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
+							<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
+						</a>
+					</ContextMenu>
+				{/if}
 				{:catch error}
 					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
 						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>

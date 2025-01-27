@@ -5,7 +5,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { SavedUser } from '$lib/store';
+	import { SavedUser, title } from '$lib/store';
 
 	let userData: User = {
 		username: '',
@@ -22,6 +22,8 @@
 
 	onMount(() => {
 		getUserData();
+
+		title.set('View Account');
 	});
 
 	function handleFileChange(event: Event) {

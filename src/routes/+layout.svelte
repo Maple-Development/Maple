@@ -1,10 +1,10 @@
 <script lang="ts">
-	// @ts-nocheck
+	//@ts-nocheck
 	import '../app.pcss';
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { collapsed, loadPreferencesStore, UserInfo, pendingRequests, friends, SavedUser } from '$lib/store';
+	import { collapsed, loadPreferencesStore, UserInfo } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { title, isSmallDevice, socket, isLoggedIn } from '$lib/store';
@@ -15,15 +15,13 @@
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
 	import { io } from 'socket.io-client';
 	import { browser } from '$app/environment';
-	import { socketManager } from '../lib/socketManager.ts';
+	import { socketManager } from '../lib/socketManager';
 	import UserSettings from '$lib/preferences/usersettings';
-	import type { AddedFriend } from '$lib/types/addedfriends';
+	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 
 	async function getUserData() {
 		await UserManager.getUser();
 	}
-
-	let fetchedFriends: [] = [];
 
 	onMount(async () => {
 		loadPreferencesStore.load();
@@ -45,32 +43,12 @@
 						console.log('Connected to server');
 					});
 					socketManager();
+					refreshFriends();
+					refreshRequests();
 				}
 			}
 		}
-		pendingRequests.set(await UserManager.getRequests());
-		fetchedFriends = await UserManager.getFriends();
-		sortFriends(fetchedFriends);
 	});
-
-	async function sortFriends(unsorted: any) {
-		let newFriends = unsorted.map((friend: { user_id: any; friend_id: any; }) => {
-			if (friend.user_id === $SavedUser.id) {
-				return { user_id: $SavedUser.id, friend_id: friend.friend_id };
-			} else {
-				return { user_id: $SavedUser.id, friend_id: friend.user_id };
-			}
-		});
-		newFriends.forEach(async (friend: any) => {
-			const friendData = await UserManager.getUserbyId(friend.friend_id);
-			const newFriend: AddedFriend = {
-				id: friendData.id,
-				name: friendData.name,
-				username: friendData.username
-			}
-			friends.set([...$friends, newFriend]);
-		});
-	}
 
 	let bottomDiv: HTMLDivElement;
 

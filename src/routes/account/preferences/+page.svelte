@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { onMount } from 'svelte';
-	import { isLoggedIn } from '$lib/store';
+	import { isLoggedIn, title } from '$lib/store';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import UserSettings from '$lib/preferences/usersettings';
 	import { Settings } from '$lib/preferences/fetch';
@@ -16,9 +16,15 @@
 	onMount(async () => {
 		webhookUrl = UserSettings.webhook.url;
 		doWebhooks = UserSettings.webhook.enabled;
+
+		title.set('Preferences');
 	});
 
 	function updateSettings() {
+		if (webhookUrl == '') {
+			toast.error('Please enter a valid webhook URL');
+			return;
+		}
 		webhookSettings.set('enabled', doWebhooks);
 		if (webhookUrl != '') {
 			webhookSettings.set('url', webhookUrl);
@@ -52,7 +58,7 @@
 			<Input
 				bind:value={webhookUrl}
 				class="text-muted"
-				placeholder="Ex: https://discord.com/api/webhooks/13292141241482912/HCAg7pewfwfewF_wefcQxOGN6ZAMDewfwfwfbIAawefhLz"
+				placeholder="Ex: https://discord.com/api/webhooks/13292141241482912/HCAg7pewqefweffwfewF_wefcQxOGN6ZAMDewfwfwfbIAawefhLz"
 			/>
 		</div>
 		<p class="text-xs text-muted">

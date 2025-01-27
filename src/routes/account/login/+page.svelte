@@ -2,7 +2,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { UserManager } from '$lib/api/UserManager';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { isLoggedIn } from '$lib/store';
+	import { isLoggedIn, title } from '$lib/store';
+	import { goto } from '$app/navigation';
 
 	let username = '';
 	let password = '';
@@ -12,7 +13,9 @@
 		log = JSON.stringify(await UserManager.login(username, password));
 		username = '';
 		password = '';
-		history.back();
+		goto('/');
+		window.location.reload();
+		title.set('Login');
 	}
 </script>
 
