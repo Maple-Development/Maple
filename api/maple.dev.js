@@ -1,21 +1,20 @@
 // ONLY USE IN DEV ENVIRONMENT!
 
-import express from 'express';
-
-import cors from 'cors';
-import login from './auth/login.js';
-import getPath from './get/get.js';
-import manageUser from './user/manageUser.js';
-import publicGet from './publicGet/get.js';
-import friends from './user/friends.js';
-import ioTools from './iomanager/io.js';
+const express = require('express');
+const cors = require('cors');
+const login = require('./auth/login.js');
+const getPath = require('./get/get.js');
+const manageUser = require('./user/manageUser.js');
+const publicGet = require('./publicGet/get.js');
+const friends = require('./user/friends.js');
+const ioTools = require('./iomanager/io.js');
 const app = express();
 
-import http from 'http';
-import jwt from 'jsonwebtoken';
+const http = require('http');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-import { ExpressPeerServer } from 'peer';
+var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 var options = {
 	debug: true
@@ -28,9 +27,7 @@ const corsOptions = {
 
 const server = http.createServer(app);
 
-import ioFactory from 'socket.io';
-
-const io = ioFactory(server, {
+const io = require('socket.io')(server, {
 	cors: {
 		origin: 'http://localhost:5173',
 		credentials: true

@@ -1,21 +1,21 @@
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import cors from 'cors';
-import login from './auth/login.js';
-import getPath from './get/get.js';
-import mysql from 'mysql2';
-import manageUser from './user/manageUser.js';
-import publicGet from './publicGet/get.js';
-import ioTools from './iomanager/io.js';
-import socket from './socket';
+const express = require('express');
+const rateLimit = require("express-rate-limit");
+const cors = require('cors');
+const login = require('./auth/login');
+const getPath = require('./get/get.js');
+const mysql = require('mysql2');
+const manageUser = require('./user/manageUser.js');
+const publicGet = require('./publicGet/get.js');
+const ioTools = require('./iomanager/io.js');
+const socket = require('./socket');
 const app = express();
 
-import fs from 'fs';
-import https from 'https';
-import jwt from 'jsonwebtoken';
+const fs = require('fs');
+const https = require('https');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-import { ExpressPeerServer } from 'peer';
+var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 var options = {
 	debug: true
@@ -60,7 +60,7 @@ const ioOptions = {
 
 const io = socket.init(server, ioOptions);
 
-import friends from './user/friends.js';
+const friends = require('./user/friends.js');
 
 app.use(limiter);
 app.use(cors(corsOptions));

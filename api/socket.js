@@ -1,11 +1,10 @@
 let io;
 
-const exported = {
+module.exports = {
   init: (server, options) => {
     io = require('socket.io')(server, options);
     return io;
   },
-
   getIO: () => {
     if (!io) {
       throw new Error("Socket.io has not been initialized!");
@@ -13,10 +12,3 @@ const exported = {
     return io;
   }
 };
-
-export default exported;
-
-export const {
-  init,
-  getIO
-} = exported;
