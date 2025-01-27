@@ -21,10 +21,10 @@ var options = {
 	debug: true
 };
 
-const limiter = rateLimit({
+/* const limiter = rateLimit({
 	windowMs: 2 * 60 * 1000,
 	max: 20,
-});
+}); */
 
 const connection = mysql.createConnection({
 	host: 'localhost',
@@ -69,7 +69,8 @@ const io = socket.init(server, ioOptions);
 
 const friends = require('./user/friends.js');
 
-app.use(limiter);
+/* app.use(limiter);
+ */
 app.use(cors(corsOptions));
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
