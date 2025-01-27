@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { UserInfo, SavedUser } from '$lib/store';
+import { UserInfo, SavedUser, friendNowPlaying } from '$lib/store';
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
 import { Peer } from 'peerjs';
@@ -206,6 +206,9 @@ export class UserManager {
 			});
 			const data = await response.json();
 			if (response.ok) {
+				if (data.nowPlaying) {
+					friendNowPlaying.set(data.nowPlaying);
+				}
 				return data;
 			} else {
 				toast.error('Error fetching user: "' + data.error + '"');

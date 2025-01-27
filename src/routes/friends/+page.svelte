@@ -13,8 +13,6 @@
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
 	import type { Playlist } from '$lib/types/playlist';
-	import type { PendingRequest } from '$lib/types/preq';
-	import type { AddedFriend } from '$lib/types/addedfriends';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];

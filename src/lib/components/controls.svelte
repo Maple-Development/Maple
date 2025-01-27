@@ -43,9 +43,7 @@
 			album: song.album
 		};
 
-		const friendId = (await UserManager.getUserName('nail')).id;
-
-		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying, friendId: friendId });
+		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
 
 		const image = await getImage(song.image);
 		const formData = new FormData();

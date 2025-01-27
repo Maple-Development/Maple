@@ -1,4 +1,12 @@
 /* eslint-disable no-unused-vars */
+const mysql = require('mysql2');
+
+const connection = mysql.createConnection({
+	host: 'localhost',
+	user: 'root',
+	password: 'admin',
+	database: 'maple_auth'
+});
 
 module.exports = {
 	addFriend: function (user, friend, socket, io) {
@@ -24,9 +32,18 @@ module.exports = {
 		}
 	},
 
-	nowPlaying: function (user, socket, io, nowPlaying) {
+	nowPlaying: function (user, friends, io, nowPlaying) {
 		try {
-			io.to(socket.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
+			friends.forEach((friend) => {
+				const client = this.getSocket(io, friend.friend_id)
+				if (client) {
+					connection.promise().query(
+						'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ON DUPLICATE KEY UPDATE playing = ?',
+						[user.id, nowPlaying, nowPlaying]
+					);
+					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
+				}
+			})
 		} catch (error) {
 			console.error(error);
 		}

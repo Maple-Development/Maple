@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const login = require('./auth/login');
 const getPath = require('./get/get.js');
+const mysql = require('mysql2');
 const manageUser = require('./user/manageUser.js');
 const publicGet = require('./publicGet/get.js');
 const ioTools = require('./iomanager/io.js');
@@ -18,6 +19,14 @@ var ExpressPeerServer = require('peer').ExpressPeerServer;
 var options = {
 	debug: true
 };
+
+const connection = mysql.createConnection({
+	host: 'localhost',
+	user: 'root',
+	password: 'admin',
+	database: 'maple_auth'
+});
+
 
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
@@ -85,11 +94,22 @@ io.on('connection', (client) => {
 	console.log('User connected: ' + client.user.id);
 
 	client.on('nowPlaying', async (data) => {
-		const userId = client.user.id;
-		const friendId = data.friendId;
-		const friendSocket = await ioTools.getSocket(io, friendId);
-		if (friendSocket) {
-			ioTools.nowPlaying(userId, friendSocket, io, data.nowPlaying);
+		const id = client.user.id;
+		
+		const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
+
+		const allFriends = connection.query(sql, [id, id], (error, results) => {
+			if (error) {
+				console.error(error);
+				return null;
+			}
+			return results;
+		});
+
+		const sorted = sortFriends(allFriends, id);
+
+		if (allFriends !== null) {
+			ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
 		}
 	});
 	client.on('disconnect', () => {
@@ -104,5 +124,16 @@ io.on('disconnect', (reason) => {
 io.on('connect_error', (error) => {
 	console.log(`Connection error: ${error}`);
 });
+
+function sortFriends(unsorted, id) {
+	let newFriends = unsorted.map((friend) => {
+		if (friend.user_id === id) {
+			return { user_id: id, friend_id: friend.friend_id };
+		} else {
+			return { user_id: id, friend_id: friend.user_id };
+		}
+	});
+	return newFriends;
+}
 
 server.listen(443);

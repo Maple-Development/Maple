@@ -28,7 +28,7 @@ async function sortFriends(unsorted: any) {
 			id: friendData.id,
 			name: friendData.name,
 			username: friendData.username
-		}
+        }
 		friends.set([...get(friends), newFriend]);
 	});
 }
