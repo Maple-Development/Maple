@@ -24,7 +24,7 @@
 
 	onMount(async () => {
 		loadPreferencesStore.load();
-		if ($UserInfo.id !== null) {
+		if ($UserInfo !== null) {
 			await getUserData();
 		}
 		const authStatus = await UserManager.isLoggedIn();

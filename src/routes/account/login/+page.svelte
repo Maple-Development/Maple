@@ -4,17 +4,19 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { isLoggedIn, title } from '$lib/store';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+
 
 	let username = '';
 	let password = '';
 
-	async function login() {
-		username = '';
-		password = '';
-		goto('/');
-		await UserManager.login(username, password);
-		window.location.reload();
+	onMount(() => {
 		title.set('Login');
+	});
+
+	async function login() {
+		await UserManager.login(username, password);
+		goto('/');
 	}
 </script>
 

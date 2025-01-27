@@ -14,7 +14,7 @@ export const friendNowPlaying = writable({} as any);
 export const socket = writable(null as Socket | null);
 export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
-export const UserInfo = writable({} as any);
+export const UserInfo = writable(null as any);
 UserInfo.subscribe((value) => {
 	if (browser) {
 		if (!value) return;
