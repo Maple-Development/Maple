@@ -10,6 +10,8 @@
     <a href="https://maple.kolf.pro/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
 </p>
 
+> Need Help? Join our [Development Server](https://discord.gg/Wxrp73HVj4)
+
 <p align="center">
     Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
 </p>
@@ -47,6 +49,8 @@ What data is saved on the server?
 If you have any other questions, feel free to DM `cattn.` on discord, or email me @ `Logan@cattn.dev`
 
 ## API Documentation
+
+> API Link: https://maple.kolf.pro:3000
 
 ### ``GET`` - ``/public/get/user/:username``
 Returns a user based on the given username.
@@ -102,16 +106,12 @@ Request Example:
 const response = await fetch(`${this.SERVER}/public/get/pfp/${id}`, {
     method: 'GET'
 });
-const data = await response.json();
+const data = await response;
 ```
 
 Response:
 ```
-{
-    id: id,
-    username: username,
-    name?: name,
-}
+File Object
 ```
 
 ### ``POST`` - ``/user/friends/add/:id``
