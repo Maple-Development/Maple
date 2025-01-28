@@ -106,16 +106,12 @@ Request Example:
 const response = await fetch(`${this.SERVER}/public/get/pfp/${id}`, {
     method: 'GET'
 });
-const data = await response.json();
+const data = await response;
 ```
 
 Response:
 ```
-{
-    id: id,
-    username: username,
-    name?: name,
-}
+File Object
 ```
 
 ### ``POST`` - ``/user/friends/add/:id``
