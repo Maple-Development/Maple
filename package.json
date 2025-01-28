@@ -50,6 +50,7 @@
 		"cmdk-sv": "^0.0.17",
 		"colorthief": "^2.6.0",
 		"comlink": "^4.4.1",
+		"express": "^4.21.2",
 		"extract-colors": "^4.1.1",
 		"idb": "^8.0.0",
 		"idb-keyval": "^6.2.1",
