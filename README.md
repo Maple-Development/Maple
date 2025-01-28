@@ -50,6 +50,8 @@ If you have any other questions, feel free to DM `cattn.` on discord, or email m
 
 ## API Documentation
 
+> API Link: https://maple.kolf.pro:3000
+
 ### ``GET`` - ``/public/get/user/:username``
 Returns a user based on the given username.
 
