@@ -65,6 +65,11 @@ const friends = require('./user/friends.js');
 /* app.use(limiter);
  */
 app.use(cors(corsOptions));
+
+app.get('/', (req, res) => {
+  res.status(200).send('Hello! I is alive!');
+});
+
 app.use('/peerjs', ExpressPeerServer(server, options));
 app.use('/login', login);
 app.use('/get', getPath);
