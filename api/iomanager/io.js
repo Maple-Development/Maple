@@ -1,12 +1,5 @@
 /* eslint-disable no-unused-vars */
-const mysql = require('mysql2');
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
+const pool = require('../db');
 
 module.exports = {
 	addFriend: function (user, friend, socket, io) {
@@ -34,7 +27,7 @@ module.exports = {
 
 	nowPlaying: function (user, friends, io, nowPlaying) {
 		try {
-			connection.promise().query(
+			pool.promise().query(
 				'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ' +
 				'ON DUPLICATE KEY UPDATE playing = VALUES(playing)',
 				[user, JSON.stringify(nowPlaying)]

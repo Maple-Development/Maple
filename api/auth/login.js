@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
 	cookieParser = require('cookie-parser');
-const mysql = require('mysql2');
+const pool = require('../db');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
@@ -9,13 +9,6 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 var validator = require('validator');
 dotenv.config();
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
 
 router.use(express.json());
 router.use(cookieParser());
@@ -47,7 +40,7 @@ router.post('/create', (req, res) => {
 			.json({ error: 'Password is not strong enough', passwordStrength: isStrongPassword });
 	}
 
-	connection.query('SELECT username FROM users WHERE username= ?', [username], function (err, row) {
+	pool.query('SELECT username FROM users WHERE username= ?', [username], function (err, row) {
 		if (err) {
 			console.error(err);
 			return res.status(500).json({ error: 'Error checking username' });
@@ -64,7 +57,7 @@ router.post('/create', (req, res) => {
 
 			const id = uuidv4();
 			const sql = 'INSERT INTO users (id, username, password) VALUES (?, ?, ?)';
-			connection.query(sql, [id, username, hash], (error, results) => {
+			pool.query(sql, [id, username, hash], (error, results) => {
 				if (error) {
 					console.error(error);
 					return res.status(500).json({ error: 'Error creating user' });
@@ -80,7 +73,7 @@ router.post('/', (req, res) => {
 	const { username, password } = req.body;
 
 	const sql = 'SELECT * FROM users WHERE username = ?';
-	connection.query(sql, [username], (error, results) => {
+	pool.query(sql, [username], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error fetching user' });

@@ -1,18 +1,11 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
 	cookieParser = require('cookie-parser');
-const mysql = require('mysql2');
+const pool = require('../db');
 const authenticateToken = require('../middleware/authToken');
 const verifyUser = require('../middleware/verifyUser');
 
 const router = express.Router();
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
 
 router.use(express.json());
 router.use(cookieParser());
@@ -23,7 +16,7 @@ router.get('/user/:id', (req, res) => {
 	const id = req.user.id;
 	const sql = 'SELECT username, id, name, pfp FROM users WHERE id = ?';
 
-	connection.query(sql, [id], (error, results) => {
+	pool.query(sql, [id], (error, results) => {
 		if (error) {
 			console.error('Error fetching user:', error);
 			return res.status(500).json({ error: 'Error fetching user' });

@@ -3,7 +3,6 @@ const rateLimit = require("express-rate-limit");
 const cors = require('cors');
 const login = require('./auth/login');
 const getPath = require('./get/get.js');
-const mysql = require('mysql2');
 const manageUser = require('./user/manageUser.js');
 const publicGet = require('./publicGet/get.js');
 const ioTools = require('./iomanager/io.js');
@@ -26,14 +25,6 @@ var options = {
 	max: 20,
 }); */
 
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
-
-
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
@@ -47,7 +38,7 @@ const credentials = {
 const corsOptions = {
 	origin: true,
 	credentials: true
-  };
+};
 
 const server = https.createServer(credentials, app);
 
@@ -112,14 +103,15 @@ io.on('connection', (client) => {
         const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
         try {
-            const [allFriends] = await connection.promise().query(sql, [id, id]);
+            const pool = require('./db');
+            const [allFriends] = await pool.promise().query(sql, [id, id]);
             const sorted = sortFriends(allFriends, id);
 
             if (allFriends !== null && allFriends.length > 0) {
                 ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
             }
         } catch (error) {
-            console.error(error);
+            console.error('Error in nowPlaying:', error);
         }
     });
 

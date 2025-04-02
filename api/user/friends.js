@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
 cookieParser = require('cookie-parser');
-const mysql = require('mysql2');
+const pool = require('../db');
 const authenticateToken = require('../middleware/authToken');
 const verifyUser = require('../middleware/verifyUser');
 const socket = require('../socket');
@@ -10,13 +10,6 @@ const ioTools = require('../iomanager/io.js');
 const router = express.Router();
 
 const io = socket.getIO();
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
 
 router.use(express.json());
 router.use(cookieParser());
@@ -32,7 +25,7 @@ router.post('/add/:id', async (req, res) => {
   }
 
   try {
-	const [alreadyFriends] = await connection.promise().query(
+	const [alreadyFriends] = await pool.promise().query(
 		'SELECT * FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
 		[id, friendId, friendId, id]
 	  );
@@ -45,7 +38,7 @@ router.post('/add/:id', async (req, res) => {
 		return res.status(409).json({ error: 'You are already friends.' });
 	}
 
-	const [existingRequests] = await connection.promise().query(
+	const [existingRequests] = await pool.promise().query(
 	  'SELECT * FROM pending_requests WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
 	  [id, friendId, friendId, id]
 	);
@@ -58,7 +51,7 @@ router.post('/add/:id', async (req, res) => {
 	  return res.status(409).json({ error: 'Friend request already sent/pending.' });
 	}
 
-	await connection.promise().query(
+	await pool.promise().query(
 	  'INSERT INTO pending_requests (user_id, friend_id) VALUES (?, ?)',
 	  [id, friendId]
 	);
@@ -83,7 +76,7 @@ router.post('/accept/:id', async (req, res) => {
   }
 
   try {
-	const [alreadyFriends] = await connection.promise().query(
+	const [alreadyFriends] = await pool.promise().query(
 	  'SELECT * FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)',
 	  [id, friendId, friendId, id]
 	);
@@ -96,7 +89,7 @@ router.post('/accept/:id', async (req, res) => {
 	  return res.status(409).json({ error: 'You are already friends.' });
 	}
 
-	const [pendingResults] = await connection.promise().query(
+	const [pendingResults] = await pool.promise().query(
 	  'SELECT * FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
 	  [friendId, id]
 	);
@@ -109,12 +102,12 @@ router.post('/accept/:id', async (req, res) => {
 	  return res.status(404).json({ error: 'Friend request not found' });
 	}
 
-	await connection.promise().query(
+	await pool.promise().query(
 	  'DELETE FROM pending_requests WHERE user_id = ? AND friend_id = ?', 
 	  [friendId, id]
 	);
 
-	await connection.promise().query(
+	await pool.promise().query(
 	  'INSERT INTO friends_db (user_id, friend_id) VALUES (?, ?)', 
 	  [id, friendId]
 	);
@@ -148,7 +141,7 @@ router.post('/decline/:id', (req, res) => {
 
 	const sql = 'DELETE FROM pending_requests WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)';
 
-	connection.query(sql, [id, friendId, friendId, id], (error, results) => {
+	pool.query(sql, [id, friendId, friendId, id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error declining friend request' });
@@ -167,7 +160,7 @@ router.post('/remove/:id', (req, res) => {
 
 	const sql = 'DELETE FROM friends_db WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)';
 
-	connection.query(sql, [id, friendId, friendId, id], (error, results) => {
+	pool.query(sql, [id, friendId, friendId, id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error removing friend' });
@@ -181,7 +174,7 @@ router.get('/get/requests/:id', (req, res) => {
 
 	const sql = 'SELECT * FROM pending_requests WHERE friend_id = ?';
 
-	connection.query(sql, [id], (error, results) => {
+	pool.query(sql, [id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error fetching friend requests' });
@@ -195,7 +188,7 @@ router.get('/get/friends/:id', (req, res) => {
 
 	const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
-	connection.query(sql, [id, id], (error, results) => {
+	pool.query(sql, [id, id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error fetching friends' });
@@ -203,7 +196,5 @@ router.get('/get/friends/:id', (req, res) => {
 		return res.status(200).json(results);
 	});
 });
-
-
 
 module.exports = router;
