@@ -4,7 +4,7 @@ const pool = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
 	password: 'admin',
-	database: 'maple',
+	database: 'maple_auth',
 	connectionLimit: 10,
 	waitForConnections: true,
 	queueLimit: 0
