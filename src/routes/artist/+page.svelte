@@ -174,7 +174,7 @@
 	}
 </script>
 
-<div class="container mx-10 px-4 py-8">
+<div class="container mx-auto px-4 py-8">
 	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
 		<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
 			<div class="relative">
@@ -182,7 +182,7 @@
 					{#if editModeOn}
 						<div class="group relative">
 							<img
-								class="h-44 w-44 rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:opacity-75 md:h-64 md:w-64"
+								class="h-44 w-44 rounded-[50%] object-cover shadow-lg transition-all duration-300 group-hover:opacity-75 md:h-64 md:w-64"
 								src={image}
 								alt={artist?.name?.toString() ?? ''}
 							/>

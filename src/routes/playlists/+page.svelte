@@ -2,7 +2,7 @@
 	import { OPFS } from '$lib/opfs';
 	import { page } from '$app/stores';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Pencil, Check, Plus } from 'lucide-svelte';
+	import { Pencil, Check, Plus, Search } from 'lucide-svelte';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import type { Playlist } from '$lib/types/playlist';
 	import type { Song } from '$lib/types/song';
@@ -35,6 +35,8 @@
 	let songs: Song[] = [];
 	let addedSongs: String[] = [];
 	let curSongs: Song[] = [];
+	let searchQuery = '';
+	let filteredSongs: Song[] = [];
 	$: params = new URLSearchParams($page.url.search);
 	$: {
 		doCreate = params.get('create') === 'true';
@@ -42,6 +44,7 @@
 
 	onMount(async () => {
 		songs = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+		filteredSongs = songs;
 		changedName = newPlaylist.name;
 		changedDescription = newPlaylist.description;
 		playlists = await OPFS.get().playlists();
@@ -149,220 +152,280 @@
 		selectedPlaylist = playlist;
 		isOpenAlert = true;
 	}
+
+	function filterSongs() {
+		filteredSongs = songs.filter(song =>
+			song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			song.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			song.album.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+	}
 </script>
 
 {#if !doCreate}
-	<div
-		class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
-	>
-		<a class="pointer" href={`/playlists?create=true`}>
-			<div
-				class="flex h-44 w-44 animate-pulse items-center justify-center rounded-sm bg-gray-500 md:h-52 md:w-52"
-			>
-				<Plus size={40} color="white" />
-			</div>
-			<div class="flex flex-row items-start">
-				<div class="mt-4 flex h-full flex-col items-start">
-					<h1 class="mb-1 text-lg font-bold leading-none text-foreground">Create Playlist</h1>
-				</div>
-			</div>
-		</a>
-		{#each playlists as playlist}
-			<div class="flex flex-col items-start">
-				{#await getImageUrl(playlist.image) then image}
-				{#if image}
-					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
-						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-							<img
-							src={image}
-								class="h-44 w-44 rounded-sm object-cover md:h-52 md:w-52"
-								alt={playlist.name}
-							/>
-						</a>
-					</ContextMenu>
-				{:else if image === ''}
-					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
-						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-							<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-						</a>
-					</ContextMenu>
-				{/if}
-				{:catch error}
-					<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
-						<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
-							<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-						</a>
-					</ContextMenu>
-				{/await}
-				<div class="flex flex-row items-start">
-					<div class="mt-4 flex h-full flex-col items-start">
-						<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{playlist.name}</h1>
+	<div class="container mx-0 px-4 py-8">
+		<div class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12">
+			<a class="pointer" href={`/playlists?create=true`}>
+				<div class="group relative flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
+					<div class="flex h-44 w-44 animate-pulse items-center justify-center rounded-lg bg-muted md:h-52 md:w-52">
+						<Plus size={40} color="white" />
+					</div>
+					<div class="mt-3 flex w-full flex-col items-start space-y-1">
+						<h1 class="line-clamp-1 w-full text-base font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-lg">Create Playlist</h1>
 					</div>
 				</div>
-			</div>
-		{/each}
+			</a>
+			{#each playlists as playlist}
+				<div class="group relative mr-2 flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
+					{#await getImageUrl(playlist.image) then image}
+						{#if image}
+							<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+								<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
+									<img
+										class="h-44 w-44 rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:shadow-xl md:h-52 md:w-52"
+										src={image}
+										alt={playlist.name}
+									/>
+								</a>
+							</ContextMenu>
+						{:else}
+							<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+								<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
+									<div class="h-44 w-44 animate-pulse rounded-lg bg-muted md:h-52 md:w-52"></div>
+								</a>
+							</ContextMenu>
+						{/if}
+						{:catch error}
+							<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+								<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
+									<div class="h-44 w-44 animate-pulse rounded-lg bg-muted md:h-52 md:w-52"></div>
+								</a>
+							</ContextMenu>
+						{/await}
+						<div class="mt-3 flex w-full flex-col items-start space-y-1">
+							<h1 class="line-clamp-1 w-full text-base font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-lg">
+								{playlist.name}
+							</h1>
+						</div>
+				</div>
+			{/each}
+		</div>
 	</div>
 {:else}
-	<div class="mt-4 flex h-fit justify-between rounded-md border-gray-600 p-5 px-10">
-		<div class="flex">
-			<div>
-				{#if editModeOn}
-					<input
-						type="file"
-						id="files"
-						class="block w-full rounded-md border-2 border-gray-300 px-2 py-1 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200"
-						accept="image/*"
-						multiple
-						on:change={(e) => handlePhotoChange(e)}
-					/>
-				{/if}
-			</div>
-			<div class="ml-7 flex flex-col items-start">
-				<div class="flex flex-col items-start">
+	<div class="container mx-auto px-4 py-8">
+		<div class="mb-8 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+			<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
+				<div class="relative">
 					{#if editModeOn}
-						<h1
-							bind:innerHTML={changedName}
-							contenteditable="true"
-							class="border-1 mb-1 rounded-sm border p-1 text-2xl font-bold leading-none text-foreground underline"
-						>
-							{newPlaylist?.name}
-						</h1>
-						<h1
-							bind:innerHTML={changedDescription}
-							contenteditable="true"
-							class="border-1 rounded-sm border p-1 text-lg font-light leading-none text-slate-400 underline"
-						>
-							{newPlaylist?.description}
-						</h1>
-					{:else}
-						<h1 class="mb-1 text-2xl font-bold leading-none text-foreground">
-							{newPlaylist?.name}
-						</h1>
-						<h1 class="p text-lg font-light leading-none text-slate-400">
-							{newPlaylist?.description}
-						</h1>
+						<div class="group relative">
+							<div class="h-44 w-44 rounded-lg bg-muted md:h-64 md:w-64">
+								<div class="flex h-full items-center justify-center">
+									<Plus size={40} color="white" />
+								</div>
+							</div>
+							<div class="absolute inset-0 flex items-center justify-center rounded-lg bg-background/50 opacity-0 transition-opacity group-hover:opacity-100">
+								<label
+									for="playlist-image"
+									class="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+								>
+									Add Image
+								</label>
+								<input
+									id="playlist-image"
+									type="file"
+									class="hidden"
+									accept="image/*"
+									on:change={(e) => handlePhotoChange(e)}
+								/>
+							</div>
+						</div>
 					{/if}
 				</div>
-			</div>
-		</div>
-		<div>
-			<Button
-				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-				on:click={() => editMode()}
-			>
-				{#if editModeOn}
-					<Check size={20} color="white" />
-				{:else}
-					<Pencil size={20} color="white" />
-				{/if}
-			</Button>
-		</div>
-	</div>
-	<Separator class="mb-4 ml-14 mt-1 w-[95%] pr-20"></Separator>
 
-	<div class="mx-4 mb-5 mt-2 flex flex-col">
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<!-- svelte-ignore a11y-missing-attribute -->
-		<a
-			on:click={() => (open = true)}
-			class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
-		>
-			<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-				<div class="mr-4 flex h-24 w-24 items-center justify-center bg-gray-500">
-					<div class="flex h-12 w-12 items-center justify-center rounded-full bg-white">
-						<Plus size={20} color="black" />
+				<div class="flex flex-1 flex-col space-y-4">
+					<div class="flex items-center justify-between">
+						<div class="flex-1">
+							{#if editModeOn}
+								<div class="space-y-2">
+									<label for="playlist-name" class="text-sm font-medium">Playlist Name</label>
+									<input
+										id="playlist-name"
+										bind:value={changedName}
+										class="w-full rounded-md border bg-background px-3 py-2 text-xl font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary md:text-2xl"
+										placeholder="Playlist name"
+									/>
+								</div>
+							{:else}
+								<h1 class="text-2xl font-bold text-foreground md:text-3xl">{newPlaylist?.name}</h1>
+							{/if}
+						</div>
+						<div class="flex items-center gap-2">
+							<Button
+								class="h-9 w-9 p-0"
+								variant="ghost"
+								on:click={() => editMode()}
+							>
+								{#if editModeOn}
+									<Check class="h-5 w-5" />
+								{:else}
+									<Pencil class="h-5 w-5" />
+								{/if}
+							</Button>
+						</div>
+					</div>
+
+					<div class="space-y-4">
+						{#if editModeOn}
+							<div class="space-y-2">
+								<label for="playlist-description" class="text-sm font-medium">Description</label>
+								<input
+									id="playlist-description"
+									bind:value={changedDescription}
+									class="w-full rounded-md border bg-background px-3 py-2 text-base shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+									placeholder="Playlist description"
+								/>
+							</div>
+						{:else}
+							<div class="mt-2 space-y-1">
+								<p class="text-base font-medium text-muted-foreground/80">{newPlaylist?.description}</p>
+							</div>
+						{/if}
 					</div>
 				</div>
-				<div class="flex flex-grow flex-col items-start">
-					<h1 class="mb-1 text-lg font-bold leading-none text-foreground">Add Track</h1>
-				</div>
 			</div>
-		</a>
-	</div>
+		</div>
 
-	<div class="mx-4 mb-5 mt-2 flex flex-col">
-		{#each curSongs as track}
-			<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-				{#await getImageUrl(track.image) then image}
-					<Lazy height={208} keep={true}>
-						<img class="mr-4 h-24 w-24" src={image} alt={track.title} />
-					</Lazy>
-				{:catch error}
-					<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-				{/await}
-				<div class="flex flex-grow flex-col items-start">
-					<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{track.title}</h1>
-					<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
+		<div class="mx-0 mb-5 mt-2 flex flex-col md:mx-4">
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<!-- svelte-ignore a11y-missing-attribute -->
+			<a
+				on:click={() => (open = true)}
+				class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
+			>
+				<div class="flex flex-row items-center">
+					<div class="mr-4 flex h-16 w-16 items-center justify-center bg-gray-500 md:h-24 md:w-24">
+						<div class="flex h-8 w-8 items-center justify-center rounded-full bg-white md:h-12 md:w-12">
+							<Plus size={16} color="black" class="md:size-5" />
+						</div>
+					</div>
+					<div class="flex flex-grow flex-col items-start">
+						<h1 class="text-lg font-bold leading-none text-foreground">Add Track</h1>
+					</div>
 				</div>
-				<div class="ml-4 flex flex-col items-end text-right">
-					<h1 class="text-base font-light leading-none text-slate-400">
-						{formatDuration(track.duration)}
-					</h1>
-					<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-				</div>
-			</div>
-		{/each}
-	</div>
+			</a>
+		</div>
 
-	<Drawer.Root bind:open>
-		<Drawer.Content>
-			<div class="mx-auto w-full max-w-lg">
-				<Drawer.Header>
-					<Drawer.Title>Select Tracks</Drawer.Title>
-					<Drawer.Description>You can select multiple tracks</Drawer.Description>
-				</Drawer.Header>
-				<section data-vaul-no-drag>
-					<ScrollArea class="h-72 w-full rounded-md border">
-						{#each songs as song}
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<!-- svelte-ignore a11y-missing-attribute -->
-							<a
-								on:click={() => toggleSongSelection(song)}
-								class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
-							>
-								<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-									<div class="mr-4 flex h-24 w-24 items-center justify-center bg-gray-500">
-										{#await getImageUrl(song.image) then image}
-											{#if isToggled(song)}
-												<Lazy height={208} keep={true}>
-													<img
-														class="mr-4 h-24 w-24 border-2 border-green-400"
-														src={image}
-														alt={song.title}
-													/>
-												</Lazy>
-											{:else}
-												<Lazy height={208} keep={true}>
-													<img class="mr-4 h-24 w-24" src={image} alt={song.title} />
-												</Lazy>
-											{/if}
-										{:catch error}
-											<div class="mr-4 h-24 w-24 bg-gray-500"></div>
-										{/await}
-									</div>
-									<div class="flex flex-grow flex-col items-start">
-										<h1 class="mb-1 text-lg font-bold leading-none text-foreground">
-											{song.title}
-										</h1>
-										<h1 class="text-md mb-1 font-light leading-none text-slate-400">
-											{song.artist}
-										</h1>
-									</div>
-								</div>
-							</a>
-						{/each}
-					</ScrollArea>
-				</section>
-				<Drawer.Footer>
-					<Button on:click={() => submitSongs()}>Submit</Button>
-					<Drawer.Close asChild let:builder>
-						<Button builders={[builder]} variant="outline">Cancel</Button>
-					</Drawer.Close>
-				</Drawer.Footer>
-			</div>
-		</Drawer.Content>
-	</Drawer.Root>
+		<div class="mx-0 mb-5 mt-2 flex flex-col md:mx-4">
+			{#each curSongs as track}
+				<div class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
+					{#await getImageUrl(track.image) then image}
+						<Lazy height={208} keep={true}>
+							<img class="mr-4 h-16 w-16 rounded-md object-cover md:h-24 md:w-24" src={image} alt={track.title} />
+						</Lazy>
+					{:catch error}
+						<div class="mr-4 h-16 w-16 bg-gray-500 md:h-24 md:w-24"></div>
+					{/await}
+					<div class="flex flex-grow flex-col items-start">
+						<h1 class="text-base font-bold leading-none text-foreground md:text-lg">{track.title}</h1>
+						<h1 class="text-sm font-light leading-none text-slate-400 md:text-base">{track.artist}</h1>
+					</div>
+					<div class="ml-4 flex flex-col items-end text-right">
+						<h1 class="text-sm font-light leading-none text-slate-400 md:text-base">
+							{formatDuration(track.duration)}
+						</h1>
+						<h1 class="text-sm font-light leading-none text-slate-400 md:text-base">{track.album}</h1>
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
 {/if}
+
+<Drawer.Root bind:open>
+	<Drawer.Content>
+		<div class="mx-auto w-full max-w-4xl">
+			<Drawer.Header>
+				<Drawer.Title>Add Tracks to Playlist</Drawer.Title>
+				<Drawer.Description>Search and select tracks to add to your playlist</Drawer.Description>
+			</Drawer.Header>
+			<section data-vaul-no-drag>
+				<div class="mb-4 px-4">
+					<div class="relative">
+						<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<input
+							type="text"
+							placeholder="Search tracks..."
+							class="w-full rounded-md border bg-background px-9 py-2 text-sm shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+							bind:value={searchQuery}
+							on:input={() => filterSongs()}
+						/>
+					</div>
+				</div>
+				<ScrollArea class="h-[60vh] w-full rounded-md border">
+					{#each filteredSongs as song}
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<a
+							on:click={() => toggleSongSelection(song)}
+							class="flex flex-row items-center rounded-sm px-4 py-3 hover:bg-secondary"
+						>
+							<div class="flex flex-row items-center">
+								<div class="mr-4 flex h-16 w-16 items-center justify-center bg-gray-500">
+									{#await getImageUrl(song.image) then image}
+										{#if isToggled(song)}
+											<Lazy height={208} keep={true}>
+												<img
+													class="h-16 w-16 border-2 border-green-400 object-cover"
+													src={image}
+													alt={song.title}
+												/>
+											</Lazy>
+										{:else}
+											<Lazy height={208} keep={true}>
+												<img class="h-16 w-16 object-cover" src={image} alt={song.title} />
+											</Lazy>
+										{/if}
+									{:catch error}
+										<div class="h-16 w-16 bg-gray-500"></div>
+									{/await}
+								</div>
+								<div class="flex flex-grow flex-col items-start">
+									<h1 class="text-lg font-bold leading-none text-foreground">
+										{song.title}
+									</h1>
+									<h1 class="text-md mt-1 font-light leading-none text-slate-400">
+										{song.artist}
+									</h1>
+									<h1 class="text-sm font-light leading-none text-slate-400">
+										{song.album}
+									</h1>
+								</div>
+								<div class="ml-4 flex items-center">
+									{#if isToggled(song)}
+										<Check class="h-5 w-5 text-green-500" />
+									{/if}
+								</div>
+							</div>
+						</a>
+					{/each}
+				</ScrollArea>
+			</section>
+			<Drawer.Footer>
+				<div class="flex w-full items-center justify-between">
+					<span class="text-sm text-muted-foreground">
+						{addedSongs.length} track{addedSongs.length === 1 ? '' : 's'} selected
+					</span>
+					<div class="flex gap-2">
+						<Drawer.Close asChild let:builder>
+							<Button builders={[builder]} variant="outline">Cancel</Button>
+						</Drawer.Close>
+						<Button on:click={() => submitSongs()}>Add Tracks</Button>
+					</div>
+				</div>
+			</Drawer.Footer>
+		</div>
+	</Drawer.Content>
+</Drawer.Root>
 
 <AlertDialog.Root bind:open={isOpenAlert}>
 	<AlertDialog.Trigger></AlertDialog.Trigger>
