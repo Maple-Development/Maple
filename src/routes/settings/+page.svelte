@@ -297,79 +297,129 @@
 	}
 </script>
 
-<div class="mt-16 flex flex-col items-center justify-center">
-	<h2>You currently have {length} tracks imported</h2>
-	<div class="border-1 mt-4 items-center justify-center rounded-sm border p-10 px-20">
-		{#if device == 'ew'}
-			<input
-				type="file"
-				id="files"
-				class="block w-full rounded-md border-2 border-gray-300 px-2 py-1 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200"
-				accept="audio/*"
-				multiple
-				on:change={(e) => createLibrary(e)}
-			/>
-		{:else}
+<div class="container mx-auto max-w-4xl px-4 py-8">
+	<div class="mb-8 text-center">
+		<h1 class="mb-2 text-2xl font-semibold">Settings</h1>
+		<p class="text-muted-foreground">Manage your library and application preferences</p>
+	</div>
+
+	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
+		<div class="mb-6 text-center">
+			<h2 class="mb-1 text-lg font-medium">Library Management</h2>
+			<p class="text-sm text-muted-foreground">You currently have {length} tracks imported</p>
+		</div>
+
+		<div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+			{#if device == 'ew'}
+				<div class="w-full max-w-md">
+					<input
+						type="file"
+						id="files"
+						class="block w-full rounded-md border bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+						accept="audio/*"
+						multiple
+						on:change={(e) => createLibrary(e)}
+					/>
+				</div>
+			{:else}
+				<Button
+					class="w-full sm:w-auto"
+					variant="secondary"
+					on:click={() => createLibrary()}
+				>
+					<Users class="mr-2 h-4 w-4" />
+					Import Music
+				</Button>
+			{/if}
 			<Button
-				class="px-4 py-6 md:px-10 md:py-16"
-				variant="secondary"
-				on:click={() => createLibrary()}>Import Music</Button
+				class="w-full sm:w-auto"
+				variant="destructive"
+				on:click={() => clearLibrary()}
 			>
-		{/if}
-		<Button
-			class="px-4 py-6 md:px-10 md:py-16"
-			variant="destructive"
-			on:click={() => clearLibrary()}>Clear Library</Button
-		>
-		<div class="mt-2 flex flex-col items-center justify-center">
-			<h2>Dev Options:</h2>
-			<div class="mb-2 mt-2">
-				<div class="mb-2 flex flex-row items-center">
-					<Switch class="mr-2" id="devMode" bind:checked={devMode} />
-					<Label for="devMode">Developer Mode</Label>
-				</div>
-				<div class="mb-2 flex flex-row items-center">
-					<Switch class="mr-2" id="logging" bind:checked={showLogging} />
-					<Label for="logging">Show Logging</Label>
-				</div>
-				<Separator />
-				<div class="mb-2 mt-2 flex flex-row items-center">
-					<Switch class="mr-2" id="p2p" bind:checked={p2p} />
-					<Label for="p2p">Enable P2P Transfer</Label>
-				</div>
-				<div class="mb-2 mt-2 flex flex-row items-center">
-					<Switch class="mr-2" id="p2p" bind:checked={socket} />
-					<Label for="p2p">Enable Socket.io Communication</Label>
-				</div>
-				<div class="flex flex-col items-center justify-center">
-					<Button
-						on:click={updatePrefs}
-						class="mx-2 mt-2 w-max px-8 py-6 text-white"
-						variant="secondary">Save Settings</Button
-					>
-				</div>
-			</div>
+				Clear Library
+			</Button>
 		</div>
 	</div>
-	<h1 class="text-center text-sm text-muted">
-		tip: you can upload as many different folders/files as you'd like.
-	</h1>
+
+	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
+		<h2 class="mb-4 text-center text-lg font-medium">Developer Options</h2>
+		<div class="space-y-4">
+			<div class="flex items-center justify-between rounded-lg bg-background p-2">
+				<div class="space-y-0.5">
+					<Label for="devMode" class="text-base">Developer Mode</Label>
+					<p class="text-sm text-muted-foreground">Enable developer tools and features</p>
+				</div>
+				<Switch id="devMode" bind:checked={devMode} />
+			</div>
+
+			<div class="flex items-center justify-between rounded-lg bg-background p-2">
+				<div class="space-y-0.5">
+					<Label for="logging" class="text-base">Show Logging</Label>
+					<p class="text-sm text-muted-foreground">Display debug logs and system information</p>
+				</div>
+				<Switch id="logging" bind:checked={showLogging} />
+			</div>
+
+			<Separator class="my-4" />
+
+			<div class="flex items-center justify-between rounded-lg bg-background p-2">
+				<div class="space-y-0.5">
+					<Label for="p2p" class="text-base">P2P Transfer</Label>
+					<p class="text-sm text-muted-foreground">Enable peer-to-peer file sharing</p>
+				</div>
+				<Switch id="p2p" bind:checked={p2p} />
+			</div>
+
+			<div class="flex items-center justify-between rounded-lg bg-background p-2">
+				<div class="space-y-0.5">
+					<Label for="socket" class="text-base">Socket.io Communication</Label>
+					<p class="text-sm text-muted-foreground">Enable real-time communication features</p>
+				</div>
+				<Switch id="socket" bind:checked={socket} />
+			</div>
+		</div>
+
+		<div class="mt-6 flex justify-center">
+			<Button
+				on:click={updatePrefs}
+				class="w-full sm:w-auto"
+				variant="secondary"
+			>
+				Save Settings
+			</Button>
+		</div>
+	</div>
+
+	<p class="text-center text-sm text-muted-foreground">
+		Tip: You can upload as many different folders/files as you'd like.
+	</p>
 </div>
 
 {#if UserSettings.preferences.devMode}
-	<div class="mx-10 mb-6 mt-10 font-['VT323']">
-		<Textarea
-			on:keydown={handleKeydown}
-			class="h-48"
-			bind:value={text}
-			placeholder="Type your message here."
-		/>
+	<div class="container mx-auto max-w-4xl px-4">
+		<div class="rounded-lg border bg-card p-6 shadow-sm">
+			<h2 class="mb-4 text-center text-lg font-medium">Developer Console</h2>
+			<Textarea
+				on:keydown={handleKeydown}
+				class="h-48 w-full rounded-md border bg-background p-3 font-mono text-sm"
+				bind:value={text}
+				placeholder="Type your message here..."
+			/>
+		</div>
 	</div>
 {/if}
 
 {#if UserSettings.preferences.showLogging}
-	<div class="mx-10 mb-6 mt-10 font-['VT323']">
-		<Textarea class="h-48" bind:value={errorText} placeholder="LOG" disabled />
+	<div class="container mx-auto max-w-4xl px-4 py-8">
+		<div class="rounded-lg border bg-card p-6 shadow-sm">
+			<h2 class="mb-4 text-center text-lg font-medium">System Logs</h2>
+			<Textarea
+				class="h-48 w-full rounded-md border bg-background p-3 font-mono text-sm"
+				bind:value={errorText}
+				placeholder="Logs will appear here..."
+				disabled
+			/>
+		</div>
 	</div>
 {/if}
 
