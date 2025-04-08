@@ -46,10 +46,10 @@
 </script>
 
 <div
-	class="grid auto-rows-fr grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+	class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
 >
 	{#each items as track (track.id)}
-		<div class="group relative flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
+		<div class="group relative mr-2 flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
 			{#await getImageUrl(track.image) then image}
 				<ContextMenu
 					type={'track'}

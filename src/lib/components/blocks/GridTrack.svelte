@@ -54,11 +54,11 @@
 					</Lazy>
 				</TrackWrapper>
 			</ContextMenu>
-			<div class="mt-3 flex w-full flex-col items-start">
-				<h1 class="line-clamp-1 w-full text-base font-semibold leading-none text-foreground transition-colors group-hover:text-primary md:text-lg">
+			<div class="mt-3 flex w-full flex-col items-start space-y-1">
+				<h1 class="line-clamp-1 w-full text-base font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-lg">
 					{track.title}
 				</h1>
-				<h1 class="line-clamp-1 w-full text-sm font-normal leading-none text-muted-foreground md:text-base">
+				<h1 class="line-clamp-1 w-full text-sm font-normal leading-tight text-muted-foreground md:text-base">
 					{track.artist}
 				</h1>
 			</div>

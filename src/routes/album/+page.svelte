@@ -219,210 +219,229 @@
 	}
 </script>
 
-<div class="mt-4 flex h-fit justify-between rounded-md border-gray-600 p-5 px-10">
-	<div class="flex flex-col md:flex-row">
-		<div>
-			{#await getImageUrl(album?.image) then image}
-				{#if editModeOn}
-					<input
-						type="file"
-						id="files"
-						class="block w-full rounded-md border-2 border-gray-300 px-2 py-1 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200"
-						accept="image/*"
-						multiple
-						on:change={(e) => handlePhotoChange(e)}
-					/>
-				{:else}
-					<img
-						class="h-44 w-44 rounded-sm md:h-64 md:w-64"
-						src={image}
-						alt={album?.name?.toString() ?? ''}
-					/>
-				{/if}
-			{:catch error}
-				<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-			{/await}
-		</div>
-		<div class="ml-2 mt-2 flex flex-col items-start md:ml-7 md:mt-0">
-			<div class="flex flex-col items-start">
-				{#if editModeOn}
-					<h1
-						bind:innerHTML={changedName}
-						contenteditable="true"
-						class="border-1 mb-1 rounded-sm border p-1 text-2xl font-bold leading-none text-foreground underline"
-					>
-						{album?.name}
-					</h1>
-					<h1
-						bind:innerHTML={changedArtist}
-						contenteditable="true"
-						class="border-1 rounded-sm border p-1 text-lg font-light leading-none text-slate-400 underline"
-					>
-						{album?.artist}
-					</h1>
-				{:else}
-					<h1 class="mb-1 text-2xl font-bold leading-none text-foreground">{album?.name}</h1>
-					<h1 class="p text-lg font-light leading-none text-slate-400">{album?.artist}</h1>
-				{/if}
+<div class="container mx-10 px-4 py-8">
+	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
+		<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
+			<div class="relative">
+				{#await getImageUrl(album?.image) then image}
+					{#if editModeOn}
+						<div class="group relative">
+							<img
+								class="h-44 w-44 rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:opacity-75 md:h-64 md:w-64"
+								src={image}
+								alt={album?.name?.toString() ?? ''}
+							/>
+							<div class="absolute inset-0 flex items-center justify-center rounded-lg bg-background/50 opacity-0 transition-opacity group-hover:opacity-100">
+								<label
+									for="album-image"
+									class="cursor-pointer rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+								>
+									Change Image
+								</label>
+								<input
+									id="album-image"
+									type="file"
+									class="hidden"
+									accept="image/*"
+									on:change={(e) => handlePhotoChange(e)}
+								/>
+							</div>
+						</div>
+					{:else}
+						<img
+							class="h-44 w-44 rounded-lg object-cover shadow-lg md:h-64 md:w-64"
+							src={image}
+							alt={album?.name?.toString() ?? ''}
+						/>
+					{/if}
+				{:catch error}
+					<div class="h-44 w-44 animate-pulse rounded-lg bg-muted md:h-64 md:w-64"></div>
+				{/await}
 			</div>
-			<div class="mt-auto flex flex-row items-end justify-between">
-				{#if editModeOn}
-					<h1
-						bind:innerHTML={changedYear}
-						contenteditable="true"
-						class="border-1 rounded-sm border p-1 text-lg font-light leading-none text-slate-400 underline"
-					>
-						{album?.year}
-					</h1>
-				{:else}
-					<h1 class="text-lg font-light leading-none text-slate-400">{album?.year}</h1>
-				{/if}
-			</div>
-		</div>
-	</div>
-	<div class="flex flex-row items-center">
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => editMode()}
-		>
-			{#if editModeOn}
-				<Check size={20} color="white" />
-			{:else}
-				<Pencil size={20} color="white" />
-			{/if}
-		</Button>
-		<AlertDialog.Root>
-			<AlertDialog.Trigger>
-				<Button class="my-1 ml-3 h-10 w-10 px-1" variant="destructive">
-					<Trash size={20} color="white" />
-				</Button>
-			</AlertDialog.Trigger>
-			<AlertDialog.Content>
-				<AlertDialog.Header>
-					<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
-					<AlertDialog.Description>
-						This action cannot be undone. This will NOT delete the tracks within the album, only the
-						album itself.
-					</AlertDialog.Description>
-				</AlertDialog.Header>
-				<AlertDialog.Footer>
-					<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-					<AlertDialog.Action on:click={() => deleteAlbum()}>Continue</AlertDialog.Action>
-				</AlertDialog.Footer>
-			</AlertDialog.Content>
-		</AlertDialog.Root>
-	</div>
-</div>
 
-<Separator class="mb-4 ml-2 mt-1 w-[95%] pr-20 md:ml-14"></Separator>
-<div class="mx-4 mt-4 flex h-10 justify-center border-gray-600 px-5 md:justify-end">
-	<div class="flex items-center">
-		{#if ascending}
-			<Button
-				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-				on:click={() => swapAscending()}
-			>
-				<ArrowUpAZ size={20} color="white" />
-			</Button>
-		{:else}
-			<Button
-				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-				on:click={() => swapAscending()}
-			>
-				<ArrowDownZA size={20} color="white" />
-			</Button>
-		{/if}
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
-				<Button
-					class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-					builders={[builder]}
-				>
-					<ListFilter size={20} color="white" />
-				</Button>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-56">
-				<DropdownMenu.Label>Sort By</DropdownMenu.Label>
-				<DropdownMenu.Separator />
-				<DropdownMenu.RadioGroup bind:value={sort}>
-					<DropdownMenu.RadioItem value="track" on:click={() => orderTracks('track')}
-						>Track #</DropdownMenu.RadioItem
-					>
-					<DropdownMenu.RadioItem value="title" on:click={() => orderTracks('title')}
-						>Title</DropdownMenu.RadioItem
-					>
-					<DropdownMenu.RadioItem value="duration" on:click={() => orderTracks('duration')}
-						>Duration</DropdownMenu.RadioItem
-					>
-				</DropdownMenu.RadioGroup>
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => swapListType()}
-		>
-			<List size={20} color="white" />
-		</Button>
-	</div>
-</div>
-
-{#if listType !== 'grid'}
-	<div class="my-0 ml-0 flex flex-col gap-y-8 md:my-5 md:ml-16">
-		{#if alldisks.length > 1 && sort === 'track'}
-			{#each alldisks as disk, diskIndex}
-				{#if diskIndex > 0}
-					<div class="flex flex-col items-start">
-						<Separator class="mb-4 mt-1 w-[95%] pr-20"></Separator>
+			<div class="flex flex-1 flex-col space-y-4">
+				<div class="flex items-center justify-between">
+					<div class="flex-1">
+						{#if editModeOn}
+							<div class="space-y-2">
+								<label for="album-name" class="text-sm font-medium">Album Name</label>
+								<input
+									id="album-name"
+									bind:value={changedName}
+									class="w-full rounded-md border bg-background px-3 py-2 text-2xl font-bold shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+									placeholder="Album name"
+								/>
+							</div>
+						{:else}
+							<h1 class="text-3xl font-bold text-foreground">{album?.name}</h1>
+						{/if}
 					</div>
+					<div class="flex items-center gap-2">
+						<Button
+							class="h-9 w-9 p-0"
+							variant="ghost"
+							on:click={() => editMode()}
+						>
+							{#if editModeOn}
+								<Check class="h-5 w-5" />
+							{:else}
+								<Pencil class="h-5 w-5" />
+							{/if}
+						</Button>
+						<AlertDialog.Root>
+							<AlertDialog.Trigger asChild>
+								<Button class="h-9 w-9 p-0" variant="ghost">
+									<Trash class="h-5 w-5 text-destructive" />
+								</Button>
+							</AlertDialog.Trigger>
+							<AlertDialog.Content>
+								<AlertDialog.Header>
+									<AlertDialog.Title>Delete Album</AlertDialog.Title>
+									<AlertDialog.Description>
+										This action cannot be undone. This will NOT delete the tracks within the album, only the
+										album itself.
+									</AlertDialog.Description>
+								</AlertDialog.Header>
+								<AlertDialog.Footer>
+									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+									<AlertDialog.Action on:click={() => deleteAlbum()}>Delete</AlertDialog.Action>
+								</AlertDialog.Footer>
+							</AlertDialog.Content>
+						</AlertDialog.Root>
+					</div>
+				</div>
+
+				<div class="space-y-4">
+					{#if editModeOn}
+						<div class="space-y-2">
+							<label for="album-artist" class="text-sm font-medium">Artist</label>
+							<input
+								id="album-artist"
+								bind:value={changedArtist}
+								class="w-full rounded-md border bg-background px-3 py-2 text-base shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+								placeholder="Artist name"
+							/>
+						</div>
+						<div class="space-y-2">
+							<label for="album-year" class="text-sm font-medium">Year</label>
+							<input
+								id="album-year"
+								bind:value={changedYear}
+								class="w-full rounded-md border bg-background px-3 py-2 text-base shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+								placeholder="Release year"
+								type="number"
+							/>
+						</div>
+					{:else}
+						<div class="mt-2 space-y-1">
+							<p class="text-base font-medium text-muted-foreground/80">{album?.artist}</p>
+							<p class="text-sm text-muted-foreground/70">{album?.year}</p>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mb-4 flex items-center justify-between">
+		<div class="flex items-center gap-2">
+			<Button
+				class="h-9 w-9 p-0"
+				variant="ghost"
+				on:click={() => swapAscending()}
+			>
+				{#if ascending}
+					<ArrowUpAZ class="h-5 w-5" />
+				{:else}
+					<ArrowDownZA class="h-5 w-5" />
 				{/if}
-				<div
-					class="my-5 ml-4 mr-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-2 md:mr-0 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
-				>
-					{#each disk as track}
+			</Button>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger asChild let:builder>
+					<Button
+						class="h-9 w-9 p-0"
+						variant="ghost"
+						builders={[builder]}
+					>
+						<ListFilter class="h-5 w-5" />
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content class="w-56">
+					<DropdownMenu.Label>Sort By</DropdownMenu.Label>
+					<DropdownMenu.Separator />
+					<DropdownMenu.RadioGroup bind:value={sort}>
+						<DropdownMenu.RadioItem value="track" on:click={() => orderTracks('track')}>
+							Track #
+						</DropdownMenu.RadioItem>
+						<DropdownMenu.RadioItem value="title" on:click={() => orderTracks('title')}>
+							Title
+						</DropdownMenu.RadioItem>
+						<DropdownMenu.RadioItem value="duration" on:click={() => orderTracks('duration')}>
+							Duration
+						</DropdownMenu.RadioItem>
+					</DropdownMenu.RadioGroup>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+			<Button
+				class="h-9 w-9 p-0"
+				variant="ghost"
+				on:click={() => swapListType()}
+			>
+				<List class="h-5 w-5" />
+			</Button>
+		</div>
+	</div>
+
+	{#if listType !== 'grid'}
+		<div class="space-y-8">
+			{#if alldisks.length > 1 && sort === 'track'}
+				{#each alldisks as disk, diskIndex}
+					{#if diskIndex > 0}
+						<Separator class="my-4" />
+					{/if}
+					<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+						{#each disk as track}
+							<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
+						{/each}
+					</div>
+				{/each}
+			{:else}
+				<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+					{#each tracks as track}
 						<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
 					{/each}
 				</div>
-			{/each}
-		{:else}
-			<div
-				class="my-5 ml-4 mr-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-2 md:mr-0 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
-			>
-				{#each tracks as track}
-					<GridTrack {track} {tracks} on:delete={(e) => openAlert(track)} />
-				{/each}
-			</div>
-		{/if}
-	</div>
-{:else}
-	<div class="mx-0 mb-5 mt-2 flex flex-col md:mx-4">
-		{#if alldisks.length > 1 && sort === 'track'}
-			{#each alldisks as disk, diskIndex}
-				{#if diskIndex > 0}
-					<div class="ml-16 flex flex-col items-start">
-						<Separator class="mb-4 mt-1 w-[95%] pr-20"></Separator>
+			{/if}
+		</div>
+	{:else}
+		<div class="space-y-2">
+			{#if alldisks.length > 1 && sort === 'track'}
+				{#each alldisks as disk, diskIndex}
+					{#if diskIndex > 0}
+						<Separator class="my-4" />
+					{/if}
+					<div class="space-y-2">
+						{#each disk as track}
+							<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
+						{/each}
 					</div>
-				{/if}
-				<div class="mx-4 mb-5 mt-2 flex flex-col">
-					{#each disk as track}
+				{/each}
+			{:else}
+				<div class="space-y-2">
+					{#each tracks as track}
 						<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
 					{/each}
 				</div>
-			{/each}
-		{:else}
-			<div class="mx-4 mb-5 mt-2 flex flex-col">
-				{#each tracks as track}
-					<ListTrack {track} {tracks} {playlists} on:delete={(e) => openAlert(track)} />
-				{/each}
-			</div>
-		{/if}
-	</div>
-{/if}
+			{/if}
+		</div>
+	{/if}
+</div>
 
 <AlertDialog.Root bind:open>
 	<AlertDialog.Trigger></AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Are you absolutely sure?</AlertDialog.Title>
+			<AlertDialog.Title>Delete Track</AlertDialog.Title>
 			<AlertDialog.Description>
 				This action cannot be undone. This will COMPLETELY delete the track, and remove it from any
 				playlists, albums or artist pages.
@@ -430,7 +449,7 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action on:click={() => deleteTrack()}>Continue</AlertDialog.Action>
+			<AlertDialog.Action on:click={() => deleteTrack()}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

@@ -50,10 +50,14 @@
 			h: window.innerHeight
 		};
 
-		// Update cursor position
+		// Get the target element's position relative to the viewport
+		const target = e.currentTarget as HTMLElement;
+		const rect = target.getBoundingClientRect();
+
+		// Update cursor position relative to the target element
 		pos = {
-			x: e.clientX,
-			y: e.clientY
+			x: e.clientX - rect.left,
+			y: e.clientY - rect.top
 		};
 
 		// Adjust position if context menu goes out of bounds
@@ -131,7 +135,7 @@
 	<div
 		bind:this={content}
 		use:getContextMenuDimension
-		style="position: absolute; top: {pos.y}px; left: {pos.x}px"
+		style="position: fixed; top: {pos.y}px; left: {pos.x}px"
 	>
 		<div class="navbar" id="navbar">
 			<DropdownMenu.Root bind:open={showMenu}>
