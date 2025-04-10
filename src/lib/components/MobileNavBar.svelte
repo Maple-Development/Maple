@@ -7,63 +7,117 @@
 		SquareUser,
 		Home,
 		Settings,
-		CirclePlus
+		CirclePlus,
+		Users,
+		MoreHorizontal,
+		X
 	} from 'lucide-svelte';
+	import { SavedUser } from '$lib/store';
+	import { createEventDispatcher } from 'svelte';
+	import { slide, fade } from 'svelte/transition';
+
+	let isMenuOpen = false;
+	const dispatch = createEventDispatcher();
+
+	function toggleMenu() {
+		isMenuOpen = !isMenuOpen;
+		dispatch('menuToggle', { isOpen: isMenuOpen });
+	}
+
+	function handleMenuClick(e: MouseEvent) {
+		e.stopPropagation();
+		isMenuOpen = false;
+	}
 </script>
 
-<div class="relative flex items-center justify-center">
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/"
-		>
-			<Home size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Home</h1>
-	</div>
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/tracks"
-		>
-			<Music size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Tracks</h1>
-	</div>
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/playlists"
-		>
-			<ListMusic size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Playlists</h1>
-	</div>
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/albums"
-		>
-			<DiscAlbum size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Albums</h1>
-	</div>
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/artists"
-		>
-			<SquareUser size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Artists</h1>
-	</div>
-	<div class="flex flex-col items-center justify-center">
-		<Button
-			class="my-1 flex w-fit flex-row items-center justify-start bg-transparent py-2 pl-4 pr-2 hover:bg-secondary"
-			href="/settings"
-		>
-			<Settings size={30} class="mr-2 text-foreground" />
-		</Button>
-		<h1 class="px-1 text-sm font-semibold text-foreground">Settings</h1>
-	</div>
+<div class="fixed bottom-0 left-0 right-0 flex h-15 items-center justify-around border-t bg-background px-2">
+	<Button
+		class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-transparent p-2 hover:bg-secondary"
+		href="/"
+	>
+		<Home size={32} class="text-foreground" />
+	</Button>
+
+	<Button
+		class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-transparent p-2 hover:bg-secondary"
+		href="/tracks"
+	>
+		<Music size={32} class="text-foreground" />
+	</Button>
+
+	<Button
+		class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-transparent p-2 hover:bg-secondary"
+		href="/playlists"
+	>
+		<ListMusic size={32} class="text-foreground" />
+	</Button>
+
+	<Button
+		class="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-transparent p-2 hover:bg-secondary"
+		on:click={toggleMenu}
+	>
+		<MoreHorizontal size={32} class="text-foreground" />
+	</Button>
 </div>
+
+{#if isMenuOpen}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm" on:click={toggleMenu} transition:fade>
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div 
+			class="fixed bottom-10 left-0 right-0 rounded-t-2xl bg-background p-4 shadow-lg"
+			transition:slide|local={{ duration: 200 }}
+		>
+			<div class="mb-4 flex items-center justify-between">
+				<h2 class="text-lg font-semibold text-foreground">More</h2>
+				<Button variant="ghost" size="icon" on:click={handleMenuClick}>
+					<X size={24} />
+				</Button>
+			</div>
+			<div class="grid grid-cols-2 gap-4">
+				<Button
+					class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
+					href="/albums"
+					on:click={handleMenuClick}
+				>
+					<DiscAlbum size={40} class="text-foreground" />
+					<span class="text-sm font-medium text-foreground">Albums</span>
+				</Button>
+				<Button
+					class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
+					href="/artists"
+					on:click={handleMenuClick}
+				>
+					<SquareUser size={40} class="text-foreground" />
+					<span class="text-sm font-medium text-foreground">Artists</span>
+				</Button>
+				{#if $SavedUser.id}
+					<Button
+						class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
+						href="/friends"
+						on:click={handleMenuClick}
+					>
+						<Users size={40} class="text-foreground" />
+						<span class="text-sm font-medium text-foreground">Friends</span>
+					</Button>
+				{/if}
+				<Button
+					class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
+					href="/playlists?create=true"
+					on:click={handleMenuClick}
+				>
+					<CirclePlus size={40} class="text-foreground" />
+					<span class="text-sm font-medium text-foreground">New Playlist</span>
+				</Button>
+				<Button
+					class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
+					href="/settings"
+					on:click={handleMenuClick}
+				>
+					<Settings size={40} class="text-foreground" />
+					<span class="text-sm font-medium text-foreground">Settings</span>
+				</Button>
+			</div>
+		</div>
+	</div>
+{/if}
