@@ -1,16 +1,9 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
-	cookieParser = require('cookie-parser');
-const mysql = require('mysql2');
+cookieParser = require('cookie-parser');
+const pool = require('../db');
 
 const router = express.Router();
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
 
 router.use(express.json());
 router.use(cookieParser());
@@ -19,7 +12,7 @@ router.get('/user/:username', (req, res) => {
 	const username = req.params.username;
 	const sql = 'SELECT id, username, name FROM users WHERE username = ?';
 
-	connection.query(sql, [username], (error, results) => {
+	pool.query(sql, [username], (error, results) => {
 		if (error) {
 			console.error('Error fetching user:', error);
 			return res.status(500).json({ error: 'Error fetching user' });
@@ -36,7 +29,7 @@ router.get('/user/id/:id', async (req, res) => {
   const id = req.params.id;
 
   try {
-	const [userResults] = await connection.promise().query(
+	const [userResults] = await pool.promise().query(
 	  'SELECT id, username, name FROM users WHERE id = ?',
 	  [id]
 	);
@@ -45,7 +38,7 @@ router.get('/user/id/:id', async (req, res) => {
 	  return res.status(404).json({ error: 'User not found' });
 	}
 
-	const [nowPlayingResults] = await connection.promise().query(
+	const [nowPlayingResults] = await pool.promise().query(
 	  'SELECT * FROM live_status WHERE user_id = ?',
 	  [id]
 	);
@@ -66,7 +59,7 @@ router.get('/pfp/:id', (req, res) => {
 	const id = req.params.id;
 	const sql = 'SELECT pfp FROM users WHERE id = ?';
 
-	connection.query(sql, [id], (error, results) => {
+	pool.query(sql, [id], (error, results) => {
 		if (error) {
 			console.error('Error fetching user:', error);
 			return res.status(500).json({ error: 'Error fetching user' });

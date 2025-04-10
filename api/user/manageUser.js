@@ -1,19 +1,12 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
 	cookieParser = require('cookie-parser');
-const mysql = require('mysql2');
+const pool = require('../db');
 const authenticateToken = require('../middleware/authToken');
 const verifyUser = require('../middleware/verifyUser');
 const multer = require('multer');
 
 const router = express.Router();
-
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
 
 router.use(express.json());
 router.use(cookieParser());
@@ -47,7 +40,7 @@ router.post('/setProfile/:id', upload.single('pfp'), (req, res) => {
 	}
 
 	const getUserSql = 'SELECT username, id FROM users WHERE id = ?';
-	connection.query(getUserSql, [id], (error, results) => {
+	pool.query(getUserSql, [id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error fetching user' });
@@ -57,7 +50,7 @@ router.post('/setProfile/:id', upload.single('pfp'), (req, res) => {
 		}
 
 		const updatePfpSql = 'UPDATE users SET pfp = ? WHERE id = ?';
-		connection.query(updatePfpSql, [imageBuffer, id], (updateError) => {
+		pool.query(updatePfpSql, [imageBuffer, id], (updateError) => {
 			if (updateError) {
 				console.error(updateError);
 				return res.status(500).json({ error: 'Error updating profile picture' });
@@ -76,7 +69,7 @@ router.post('/setDisplayName/:id', (req, res) => {
 	}
 
 	const getUserSql = 'SELECT username, id FROM users WHERE id = ?';
-	connection.query(getUserSql, [id], (error, results) => {
+	pool.query(getUserSql, [id], (error, results) => {
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: 'Error fetching user' });
@@ -86,7 +79,7 @@ router.post('/setDisplayName/:id', (req, res) => {
 		}
 
 		const updateDisplayNameSql = 'UPDATE users SET name = ? WHERE id = ?';
-		connection.query(updateDisplayNameSql, [displayName, id], (updateError) => {
+		pool.query(updateDisplayNameSql, [displayName, id], (updateError) => {
 			if (updateError) {
 				console.error(updateError);
 				return res.status(500).json({ error: 'Error updating display name' });
@@ -95,4 +88,5 @@ router.post('/setDisplayName/:id', (req, res) => {
 		});
 	});
 });
+
 module.exports = router;

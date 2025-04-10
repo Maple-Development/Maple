@@ -3,7 +3,6 @@ const rateLimit = require("express-rate-limit");
 const cors = require('cors');
 const login = require('./auth/login');
 const getPath = require('./get/get.js');
-const mysql = require('mysql2');
 const manageUser = require('./user/manageUser.js');
 const publicGet = require('./publicGet/get.js');
 const ioTools = require('./iomanager/io.js');
@@ -14,6 +13,16 @@ const fs = require('fs');
 const https = require('https');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+
+console.log('[1] Starting server initialization...');
+
+process.on('uncaughtException', (error) => {
+	console.error('[ERROR] Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('[ERROR] Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
@@ -26,125 +35,145 @@ var options = {
 	max: 20,
 }); */
 
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: 'admin',
-	database: 'maple_auth'
-});
+try {
+	console.log('[2] Reading SSL certificates...');
+	const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
+	const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
+	const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
 
+	console.log('[3] SSL certificates loaded successfully');
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
+	const credentials = {
+		key: privateKey,
+		cert: certificate,
+		ca: ca
+	};
 
-const credentials = {
-	key: privateKey,
-	cert: certificate,
-	ca: ca
-};
-
-const corsOptions = {
-	origin: true,
-	credentials: true
-  };
-
-const server = https.createServer(credentials, app);
-
-const ioOptions = {
-	cors: {
+	const corsOptions = {
 		origin: true,
 		credentials: true
-	}
-};
+	};
 
-const io = socket.init(server, ioOptions);
+	console.log('[4] Creating HTTPS server...');
+	const server = https.createServer(credentials, app);
 
-const friends = require('./user/friends.js');
-
-/* app.use(limiter);
- */
-app.use(cors(corsOptions));
-
-app.get('/', (req, res) => {
-  res.status(200).send('Hello! I is alive!');
-});
-
-app.use('/peerjs', ExpressPeerServer(server, options));
-app.use('/login', login);
-app.use('/get', getPath);
-app.use('/user/manage', manageUser);
-app.use('/public/get', publicGet);
-app.use('/user/friends', friends);
-
-io.use((socket, next) => {
-	const cookieString = socket.handshake.headers['cookie'];
-	let token = null;
-
-	if (cookieString) {
-		const cookies = cookieString.split(';');
-		const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('token='));
-		if (tokenCookie) {
-			token = tokenCookie.split('=')[1];
+	const ioOptions = {
+		cors: {
+			origin: true,
+			credentials: true
 		}
-	}
+	};
 
-	if (!token) {
-		return next(new Error('Authentication error: Missing token'));
-	}
+	console.log('[5] Initializing socket.io...');
+	const io = socket.init(server, ioOptions);
+	console.log('[6] Socket.io initialized');
 
-	jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-		if (err) {
-			return next(new Error('Authentication error: Invalid token'));
-		}
+	console.log('[7] Setting up routes...');
+	const friends = require('./user/friends.js');
 
-		socket.user = decoded;
-		next();
+	/* app.use(limiter);
+	 */
+	app.use(cors(corsOptions));
+
+	app.get('/', (req, res) => {
+		res.status(200).send('Hello! I is alive!');
 	});
-});
 
-io.on('connection', (client) => {
-	console.log('User connected: ' + client.user.id);
+	app.use('/peerjs', ExpressPeerServer(server, options));
+	app.use('/login', login);
+	app.use('/get', getPath);
+	app.use('/user/manage', manageUser);
+	app.use('/public/get', publicGet);
+	app.use('/user/friends', friends);
+	console.log('[8] Routes setup complete');
 
-	client.on('nowPlaying', async (data) => {
-        const id = client.user.id;
-        
-        const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
+	console.log('[9] Setting up socket authentication...');
+	io.use((socket, next) => {
+		try {
+			const cookieString = socket.handshake.headers['cookie'];
+			let token = null;
 
-        try {
-            const [allFriends] = await connection.promise().query(sql, [id, id]);
-            const sorted = sortFriends(allFriends, id);
+			if (cookieString) {
+				const cookies = cookieString.split(';');
+				const tokenCookie = cookies.find((cookie) => cookie.trim().startsWith('token='));
+				if (tokenCookie) {
+					token = tokenCookie.split('=')[1];
+				}
+			}
 
-            if (allFriends !== null && allFriends.length > 0) {
-                ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    });
+			if (!token) {
+				return next(new Error('Authentication error: Missing token'));
+			}
 
-	client.on('disconnect', () => {
-		/* … */
-	});
-});
+			jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+				if (err) {
+					return next(new Error('Authentication error: Invalid token'));
+				}
 
-io.on('disconnect', (reason) => {
-	console.log(`Disconnected: ${reason}`);
-});
-
-io.on('connect_error', (error) => {
-	console.log(`Connection error: ${error}`);
-});
-
-function sortFriends(unsorted, id) {
-	let newFriends = unsorted.map((friend) => {
-		if (friend.user_id === id) {
-			return { user_id: id, friend_id: friend.friend_id };
-		} else {
-			return { user_id: id, friend_id: friend.user_id };
+				socket.user = decoded;
+				next();
+			});
+		} catch (error) {
+			console.error('[ERROR] Socket authentication error:', error);
+			next(error);
 		}
 	});
-	return newFriends;
+	console.log('[10] Socket authentication setup complete');
+
+	console.log('[11] Setting up socket event handlers...');
+	io.on('connection', (client) => {
+		console.log('[SOCKET] User connected: ' + client.user.id);
+
+		client.on('nowPlaying', async (data) => {
+			const id = client.user.id;
+			
+			const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
+
+			try {
+				const pool = require('./db');
+				const [allFriends] = await pool.promise().query(sql, [id, id]);
+				const sorted = sortFriends(allFriends, id);
+
+				if (allFriends !== null && allFriends.length > 0) {
+					ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+				}
+			} catch (error) {
+				console.error('[ERROR] Error in nowPlaying:', error);
+			}
+		});
+
+		client.on('disconnect', () => {
+			console.log('[SOCKET] User disconnected: ' + client.user.id);
+		});
+	});
+
+	io.on('disconnect', (reason) => {
+		console.log(`[SOCKET] Server disconnected: ${reason}`);
+	});
+
+	io.on('connect_error', (error) => {
+		console.log(`[ERROR] Socket connection error: ${error}`);
+	});
+	console.log('[12] Socket event handlers setup complete');
+
+	function sortFriends(unsorted, id) {
+		let newFriends = unsorted.map((friend) => {
+			if (friend.user_id === id) {
+				return { user_id: id, friend_id: friend.friend_id };
+			} else {
+				return { user_id: id, friend_id: friend.user_id };
+			}
+		});
+		return newFriends;
+	}
+
+	console.log('[13] Starting server on port 3000...');
+	server.listen(3000, () => {
+		console.log('[14] Server is running on port 3000');
+		console.log('[DONE] Server initialization complete');
+	});
+
+} catch (error) {
+	console.error('[FATAL] Error during server startup:', error);
+	process.exit(1);
 }
-
-server.listen(3000);
