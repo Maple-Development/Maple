@@ -24,7 +24,11 @@
 		dispatch('menuToggle', { isOpen: isMenuOpen });
 	}
 
-	function handleMenuClick(e: MouseEvent) {
+	function handleMenuClick() {
+		isMenuOpen = false;
+	}
+
+	function handleCloseClick(e: MouseEvent) {
 		e.stopPropagation();
 		isMenuOpen = false;
 	}
@@ -70,7 +74,7 @@
 		>
 			<div class="mb-4 flex items-center justify-between">
 				<h2 class="text-lg font-semibold text-foreground">More</h2>
-				<Button variant="ghost" size="icon" on:click={handleMenuClick}>
+				<Button variant="ghost" size="icon" on:click={handleCloseClick}>
 					<X size={24} />
 				</Button>
 			</div>
@@ -91,7 +95,7 @@
 					<SquareUser size={40} class="text-foreground" />
 					<span class="text-sm font-medium text-foreground">Artists</span>
 				</Button>
-				{#if $SavedUser.id}
+				{#if !$SavedUser.id}
 					<Button
 						class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
 						href="/friends"
