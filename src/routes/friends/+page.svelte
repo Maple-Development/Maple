@@ -80,27 +80,28 @@
 					<div class="space-y-4">
 						{#each $friends as friend}
 							<div class="flex flex-col gap-4 rounded-lg p-4 hover:bg-secondary sm:flex-row sm:items-center sm:justify-between">
-								<div class="flex items-center gap-4">
+								<div class="flex min-w-0 items-center gap-4">
+									<!-- svelte-ignore a11y-img-redundant-alt -->
 									<img
 										src="https://maple.kolf.pro:3000/public/get/pfp/{friend.id}"
 										on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
 										alt="Profile picture"
-										class="h-10 w-10 rounded-full"
+										class="h-10 w-10 flex-shrink-0 rounded-full"
 									/>
-									<div class="flex-1">
-										<h3 class="font-medium">{friend.name || friend.username}</h3>
-										<p class="text-sm text-muted-foreground">@{friend.username}</p>
+									<div class="min-w-0 flex-1">
+										<h3 class="truncate font-medium">{friend.name || friend.username}</h3>
+										<p class="truncate text-sm text-muted-foreground">@{friend.username}</p>
 										{#if friend.nowPlaying}
 											<div class="mt-1 flex items-center gap-2">
-												<Music2 class="h-4 w-4 text-green-500" />
-												<p class="text-sm text-muted-foreground truncate">
+												<Music2 class="h-4 w-4 flex-shrink-0 text-green-500" />
+												<p class="truncate text-sm text-muted-foreground">
 													{friend.nowPlaying.title || 'Unknown Track'} - {friend.nowPlaying.artist || 'Unknown Artist'}
 												</p>
 											</div>
 										{/if}
 									</div>
 								</div>
-								<div class="flex items-center gap-2">
+								<div class="flex flex-shrink-0 items-center gap-2">
 									<Button variant="ghost" size="icon">
 										<AudioLines class="h-4 w-4" />
 									</Button>
