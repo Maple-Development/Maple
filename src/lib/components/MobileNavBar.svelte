@@ -95,7 +95,7 @@
 					<SquareUser size={40} class="text-foreground" />
 					<span class="text-sm font-medium text-foreground">Artists</span>
 				</Button>
-				{#if !$SavedUser.id}
+				{#if $SavedUser.id}
 					<Button
 						class="flex h-24 flex-col items-center justify-center space-y-1 rounded-xl bg-secondary/50 p-4 hover:bg-secondary"
 						href="/friends"
