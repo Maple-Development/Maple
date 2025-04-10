@@ -64,68 +64,68 @@
 	}
 </script>
 
-<div class="mt-4 flex h-10 w-full justify-end px-10">
-	{#if ascending}
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => swapAscending()}
-		>
-			<ArrowUpAZ size={20} color="white" />
-		</Button>
-	{:else}
-		<Button
-			class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-			on:click={() => swapAscending()}
-		>
-			<ArrowDownZA size={20} color="white" />
-		</Button>
-	{/if}
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger asChild let:builder>
+<div class="container mx-auto px-4 py-8">
+	<div class="mb-4 flex h-10 w-full justify-end">
+		{#if ascending}
 			<Button
 				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
-				builders={[builder]}
+				on:click={() => swapAscending()}
 			>
-				<ListFilter size={20} color="white" />
+				<ArrowUpAZ size={20} color="white" />
 			</Button>
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content class="w-56">
-			<DropdownMenu.Label>Sort By</DropdownMenu.Label>
-			<DropdownMenu.Separator />
-			<DropdownMenu.RadioGroup bind:value={sort}>
-				<DropdownMenu.RadioItem value="name" on:click={() => sortArtists('name')}
-					>Name</DropdownMenu.RadioItem
+		{:else}
+			<Button
+				class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+				on:click={() => swapAscending()}
+			>
+				<ArrowDownZA size={20} color="white" />
+			</Button>
+		{/if}
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger asChild let:builder>
+				<Button
+					class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary"
+					builders={[builder]}
 				>
-			</DropdownMenu.RadioGroup>
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-</div>
+					<ListFilter size={20} color="white" />
+				</Button>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content class="w-56">
+				<DropdownMenu.Label>Sort By</DropdownMenu.Label>
+				<DropdownMenu.Separator />
+				<DropdownMenu.RadioGroup bind:value={sort}>
+					<DropdownMenu.RadioItem value="name" on:click={() => sortArtists('name')}
+						>Name</DropdownMenu.RadioItem
+					>
+				</DropdownMenu.RadioGroup>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</div>
 
-<div
-	class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12"
->
-	{#each artists as artist}
-		<div class="mr-2 flex flex-col items-start">
-			{#await getImageUrl(artist.image) then image}
-				<ContextMenu type={'artist'} on:delete={(e) => openAlert(artist)}>
-					<a class="pointer" href={`/artist?artist=${artist.id}`}>
-						{#if image !== ''}
-							<img class="h-44 w-44 rounded-[50%] md:h-52 md:w-52" src={image} alt={artist.name} />
-						{:else}
-							<div class="h-44 w-44 animate-pulse rounded-[50%] bg-gray-500 md:h-52 md:w-52"></div>
-						{/if}
-					</a>
-				</ContextMenu>
-				<div class="flex flex-row items-start">
-					<div class="mt-4 flex h-full flex-col items-start">
-						<h1 class="mb-1 text-lg font-bold leading-none text-foreground">{artist.name}</h1>
+	<div class="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12">
+		{#each artists as artist}
+			<div class="group relative mr-2 flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
+				{#await getImageUrl(artist.image) then image}
+					<ContextMenu type={'artist'} on:delete={(e) => openAlert(artist)}>
+						<a class="pointer" href={`/artist?artist=${artist.id}`}>
+							{#if image !== ''}
+								<img class="h-44 w-44 rounded-[50%] object-cover shadow-lg transition-all duration-300 group-hover:shadow-xl md:h-52 md:w-52" src={image} alt={artist.name} />
+							{:else}
+								<div class="h-44 w-44 animate-pulse rounded-[50%] bg-muted md:h-52 md:w-52"></div>
+							{/if}
+						</a>
+					</ContextMenu>
+					<div class="mt-3 flex w-full flex-col items-start space-y-1">
+						<h1 class="line-clamp-1 w-full text-base font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-lg">
+							{artist.name}
+						</h1>
 					</div>
-				</div>
-			{:catch error}
-				<div class="h-52 w-52 animate-pulse rounded-sm bg-gray-500"></div>
-			{/await}
-		</div>
-	{/each}
+				{:catch error}
+					<div class="h-44 w-44 animate-pulse rounded-[50%] bg-muted md:h-52 md:w-52"></div>
+				{/await}
+			</div>
+		{/each}
+	</div>
 </div>
 
 <AlertDialog.Root bind:open={isOpenAlert}>

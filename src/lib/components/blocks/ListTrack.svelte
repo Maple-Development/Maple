@@ -55,30 +55,38 @@
 </script>
 
 {#if track}
-	<div class="flex w-full">
+	<div class="group flex w-full items-center rounded-lg p-2 transition-colors hover:bg-secondary/50">
 		<TrackWrapper className="flex-grow" {track} {tracks}>
-			<div class="flex w-full flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary">
-				<div class="h-12 w-12 flex-shrink-0 md:h-24 md:w-24">
+			<div class="flex w-full items-center gap-4">
+				<div class="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md md:h-16 md:w-16">
 					{#await getImageUrl(track.image) then image}
-						<Lazy height={208} {keep}>
-							<img class="rounded-md" src={image} alt={track.title} />
+						<Lazy height={64} {keep}>
+							<img 
+								class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+								src={image} 
+								alt={track.title} 
+							/>
 						</Lazy>
 					{:catch error}
-						<div class="h-24 w-24 rounded-full bg-gray-500"></div>
+						<div class="h-full w-full animate-pulse rounded-md bg-muted"></div>
 					{/await}
 				</div>
-				<div class="ml-4 flex flex-col">
-					<h1 class="text-lg font-bold leading-none text-foreground">{track.title}</h1>
-					<h1 class="text-base font-light leading-none text-slate-400">{track.artist}</h1>
+				<div class="flex min-w-0 flex-1 flex-col">
+					<h1 class="line-clamp-1 text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+						{track.title}
+					</h1>
+					<h1 class="line-clamp-1 text-sm text-muted-foreground">
+						{track.artist}
+					</h1>
 				</div>
 				{#if !$isSmallDevice}
-					<div class="ml-4 flex flex-grow flex-row items-center justify-end text-right">
-						<div class="flex flex-col">
-							<h1 class="text-base font-light leading-none text-slate-400">
-								{formatDuration(track.duration)}
-							</h1>
-							<h1 class="text-base font-light leading-none text-slate-400">{track.album}</h1>
-							<h1 class="text-base font-light leading-none text-slate-400">{track.year}</h1>
+					<div class="hidden flex-1 items-center justify-end gap-6 text-right md:flex">
+						<div class="flex items-center gap-4 text-xs text-muted-foreground/70">
+							<span>{formatDuration(track.duration)}</span>
+							<span class="text-muted-foreground/50">•</span>
+							<span>{track.album}</span>
+							<span class="text-muted-foreground/50">•</span>
+							<span>{track.year}</span>
 						</div>
 					</div>
 				{/if}
@@ -87,8 +95,11 @@
 		<div class="ml-2 flex items-center">
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger asChild let:builder>
-					<Button class="h-10 w-10 bg-transparent px-1 hover:bg-secondary" builders={[builder]}>
-						<EllipsisVertical size={20} color="white" />
+					<Button 
+						class="h-8 w-8 bg-transparent p-0 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-secondary" 
+						builders={[builder]}
+					>
+						<EllipsisVertical size={18} class="text-muted-foreground" />
 					</Button>
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content class="w-56">

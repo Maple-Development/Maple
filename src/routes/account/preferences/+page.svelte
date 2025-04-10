@@ -7,6 +7,7 @@
 	import UserSettings from '$lib/preferences/usersettings';
 	import { Settings } from '$lib/preferences/fetch';
 	import { toast } from 'svelte-sonner';
+	import { Label } from '$lib/components/ui/label/index.js';
 
 	let webhookSettings = new Settings('webhook');
 
@@ -16,7 +17,6 @@
 	onMount(async () => {
 		webhookUrl = UserSettings.webhook.url;
 		doWebhooks = UserSettings.webhook.enabled;
-
 		title.set('Preferences');
 	});
 
@@ -36,56 +36,51 @@
 	}
 </script>
 
-{#if !$isLoggedIn}
-	<h1 class="mt-10 text-center text-5xl font-black">You are not logged in!</h1>
-
-	<Button href="/account/login" class="my-1 ml-3 h-10 w-10 bg-transparent px-1 hover:bg-secondary">
-		Login
-	</Button>
-{:else}
-	<h1 class="mt-10 text-center text-5xl font-black">Preferences</h1>
-
-	<div class="mx-[10%] mt-10 flex flex-col justify-center md:mx-[30%]">
-		<h2 class="mt-5 text-4xl font-black">Webhook Options</h2>
-
-		<div class="mt-5 flex items-center space-x-2">
-			<Switch bind:checked={doWebhooks} id="webhooks" class="text-muted hover:text-black" />
-			<label for="webhooks">Enable Webhooks</label>
+<div class="container mx-auto max-w-4xl px-4 py-8">
+	{#if !$isLoggedIn}
+		<div class="text-center">
+			<h1 class="mb-4 text-2xl font-semibold">You are not logged in!</h1>
+			<Button href="/account/login" variant="secondary">
+				Login
+			</Button>
 		</div>
-		<p class="text-xs text-muted">Enables sending data to a chosen webhook</p>
-
-		<div class="mt-5 flex items-center space-x-2">
-			<Input
-				bind:value={webhookUrl}
-				class="text-muted"
-				placeholder="Ex: https://discord.com/api/webhooks/13292141241482912/HCAg7pewqefweffwfewF_wefcQxOGN6ZAMDewfwfwfbIAawefhLz"
-			/>
+	{:else}
+		<div class="mb-8 text-center">
+			<h1 class="mb-2 text-2xl font-semibold">Preferences</h1>
+			<p class="text-muted-foreground">Manage your account and notification settings</p>
 		</div>
-		<p class="text-xs text-muted">
-			Webhook URL to automatically send to. (Currently, the only supported service is Discord) [If
-			left blank, the community webhook will be used.]
-		</p>
-	</div>
 
-	<div class="mx-[10%] mt-5 flex flex-col justify-center md:mx-[30%]">
-		<!--  <h2 class="text-4xl font-black mt-5">Manage Profile</h2>
-    <p class="text-muted mt-2">Change Display Name</p>
-    <Input class="text-muted" placeholder="Display name"/>
+		<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
+			<h2 class="mb-4 text-center text-lg font-medium">Webhook Settings</h2>
+			
+			<div class="space-y-6">
+				<div class="flex items-center justify-between rounded-lg bg-background p-2">
+					<div class="space-y-0.5">
+						<Label for="webhooks" class="text-base">Enable Webhooks</Label>
+						<p class="text-sm text-muted-foreground">Send data to a chosen webhook service</p>
+					</div>
+					<Switch id="webhooks" bind:checked={doWebhooks} />
+				</div>
 
-    <p class="text-muted mt-2">Change Profile Picture</p>
-    <Input type="file" accept="image/*" class="text-muted"/> -->
-	</div>
+				<div class="space-y-2">
+					<Label for="webhookUrl">Webhook URL</Label>
+					<Input
+						id="webhookUrl"
+						bind:value={webhookUrl}
+						placeholder="https://discord.com/api/webhooks/..."
+						class="w-full"
+					/>
+					<p class="text-sm text-muted-foreground">
+						Webhook URL to automatically send to. Currently supports Discord webhooks. If left blank, the community webhook will be used.
+					</p>
+				</div>
+			</div>
 
-	<div class="mx-[10%] mb-20 mt-5 flex flex-col justify-center md:mx-[30%]">
-		<!-- <h2 class="text-4xl font-black mt-5">Manage Profile</h2>
-    <p class="text-muted mt-2">Change Display Name</p>
-    <Input class="text-muted" placeholder="Display name"/>
-
-    <p class="text-muted mt-2">Change Profile Picture</p>
-    <Input type="file" accept="image/*" class="text-muted"/>
- -->
-		<Button on:click={updateSettings} class="mx-2 mt-4 px-4 py-6 text-white" variant="secondary"
-			>Submit</Button
-		>
-	</div>
-{/if}
+			<div class="mt-6 flex justify-center">
+				<Button on:click={updateSettings} variant="secondary">
+					Save Preferences
+				</Button>
+			</div>
+		</div>
+	{/if}
+</div>
