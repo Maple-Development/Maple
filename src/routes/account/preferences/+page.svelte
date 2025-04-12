@@ -19,7 +19,7 @@
 	onMount(async () => {
 		webhookUrl = UserSettings.webhook.url;
 		doWebhooks = UserSettings.webhook.enabled;
-		doDiscord = UserSettings.preferences.discord;
+		doDiscord = UserSettings.discord.enabled;
 		title.set('Preferences');
 	});
 
