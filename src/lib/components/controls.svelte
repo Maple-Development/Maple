@@ -39,14 +39,21 @@
 
 		const image = await getImage(song.image);
 		const imageBuffer = await image.arrayBuffer();
-		const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+		const uint8Array = new Uint8Array(imageBuffer);
+		let binary = '';
+		const chunkSize = 8192;
+		for (let i = 0; i < uint8Array.length; i += chunkSize) {
+			const chunk = Array.from(uint8Array.slice(i, i + chunkSize));
+			binary += String.fromCharCode.apply(null, chunk);
+		}
+		const imageBase64 = btoa(binary);
 
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
 			album: song.album,
 			image: imageBase64,
-			discord: UserSettings.preferences.discord
+			discord: UserSettings.discord.enabled
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
