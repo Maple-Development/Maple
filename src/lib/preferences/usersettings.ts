@@ -30,7 +30,9 @@ const UserSettings = {
 		devMode,
 		showLogging,
 		socket,
-		discord
+	},
+	discord: {
+		enabled: discord
 	}
 };
 
