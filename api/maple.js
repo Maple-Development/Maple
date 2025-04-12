@@ -50,7 +50,7 @@ try {
 	};
 
 	const corsOptions = {
-		origin: true,
+		origin: '*',
 		credentials: true
 	};
 
@@ -59,7 +59,7 @@ try {
 
 	const ioOptions = {
 		cors: {
-			origin: true,
+			origin: '*',
 			credentials: true
 		}
 	};
