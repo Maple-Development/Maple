@@ -137,6 +137,9 @@ try {
 				if (allFriends !== null && allFriends.length > 0) {
 					ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
 				}
+				if (data.nowPlaying.discord === true) {
+					ioTools.discordRPC(id, sorted, io, data.nowPlaying);
+				}
 			} catch (error) {
 				console.error('[ERROR] Error in nowPlaying:', error);
 			}

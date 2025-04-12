@@ -50,4 +50,31 @@ module.exports = {
 			console.error(error);
 		}
 	},
+
+	discordRPC: function (user, _friends, io, nowPlaying) {
+		try {
+			const rpcData = {
+				details: nowPlaying.title || undefined,
+				state: nowPlaying.artist ? `by ${nowPlaying.artist}` : undefined,
+				largeImageKey: nowPlaying.image ? `data:image/jpeg;base64,${nowPlaying.image}` : "maple",
+				largeImageText: nowPlaying.album || undefined,
+				smallImageKey: "play",
+				smallText: "Listening to Maple",
+				buttons: [
+					{
+						label: "Listen on Maple",
+						url: `https://maple.kolf.pro/user/${user}`
+					}
+				]
+			};
+
+			io.sockets.sockets.forEach(socket => {
+				if (socket.user && socket.user.id === user) {
+					socket.emit('rpcUpdate', rpcData);
+				}
+			});
+		} catch (error) {
+			console.error('[ERROR] Error in discordRPC:', error);
+		}
+	}
 };

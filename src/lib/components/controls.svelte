@@ -37,15 +37,20 @@
 			pfp = await base64ToFile($SavedUser.pfp);
 		}
 
+		const image = await getImage(song.image);
+		const imageBuffer = await image.arrayBuffer();
+		const imageBase64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
+
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
-			album: song.album
+			album: song.album,
+			image: imageBase64,
+			discord: UserSettings.preferences.discord
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
 
-		const image = await getImage(song.image);
 		const formData = new FormData();
 		formData.append('file', image, 'album.jpg');
 		if (pfp) formData.append('file', pfp, 'pfp.png');

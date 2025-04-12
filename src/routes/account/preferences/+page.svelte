@@ -10,13 +10,16 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 
 	let webhookSettings = new Settings('webhook');
+	let discordSettings = new Settings('discord');
 
 	let doWebhooks = true;
 	let webhookUrl = '';
+	let doDiscord = true;
 
 	onMount(async () => {
 		webhookUrl = UserSettings.webhook.url;
 		doWebhooks = UserSettings.webhook.enabled;
+		doDiscord = UserSettings.preferences.discord;
 		title.set('Preferences');
 	});
 
@@ -26,6 +29,7 @@
 			return;
 		}
 		webhookSettings.set('enabled', doWebhooks);
+		discordSettings.set('enabled', doDiscord);
 		if (webhookUrl != '') {
 			webhookSettings.set('url', webhookUrl);
 		} else {
@@ -75,12 +79,26 @@
 					</p>
 				</div>
 			</div>
+		</div>
 
-			<div class="mt-6 flex justify-center">
-				<Button on:click={updateSettings} variant="secondary">
-					Save Preferences
-				</Button>
+		<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
+			<h2 class="mb-4 text-center text-lg font-medium">Discord Settings</h2>
+			
+			<div class="space-y-6">
+				<div class="flex items-center justify-between rounded-lg bg-background p-2">
+					<div class="space-y-0.5">
+						<Label for="discord" class="text-base">Enable Discord RPC</Label>
+						<p class="text-sm text-muted-foreground">Show what you're listening to in Discord</p>
+					</div>
+					<Switch id="discord" bind:checked={doDiscord} />
+				</div>
 			</div>
+		</div>
+
+		<div class="mt-6 flex justify-center">
+			<Button on:click={updateSettings} variant="secondary">
+				Save Preferences
+			</Button>
 		</div>
 	{/if}
 </div>
