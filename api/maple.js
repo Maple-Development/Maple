@@ -61,7 +61,8 @@ try {
 		cors: {
 			origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com'],
 			credentials: true
-		}
+		},
+		maxHttpBufferSize: 1e7
 	};
 
 	console.log('[5] Initializing socket.io...');
