@@ -50,7 +50,7 @@ try {
 	};
 
 	const corsOptions = {
-		origin: '*',
+		origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com/'],
 		credentials: true
 	};
 
@@ -59,7 +59,7 @@ try {
 
 	const ioOptions = {
 		cors: {
-			origin: '*',
+			origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com/'],
 			credentials: true
 		}
 	};
