@@ -42,10 +42,11 @@
 		const imageBuffer = await image.arrayBuffer();
 		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
 
+		await UserManager.setAlbumArt(imageFile);
+		await new Promise(resolve => setTimeout(resolve, 100));
+		
 		const artworkUuid = uuidv4();
 		const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
-
-		await UserManager.setAlbumArt(imageFile);
 		
 		let friendPlaying = {
 			title: song.title,
