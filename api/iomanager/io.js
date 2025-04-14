@@ -54,10 +54,13 @@ module.exports = {
 	discordRPC: function (user, _friends, io, nowPlaying) {
 		try {
 			const rpcData = {
-				details: nowPlaying.title || undefined,
+				artist: nowPlaying.artist || undefined,
+				title: nowPlaying.title || undefined,
 				state: nowPlaying.artist ? `by ${nowPlaying.artist}` : undefined,
 				largeImageKey: nowPlaying.image ? `data:image/jpeg;base64,${nowPlaying.image}` : "maple",
 				largeImageText: nowPlaying.album || undefined,
+				id: nowPlaying.id || undefined,
+				album: nowPlaying.album || undefined,
 				smallImageKey: "play",
 				smallText: "Listening to Maple",
 				buttons: [
