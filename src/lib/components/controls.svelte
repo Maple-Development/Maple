@@ -47,7 +47,8 @@
 			title: song.title,
 			artist: song.artist,
 			album: song.album,
-			discord: UserSettings.discord.enabled
+			discord: UserSettings.discord.enabled,
+			id: $SavedUser.id
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
