@@ -337,6 +337,27 @@ export class UserManager {
 		}
 	};
 
+	public static setAlbumArt = async (albumArt: File) => {
+		try {
+			const formData = new FormData();
+			formData.append('albumArt', albumArt);
+			formData.append('id', get(UserInfo)?.id);
+			const response = await fetch(`${this.SERVER}/user/manage/setAlbumArt/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: formData
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			toast.error('Error setting album art: "' + error + '"');
+			console.error('Error:', error);
+			return null;
+		}
+	};
+
 	/*  public static addFriend = async (friend: string) => {
         try {
            socket.emit('addFriend', { friendId: friend });

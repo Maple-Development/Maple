@@ -39,20 +39,14 @@
 
 		const image = await getImage(song.image);
 		const imageBuffer = await image.arrayBuffer();
-		const uint8Array = new Uint8Array(imageBuffer);
-		let binary = '';
-		const chunkSize = 8192;
-		for (let i = 0; i < uint8Array.length; i += chunkSize) {
-			const chunk = Array.from(uint8Array.slice(i, i + chunkSize));
-			binary += String.fromCharCode.apply(null, chunk);
-		}
-		const imageBase64 = btoa(binary);
+		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
 
+		UserManager.setAlbumArt(imageFile);
+		
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
 			album: song.album,
-			image: imageBase64,
 			discord: UserSettings.discord.enabled
 		};
 

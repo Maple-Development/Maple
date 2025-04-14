@@ -39,7 +39,7 @@ router.get('/user/id/:id', async (req, res) => {
 	}
 
 	const [nowPlayingResults] = await pool.promise().query(
-	  'SELECT * FROM live_status WHERE user_id = ?',
+	  'SELECT playing FROM live_status WHERE user_id = ?',
 	  [id]
 	);
 
@@ -76,6 +76,30 @@ router.get('/pfp/:id', (req, res) => {
 		res.set('Content-Type', 'image/jpeg');
 		res.set('Content-Disposition', `attachment; filename="${id}.jpg"`);
 		res.send(user.pfp);
+	});
+});
+
+router.get('/albumArt/:id', (req, res) => {
+	const id = req.params.id;
+	const sql = 'SELECT albumArt FROM live_status WHERE user_id = ?';
+
+	pool.query(sql, [id], (error, results) => {
+		if (error) {
+			console.error('Error fetching user:', error);
+			return res.status(500).json({ error: 'Error fetching user' });
+		}
+		if (results.length === 0) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+
+		const user = results[0];
+		if (!user.albumArt) {
+			return res.status(404).json({ error: 'User has no album art' });
+		}
+
+		res.set('Content-Type', 'image/jpeg');
+		res.set('Content-Disposition', `attachment; filename="${id}.jpg"`);
+		res.send(user.albumArt);
 	});
 });
 
