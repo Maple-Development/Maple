@@ -6,6 +6,7 @@
 	import { UserManager } from '$lib/api/UserManager';
 	import { SavedUser } from '$lib/store';
 	import UserSettings from '$lib/preferences/usersettings';
+	import { v4 as uuidv4 } from 'uuid';
 
 	let audioUrl: string = '';
 	let colors: {
@@ -115,7 +116,12 @@
 					navigator.mediaSession.metadata = new MediaMetadata({
 						title: song.title,
 						artist: song.artist,
-						album: song.album
+						album: song.album,
+						artwork: [
+							{
+								src: 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + uuidv4()
+							}
+						]
 					});
 
 					navigator.mediaSession.setActionHandler('play', () => {
