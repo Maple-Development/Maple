@@ -79,7 +79,7 @@ router.get('/pfp/:id', (req, res) => {
 	});
 });
 
-router.get('/albumArt/:id', (req, res) => {
+router.get('/albumArt/:id/:random', (req, res) => {
 	const id = req.params.id;
 	const sql = 'SELECT albumArt FROM live_status WHERE user_id = ?';
 
