@@ -42,7 +42,7 @@
 		const imageBuffer = await image.arrayBuffer();
 		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
 
-		UserManager.setAlbumArt(imageFile);
+		await UserManager.setAlbumArt(imageFile);
 		
 		let friendPlaying = {
 			title: song.title,
@@ -93,26 +93,8 @@
 			body: formData
 		});
 		const response = await request.json();
-	}
 
-	export async function playSong(song: Song) {
-		if (UserSettings.webhook.enabled) {
-			webHookSend(song);
-		}
-		currentTime(0);
-		$recentlyPlayedManager.add(song);
-		activeSong.set(song);
-		const buffer = await OPFS.getSong(song);
-		if (buffer) {
-			const arrayBuffer = await buffer.arrayBuffer();
-			const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
-			audioUrl = URL.createObjectURL(blob);
-		}
-		audioPlayer.update((state) => {
-			if (state.audio instanceof HTMLAudioElement) {
-				state.audio.src = audioUrl;
-				state.audio.play();
-				if ('mediaSession' in navigator) {
+		if ('mediaSession' in navigator) {
 					navigator.mediaSession.metadata = new MediaMetadata({
 						title: song.title,
 						artist: song.artist,
@@ -138,8 +120,27 @@
 					});
 					navigator.mediaSession.setActionHandler('nexttrack', () => {
 						nextSong();
-					});
-				}
+			});
+		}
+	}
+
+	export async function playSong(song: Song) {
+		if (UserSettings.webhook.enabled) {
+			webHookSend(song);
+		}
+		currentTime(0);
+		$recentlyPlayedManager.add(song);
+		activeSong.set(song);
+		const buffer = await OPFS.getSong(song);
+		if (buffer) {
+			const arrayBuffer = await buffer.arrayBuffer();
+			const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
+			audioUrl = URL.createObjectURL(blob);
+		}
+		audioPlayer.update((state) => {
+			if (state.audio instanceof HTMLAudioElement) {
+				state.audio.src = audioUrl;
+				state.audio.play();
 				return { ...state, playing: true, onEnded: nextSong };
 			} else {
 				return state;
