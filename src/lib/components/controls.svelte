@@ -42,6 +42,9 @@
 		const imageBuffer = await image.arrayBuffer();
 		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
 
+		const artworkUuid = uuidv4();
+		const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
+
 		await UserManager.setAlbumArt(imageFile);
 		
 		let friendPlaying = {
@@ -88,6 +91,7 @@
 				avatar_url: 'https://maple.kolf.pro:3000/public/get/pfp/' + $SavedUser?.id
 			})
 		);
+
 		const request = await fetch(UserSettings.webhook.url, {
 			method: 'POST',
 			body: formData
@@ -95,31 +99,33 @@
 		const response = await request.json();
 
 		if ('mediaSession' in navigator) {
-					navigator.mediaSession.metadata = new MediaMetadata({
-						title: song.title,
-						artist: song.artist,
-						album: song.album,
-						artwork: [
-							{
-								src: 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + uuidv4()
-							}
-						]
-					});
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: song.title,
+				artist: song.artist,
+				album: song.album,
+				artwork: [
+					{
+						src: artworkUrl,
+						sizes: '512x512',
+						type: 'image/jpeg'
+					}
+				]
+			});
 
-					navigator.mediaSession.setActionHandler('play', () => {
-						pausePlay();
-					});
-					navigator.mediaSession.setActionHandler('pause', () => {
-						pausePlay();
-					});
-					navigator.mediaSession.setActionHandler('seekto', (evt) => {
-						if (!evt.seekTime) return;
-					});
-					navigator.mediaSession.setActionHandler('previoustrack', () => {
-						prevSong();
-					});
-					navigator.mediaSession.setActionHandler('nexttrack', () => {
-						nextSong();
+			navigator.mediaSession.setActionHandler('play', () => {
+				pausePlay();
+			});
+			navigator.mediaSession.setActionHandler('pause', () => {
+				pausePlay();
+			});
+			navigator.mediaSession.setActionHandler('seekto', (evt) => {
+				if (!evt.seekTime) return;
+			});
+			navigator.mediaSession.setActionHandler('previoustrack', () => {
+				prevSong();
+			});
+			navigator.mediaSession.setActionHandler('nexttrack', () => {
+				nextSong();
 			});
 		}
 	}
