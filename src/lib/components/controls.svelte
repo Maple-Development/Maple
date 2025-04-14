@@ -125,9 +125,6 @@
 	}
 
 	export async function playSong(song: Song) {
-		if (UserSettings.webhook.enabled) {
-			webHookSend(song);
-		}
 		currentTime(0);
 		$recentlyPlayedManager.add(song);
 		activeSong.set(song);
@@ -151,6 +148,10 @@
 			...store,
 			onEnded: nextSong
 		}));
+
+		if (UserSettings.webhook.enabled) {
+			webHookSend(song);
+		}
 	}
 
 	export function nextSong() {
