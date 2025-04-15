@@ -18,6 +18,34 @@
 	import UserSettings from '$lib/preferences/usersettings';
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 
+	//@ts-ignore
+	import { pwaInfo } from 'virtual:pwa-info';
+	//@ts-ignore
+	import { registerSW } from 'virtual:pwa-register';
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
+
+	const intervalMS = 60 * 60 * 1000; // 1 hour
+
+	registerSW({
+		onNeedRefresh() {
+			//need to add a prompt to the user to update the app
+		},
+		onOfflineReady() {
+			// need to add a toast to the user that the app is ready to work offline
+		},
+		onRegistered(r: ServiceWorkerRegistration) {
+			r && setInterval(() => {
+				r.update();
+			}, intervalMS);
+		}
+	});
+
+	let isPWA = false;
+	if (browser) {
+		isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+				window.matchMedia('(display-mode: minimal-ui)').matches;
+	}
+
 	async function getUserData() {
 		await UserManager.getUser();
 	}
@@ -78,17 +106,18 @@
 <svelte:window use:attachListener />
 <svelte:head>
 	<title>{$title}</title>
+	{@html webManifestLink}
 </svelte:head>
 <Toaster position="top-right" />
 
 <div class="flex h-screen flex-col overflow-hidden">
 	{#if $page.url.pathname !== '/account/login' && $page.url.pathname !== '/account' && $page.url.pathname !== '/account/register' && $page.url.pathname !== '/account/preferences'}
 		{#if !smallDevice}
-			<div class="sticky top-0 z-10 border-b bg-background">
+			<div class="sticky top-0 z-10 border-b bg-background" class:pt-safe={isPWA}>
 				<TopBar />
 			</div>
 		{:else}
-			<div class="fixed inset-x-0 top-0 z-10 border-b bg-background">
+			<div class="fixed inset-x-0 top-0 z-10 border-b bg-background" class:pt-safe={isPWA}>
 				<MobileTopBar />
 			</div>
 		{/if}
