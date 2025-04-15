@@ -26,19 +26,21 @@
 
 	const intervalMS = 60 * 60 * 1000; // 1 hour
 
-	registerSW({
-		onNeedRefresh() {
-			//need to add a prompt to the user to update the app
-		},
-		onOfflineReady() {
-			// need to add a toast to the user that the app is ready to work offline
-		},
-		onRegistered(r: ServiceWorkerRegistration) {
-			r && setInterval(() => {
-				r.update();
-			}, intervalMS);
-		}
-	});
+	if (browser) {
+		registerSW({
+			onNeedRefresh() {
+				//need to add a prompt to the user to update the app
+			},
+			onOfflineReady() {
+				// need to add a toast to the user that the app is ready to work offline
+			},
+			onRegistered(r: ServiceWorkerRegistration) {
+				r && setInterval(() => {
+					r.update();
+				}, intervalMS);
+			}
+		});
+	}
 
 	let isPWA = false;
 	if (browser) {
