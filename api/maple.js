@@ -30,19 +30,26 @@ var options = {
 	debug: true,
 	generateClientId: (req) => {
 		try {
-			const cookieString = req.headers.cookie;
-			if (!cookieString) return null;
+			if (!req || !req.headers || !req.headers.cookie) {
+				console.log('[PEER] No request object or cookies found, generating random ID');
+				return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
+			}
 			
+			const cookieString = req.headers.cookie;
 			const cookies = cookieString.split(';');
 			const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
-			if (!tokenCookie) return null;
+			if (!tokenCookie) {
+				console.log('[PEER] No token cookie found, generating random ID');
+				return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
+			}
 			
 			const token = tokenCookie.split('=')[1];
 			const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
 			return decoded.id;
 		} catch (error) {
 			console.error('[ERROR] Failed to generate PeerJS client ID:', error);
-			return null;
+			// Generate a random ID as fallback
+			return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
 		}
 	}
 };
