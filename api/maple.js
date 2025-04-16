@@ -14,8 +14,6 @@ const https = require('https');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const authenticateToken = require('./middleware/authToken');
-
 console.log('[1] Starting server initialization...');
 
 process.on('uncaughtException', (error) => {
@@ -31,10 +29,21 @@ var ExpressPeerServer = require('peer').ExpressPeerServer;
 var options = {
 	debug: true,
 	generateClientId: (req) => {
-		authenticateToken(req, {}, (err) => {
-			if (err) return null;
-			return req.user.id;
-		});
+		try {
+			const cookieString = req.headers.cookie;
+			if (!cookieString) return null;
+			
+			const cookies = cookieString.split(';');
+			const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+			if (!tokenCookie) return null;
+			
+			const token = tokenCookie.split('=')[1];
+			const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+			return decoded.id;
+		} catch (error) {
+			console.error('[ERROR] Failed to generate PeerJS client ID:', error);
+			return null;
+		}
 	}
 };
 
