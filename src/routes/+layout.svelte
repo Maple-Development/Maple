@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { UserManager } from '$lib/api/UserManager';
+	import { PeerManager } from '$lib/api/PeerManager';
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
@@ -73,6 +74,7 @@
 					refreshFriends();
 					refreshRequests();
 				}
+				PeerManager.createPeer();
 			}
 		}
 	});
