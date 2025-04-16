@@ -6,7 +6,7 @@
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { OPFS } from '$lib/opfs';
-	import { hideTips, isSmallDevice, title } from '$lib/store';
+	import { hideTips, isSmallDevice, title, recentlyPlayedManager } from '$lib/store';
 	import type { Playlist } from '$lib/types/playlist';
 	import type { Song } from '$lib/types/song';
 	import {
@@ -24,8 +24,15 @@
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
 
+	$: recentlyPlayedSongs = $recentlyPlayedManager.get();
+
+	let tracks: Song[] = [];
+	let playlists: Playlist[] = [];
+
 	let onboard = true;
 	onMount(async () => {
+		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
+		playlists = await OPFS.get().playlists();
 		onboard = await OPFS.ifExists('tracks');
 		title.set('Home');
 	});
