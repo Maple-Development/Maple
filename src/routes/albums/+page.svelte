@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
-	import type { Album } from '$lib/types/album';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, EllipsisVertical } from 'lucide-svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-	import { title, isSmallDevice } from '$lib/store';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { OPFS } from '$lib/opfs';
+	import { isSmallDevice, title } from '$lib/store';
+	import type { Album } from '$lib/types/album';
+	import { ArrowDownZA, ArrowUpAZ, EllipsisVertical, List, ListFilter } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
 	import { toast } from 'svelte-sonner';
-	import { goto } from '$app/navigation';
 
 	let albums: Album[] = [];
 

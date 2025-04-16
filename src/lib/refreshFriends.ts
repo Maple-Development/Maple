@@ -1,7 +1,7 @@
+import { friends, pendingRequests, SavedUser } from '$lib/store';
+import { get } from 'svelte/store';
 import { UserManager } from './api/UserManager';
 import type { AddedFriend } from './types/addedfriends';
-import { get } from 'svelte/store';
-import { friends, pendingRequests, SavedUser } from '$lib/store';
 
 export async function refreshRequests() {
     pendingRequests.set(await UserManager.getRequests());

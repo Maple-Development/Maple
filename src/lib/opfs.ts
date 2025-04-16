@@ -5,13 +5,12 @@
 // Dir Index
 // File Index
 
-import { file, dir, write } from 'opfs-tools';
-import type { Song } from '$lib/types/song';
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
-import type { Playlist } from './types/playlist';
+import type { Song } from '$lib/types/song';
+import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
-import { activeSong } from './store';
+import type { Playlist } from './types/playlist';
 
 export class OPFS {
 	private static albumsCache: Album[] | null = null;

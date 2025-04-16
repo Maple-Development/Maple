@@ -1,43 +1,27 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
+	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
+	import * as Alert from '$lib/components/ui/alert/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { title, recentlyPlayedManager, isSmallDevice, hideTips } from '$lib/store';
+	import * as Command from '$lib/components/ui/command';
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { OPFS } from '$lib/opfs';
+	import { hideTips, isSmallDevice } from '$lib/store';
+	import type { Playlist } from '$lib/types/playlist';
+	import type { Song } from '$lib/types/song';
 	import {
 		ArrowDownZA,
 		ArrowUpAZ,
-		List,
-		ListFilter,
-		Info,
 		CircleAlert,
 		CircleCheck,
+		Info,
+		List,
+		ListFilter,
 		X
 	} from 'lucide-svelte';
-	import * as Alert from '$lib/components/ui/alert/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import * as Carousel from '$lib/components/ui/carousel/index.js';
-	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
-	// @ts-ignore
+// @ts-ignore
 	import Lazy from 'svelte-lazy';
-	import type { Song } from '$lib/types/song';
-	import type { Playlist } from '$lib/types/playlist';
 	import { toast } from 'svelte-sonner';
-
-	$: recentlyPlayedSongs = $recentlyPlayedManager.get();
-
-	let tracks: Song[] = [];
-	let playlists: Playlist[] = [];
-
-	let onboard = true;
-	onMount(async () => {
-		tracks = (await OPFS.get().tracks()).sort((a, b) => a.title.localeCompare(b.title));
-		playlists = await OPFS.get().playlists();
-		onboard = await OPFS.ifExists('tracks');
-		title.set('Home');
-	});
-	import * as Command from '$lib/components/ui/command';
 
 	let ascending = true;
 

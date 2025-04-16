@@ -1,19 +1,18 @@
 <script lang="ts">
 	//@ts-nocheck
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { onMount } from 'svelte';
-	import { title, socket, friendNowPlaying, isLoggedIn, SavedUser, pendingRequests, friends } from '$lib/store';
-	import { toast } from 'svelte-sonner';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { UserCheck, User, EllipsisVertical, AudioLines, UserPlus, UserX, Music2 } from 'lucide-svelte';
-	import { Separator } from '$lib/components/ui/separator';
 	import { UserManager } from '$lib/api/UserManager';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Card } from '$lib/components/ui/card/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { friends, isLoggedIn, pendingRequests, title } from '$lib/store';
+	import { AudioLines, EllipsisVertical, Music2, UserCheck, UserPlus, UserX } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	import { OPFS } from '$lib/opfs';
-	import type { Song } from '$lib/types/song';
 	import type { Playlist } from '$lib/types/playlist';
+	import type { Song } from '$lib/types/song';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];

@@ -1,23 +1,22 @@
 <script lang="ts">
 	//@ts-nocheck
-	import { OPFS } from '$lib/opfs';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { parseBlob } from 'music-metadata';
-	import type { Song } from '$lib/types/song';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { Separator } from '$lib/components/ui/separator';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import { OPFS } from '$lib/opfs';
+	import { Settings } from '$lib/preferences/fetch';
+	import UserSettings from '$lib/preferences/usersettings';
+	import { title } from '$lib/store';
 	import type { Album } from '$lib/types/album';
 	import type { Artist } from '$lib/types/artist';
-	import { v4 as uuidv4 } from 'uuid';
+	import type { Song } from '$lib/types/song';
+	import { Users } from 'lucide-svelte';
+	import { parseBlob } from 'music-metadata';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { title } from '$lib/store';
-	import { Separator } from '$lib/components/ui/separator';
-	import { browser } from '$app/environment';
-	import UserSettings from '$lib/preferences/usersettings';
-	import { Settings } from '$lib/preferences/fetch';
-	import { Users } from 'lucide-svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	let preferences = new Settings('preferences');
 

@@ -1,5 +1,5 @@
+import { SavedUser, UserPeer } from '$lib/store';
 import { Peer } from 'peerjs';
-import { UserPeer, SavedUser } from '$lib/store';
 import { get } from 'svelte/store';
 
 export class PeerManager {

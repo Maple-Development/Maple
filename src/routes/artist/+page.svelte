@@ -1,21 +1,20 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
-	import type { Artist } from '$lib/types/artist';
-	import type { Song } from '$lib/types/song';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter, List, Check, Pencil, Trash } from 'lucide-svelte';
 	import GridTrack from '$lib/components/blocks/GridTrack.svelte';
 	import ListTrack from '$lib/components/blocks/ListTrack.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { OPFS } from '$lib/opfs';
 	import { context, title } from '$lib/store';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	//@ts-ignore
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import type { Artist } from '$lib/types/artist';
+	import type { Song } from '$lib/types/song';
+	import { ArrowDownZA, ArrowUpAZ, Check, List, ListFilter, Pencil, Trash } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+//@ts-ignore
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { toast } from 'svelte-sonner';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import type { Playlist } from '$lib/types/playlist';
+	import { toast } from 'svelte-sonner';
 
 	let artistName: string;
 	let artist: Artist | undefined;

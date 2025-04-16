@@ -1,11 +1,11 @@
-import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Song } from './types/song';
-import type { User } from './types/user';
-import type { PendingRequest } from './types/preq';
-import type { AddedFriend } from './types/addedfriends';
 import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
+import { derived, writable } from 'svelte/store';
+import type { AddedFriend } from './types/addedfriends';
+import type { PendingRequest } from './types/preq';
+import type { Song } from './types/song';
+import type { User } from './types/user';
 
 export const pendingRequests = writable([] as PendingRequest[]);
 export const friends = writable([] as AddedFriend[]);

@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
-	import type { Album } from '$lib/types/album';
-	import type { Song } from '$lib/types/song';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter, Pencil, List, Check, Trash } from 'lucide-svelte';
+	import { page } from '$app/stores';
 	import GridTrack from '$lib/components/blocks/GridTrack.svelte';
 	import ListTrack from '$lib/components/blocks/ListTrack.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { page } from '$app/stores';
+	import { OPFS } from '$lib/opfs';
 	import { context, title } from '$lib/store';
-	//@ts-ignore
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import type { Album } from '$lib/types/album';
+	import type { Song } from '$lib/types/song';
+	import { ArrowDownZA, ArrowUpAZ, Check, List, ListFilter, Pencil, Trash } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import type { Playlist } from '$lib/types/playlist';
 
 	let albumName: string;

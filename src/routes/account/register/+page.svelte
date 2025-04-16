@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { goto } from '$app/navigation';
 	import { UserManager } from '$lib/api/UserManager';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { isLoggedIn, title } from '$lib/store';
-	import { goto } from '$app/navigation';
 
 	let username = '';
 	let password = '';

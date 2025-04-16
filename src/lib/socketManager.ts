@@ -1,7 +1,7 @@
-import { socket as importedSocket, friendNowPlaying } from '$lib/store';
-import { get } from 'svelte/store';
-import { toast } from 'svelte-sonner';
 import { browser } from '$app/environment';
+import { socket as importedSocket } from '$lib/store';
+import { toast } from 'svelte-sonner';
+import { get } from 'svelte/store';
 import { UserManager } from './api/UserManager';
 import { refreshFriends, refreshRequests } from './refreshFriends';
 

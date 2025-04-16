@@ -1,23 +1,21 @@
 <script lang="ts">
-	import '../app.pcss';
-	import SideBar from '$lib/components/SideBar.svelte';
-	import TopBar from '$lib/components/TopBar.svelte';
-	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { collapsed, loadPreferencesStore, UserInfo } from '$lib/store';
+	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 	import { UserManager } from '$lib/api/UserManager';
-	import { Toaster } from '$lib/components/ui/sonner';
-	import { title, isSmallDevice, socket, isLoggedIn } from '$lib/store';
+	import AccTopBar from '$lib/components/AccTopBar.svelte';
+	import BottomBar from '$lib/components/BottomBar.svelte';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
 	import MobileTopBar from '$lib/components/MobileTopBar.svelte';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import AccTopBar from '$lib/components/AccTopBar.svelte';
-	import { io } from 'socket.io-client';
-	import { browser } from '$app/environment';
-	import { socketManager } from '../lib/socketManager';
+	import SideBar from '$lib/components/SideBar.svelte';
+	import TopBar from '$lib/components/TopBar.svelte';
+	import { Toaster } from '$lib/components/ui/sonner';
 	import UserSettings from '$lib/preferences/usersettings';
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
-
+	import { collapsed, isLoggedIn, isSmallDevice, loadPreferencesStore, socket, title, UserInfo } from '$lib/store';
+	import { io } from 'socket.io-client';
+	import { onMount } from 'svelte';
+	import '../app.pcss';
+	import { socketManager } from '../lib/socketManager';
 	//@ts-ignore
 	import { pwaInfo } from 'virtual:pwa-info';
 	//@ts-ignore

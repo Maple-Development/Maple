@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { User } from '$lib/types/user';
 	import { UserManager } from '$lib/api/UserManager';
-	import { User as UserIcon } from 'lucide-svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import { SavedUser, title } from '$lib/store';
+	import type { User } from '$lib/types/user';
+	import { User as UserIcon } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	let userData: User = {
 		username: '',

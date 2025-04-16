@@ -1,38 +1,32 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
-	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
-	import {
-		ArrowUpAZ,
-		ArrowDownZA,
-		ListFilter,
-		List,
-		Check,
-		Pencil,
-		Trash,
-		EllipsisVertical,
-		Plus,
-		X,
-		Search
-	} from 'lucide-svelte';
+	import { page } from '$app/stores';
 	import GridTrack from '$lib/components/blocks/GridTrack.svelte';
 	import ListTrack from '$lib/components/blocks/ListTrack.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { context, title, isSmallDevice } from '$lib/store';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { page } from '$app/stores';
-	//@ts-ignore
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { OPFS } from '$lib/opfs';
+	import { context, isSmallDevice, title } from '$lib/store';
+	import type { Playlist } from '$lib/types/playlist';
+	import type { Song } from '$lib/types/song';
+	import {
+		ArrowDownZA,
+		ArrowUpAZ,
+		Check,
+		List,
+		ListFilter,
+		Pencil,
+		Plus,
+		Search,
+		Trash
+	} from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	// @ts-ignore
-	import Lazy from 'svelte-lazy';
-	import { toast } from 'svelte-sonner';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area';
+	//@ts-ignore
+	import Lazy from 'svelte-lazy';
+	import { toast } from 'svelte-sonner';
 
 	let playlistName: string;
 	let playlist: Playlist | undefined;

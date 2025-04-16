@@ -1,22 +1,21 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
 	import { page } from '$app/stores';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Pencil, Check, Plus, Search } from 'lucide-svelte';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
-	import { v4 as uuidv4 } from 'uuid';
-	import { onMount } from 'svelte';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { OPFS } from '$lib/opfs';
 	import { title } from '$lib/store';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import type { Playlist } from '$lib/types/playlist';
+	import type { Song } from '$lib/types/song';
+	import { Check, Pencil, Plus, Search } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { v4 as uuidv4 } from 'uuid';
+	import { goto } from '$app/navigation';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
-	import Controls from '$lib/components/controls.svelte';
-	import { goto } from '$app/navigation';
+
 	import { toast } from 'svelte-sonner';
 
 	let doCreate = false;

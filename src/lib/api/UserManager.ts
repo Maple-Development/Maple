@@ -1,9 +1,8 @@
-import { get } from 'svelte/store';
-import { UserInfo, SavedUser, friendNowPlaying } from '$lib/store';
+import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
+import { SavedUser, UserInfo, friendNowPlaying } from '$lib/store';
 import type { User } from '$lib/types/user';
 import { toast } from 'svelte-sonner';
-import { Peer } from 'peerjs';
-import { refreshRequests, refreshFriends } from '$lib/refreshFriends';
+import { get } from 'svelte/store';
 
 export class UserManager {
 	private static DevServer = 'http://localhost:3000';

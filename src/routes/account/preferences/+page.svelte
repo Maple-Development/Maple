@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { onMount } from 'svelte';
-	import { isLoggedIn, title } from '$lib/store';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import UserSettings from '$lib/preferences/usersettings';
-	import { Settings } from '$lib/preferences/fetch';
-	import { toast } from 'svelte-sonner';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { Settings } from '$lib/preferences/fetch';
+	import UserSettings from '$lib/preferences/usersettings';
+	import { isLoggedIn, title } from '$lib/store';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	let webhookSettings = new Settings('webhook');
 	let discordSettings = new Settings('discord');

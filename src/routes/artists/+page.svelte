@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { OPFS } from '$lib/opfs';
-	import { onMount } from 'svelte';
-	import type { Artist } from '$lib/types/artist';
-	import { ArrowUpAZ, ArrowDownZA, ListFilter } from 'lucide-svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { context, title } from '$lib/store';
-	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { OPFS } from '$lib/opfs';
+	import { title } from '$lib/store';
+	import type { Artist } from '$lib/types/artist';
+	import { ArrowDownZA, ArrowUpAZ, ListFilter } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	let artists: Artist[] = [];
 
