@@ -162,8 +162,8 @@
 </script>
 
 {#if !doCreate}
-	<div class="container mx-0 px-4 py-8">
-		<div class="my-5 ml-4 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:ml-16 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 lg:gap-x-10 xl:grid-cols-5 xl:gap-x-12">
+	<div class="px-12 py-8">
+		<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
 			<a class="pointer" href={`/playlists?create=true`}>
 				<div class="group relative flex flex-col items-start transition-all duration-200 hover:scale-[1.02]">
 					<div class="flex h-44 w-44 animate-pulse items-center justify-center rounded-lg bg-muted md:h-52 md:w-52">
@@ -211,7 +211,7 @@
 		</div>
 	</div>
 {:else}
-	<div class="container mx-auto px-4 py-8">
+	<div class="px-12 py-8">
 		<div class="mb-8 rounded-lg border bg-card p-4 shadow-sm md:p-6">
 			<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
 				<div class="relative">

@@ -64,7 +64,7 @@
 	}
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="px-12 py-8">
 	<div class="mb-4 flex h-10 w-full justify-end">
 		{#if ascending}
 			<Button

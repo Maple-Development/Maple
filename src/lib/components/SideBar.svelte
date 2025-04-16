@@ -7,11 +7,15 @@
 		Home,
 		Settings,
 		CirclePlus,
-		Users
+		Users,
+
+		Upload
+
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { collapsed, SavedUser } from '$lib/store';
 	import * as Tooltip from "$lib/components/ui/tooltip";
+	import { createLibrary } from '$lib/library';
 </script>
 
 <div class="ml-2 h-full w-full justify-between sm:flex sm:flex-col sm:items-center md:w-full">
@@ -122,6 +126,21 @@
 		</Button></Tooltip.Trigger>
 			<Tooltip.Content side="right" sideOffset={-6}>
 			  Settings
+			</Tooltip.Content>
+		  </Tooltip.Root>
+
+		  <Tooltip.Root>
+			<Tooltip.Trigger><Button
+			class="my-1 mr-5 flex w-fit flex-row items-center justify-start bg-transparent pl-4 pr-2 hover:bg-secondary"
+			on:click={() => createLibrary()}
+		>
+			<Upload size={20} class="mr-2 text-foreground" />
+			{#if $collapsed}
+				<h1 class="hidden px-1 text-foreground md:block">Import</h1>
+			{/if}
+		</Button></Tooltip.Trigger>
+			<Tooltip.Content side="right" sideOffset={-6}>
+			  Import
 			</Tooltip.Content>
 		  </Tooltip.Root>
 		

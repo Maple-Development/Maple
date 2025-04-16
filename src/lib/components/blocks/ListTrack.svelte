@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { OPFS } from '$lib/opfs';
 	import type { Song } from '$lib/types/song';
-	import { onMount } from 'svelte';
-	import ContextMenu from '../ui/context-menu/context-menu.svelte';
 	import TrackWrapper from '../TrackWrapper.svelte';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
@@ -16,7 +14,7 @@
 	import type { Playlist } from '$lib/types/playlist';
 	const dispatch = createEventDispatcher();
 
-	async function getImageUrl(imagePath: string): Promise<string> {
+	async function getImageUrl(imagePath: string): Promise<string> { 
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
 		const blob = new Blob([arrayBuffer]);

@@ -89,7 +89,11 @@
 		}
 	}
 
-	async function getImageUrl(imagePath: string): Promise<string> {
+	async function getImageUrl(imagePath: string | Blob): Promise<string> {
+		if (imagePath instanceof Blob) {
+			return URL.createObjectURL(imagePath);
+		}
+		
 		const response = await OPFS.get().image(imagePath);
 		const arrayBuffer = await response.arrayBuffer();
 		const blob = new Blob([arrayBuffer]);
@@ -153,9 +157,10 @@
 				image: doImage ? imageFile : playlist.image,
 				tracks: playlist.tracks
 			};
-			OPFS.playlist().edit(modifiedplaylist);
-			let newplaylist = await OPFS.get().playlist(modifiedplaylist.id.toString());
-			playlist = newplaylist;
+
+			await OPFS.playlist().edit(modifiedplaylist);
+			await refresh(playlist.id);
+			imageFile = null;
 		}
 	}
 
@@ -168,6 +173,12 @@
 			reader.onload = () => {
 				const imageBlob = new Blob([reader.result as ArrayBuffer], { type: file.type });
 				imageFile = imageBlob;
+				if (playlist) {
+					playlist = {
+						...playlist,
+						image: imageBlob
+					};
+				}
 			};
 		}
 	}
@@ -265,7 +276,7 @@
 	}
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class=" mx-auto px-4 py-8">
 	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
 		<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
 			<div class="relative">

@@ -9,14 +9,10 @@
 	import { Settings } from '$lib/preferences/fetch';
 	import UserSettings from '$lib/preferences/usersettings';
 	import { title } from '$lib/store';
-	import type { Album } from '$lib/types/album';
-	import type { Artist } from '$lib/types/artist';
-	import type { Song } from '$lib/types/song';
+	import { createLibrary } from '$lib/library';
 	import { Users } from 'lucide-svelte';
-	import { parseBlob } from 'music-metadata';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { v4 as uuidv4 } from 'uuid';
 
 	let preferences = new Settings('preferences');
 
@@ -27,94 +23,6 @@
 	let socket = true;
 
 	let deferredPrompt;
-	async function createLibrary(mobileFiles: FileList) {
-		try {
-			const sampleImage = await fetch('/placeholder.png');
-			const blob = await sampleImage.blob();
-			await OPFS.initializeLibrary();
-
-			let entries: FileSystemHandle[] = [];
-			const input = document.getElementById('files') as HTMLInputElement;
-
-			const handleFiles = async (files: FileList) => {
-				let i = 0;
-				for (const file of Array.from(files)) {
-					if (file.type.startsWith('audio/')) {
-						i++;
-						toast(`${i} of ${files.length} | Processing ${file.name}`);
-						try {
-							const metadata = await parseBlob(file);
-							const track: Song = {
-								id: uuidv4(),
-								title: metadata.common.title || file.name.split('.').slice(0, -1).join('.'),
-								artist: metadata.common.artist || 'Unknown Artist',
-								album: metadata.common.album || 'Unknown Album',
-								year: metadata.common.year || 0,
-								genre: metadata.common.genre || 'Unknown Genre',
-								duration: metadata.format.duration || 0,
-								image: metadata.common.picture
-									? new Blob([metadata.common.picture[0].data], {
-											type: metadata.common.picture[0].format
-										})
-									: blob,
-								trackNumber: metadata.common.track.no,
-								disk: metadata.common.disk.no,
-								ext: file.name.split('.').pop()
-							};
-
-							const album: Album = {
-								id: uuidv4(),
-								name: metadata.common.album || 'Unknown Album',
-								artist: metadata.common.artist || 'Unknown Artist',
-								year: metadata.common.year || 0,
-								genre: metadata.common.genre || 'Unknown Genre',
-								image: metadata.common.picture
-									? new Blob([metadata.common.picture[0].data], {
-											type: metadata.common.picture[0].format
-										})
-									: blob
-							};
-
-							const artist: Artist = {
-								id: uuidv4(),
-								name: metadata.common.artist || 'Unknown Artist'
-							};
-
-							await OPFS.addAlbum(album, track.id);
-							await OPFS.addArtist(artist, track.id, track.album);
-							await OPFS.addTrack(track);
-							await OPFS.addFile(track.id, file, track);
-						} catch (error) {
-							errorText += `\n${error}`;
-						}
-					}
-				}
-				toast.success(`Library added successfully!`);
-				getLength();
-			};
-
-			if (window.showDirectoryPicker && !mobileFiles) {
-				// Chrome only
-				const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
-				const files: File[] = [];
-
-				for await (const entry of dirHandle.values()) {
-					if (entry.kind === 'file') {
-						const file: File = await entry.getFile();
-						files.push(file);
-					}
-				}
-
-				handleFiles(files);
-			} else {
-				if (mobileFiles) {
-					handleFiles(input.files);
-				}
-			}
-		} catch (error) {
-			errorText += `\n${error}`;
-		}
-	}
 
 	let length = 0;
 	async function getLength() {
@@ -296,7 +204,7 @@
 	}
 </script>
 
-<div class="container mx-auto max-w-4xl px-4 py-8">
+<div class=" mx-auto max-w-4xl px-4 py-8">
 	<div class="mb-8 text-center">
 		<h1 class="mb-2 text-2xl font-semibold">Settings</h1>
 		<p class="text-muted-foreground">Manage your library and application preferences</p>
@@ -395,7 +303,7 @@
 </div>
 
 {#if UserSettings.preferences.devMode}
-	<div class="container mx-auto max-w-4xl px-4">
+	<div class=" mx-auto max-w-4xl px-4">
 		<div class="rounded-lg border bg-card p-6 shadow-sm">
 			<h2 class="mb-4 text-center text-lg font-medium">Developer Console</h2>
 			<Textarea
@@ -409,7 +317,7 @@
 {/if}
 
 {#if UserSettings.preferences.showLogging}
-	<div class="container mx-auto max-w-4xl px-4 py-8">
+	<div class="px-12 max-w-4xl py-8">
 		<div class="rounded-lg border bg-card p-6 shadow-sm">
 			<h2 class="mb-4 text-center text-lg font-medium">System Logs</h2>
 			<Textarea

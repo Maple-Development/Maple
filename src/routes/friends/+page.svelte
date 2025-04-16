@@ -31,7 +31,7 @@
 	}
 </script>
 
-<div class="container mx-auto max-w-4xl px-4 py-4 sm:py-8">
+<div class=" mx-auto max-w-4xl px-4 py-4 sm:py-8">
 	{#if !$isLoggedIn}
 		<div class="text-center">
 			<h1 class="mb-4 text-2xl font-semibold">You are not logged in!</h1>

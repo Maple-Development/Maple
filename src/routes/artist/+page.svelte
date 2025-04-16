@@ -173,7 +173,7 @@
 	}
 </script>
 
-<div class="container mx-auto px-4 py-8">
+<div class="px-12 py-8">
 	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
 		<div class="flex flex-col items-center gap-6 md:flex-row md:items-start">
 			<div class="relative">

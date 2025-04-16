@@ -9,8 +9,7 @@
 	import { toast } from 'svelte-sonner';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
-	import { onMount } from 'svelte';
-
+	
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 

@@ -333,6 +333,12 @@ export class OPFS {
 			}
 			const index = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 			if (index !== -1) {
+				if (playlist.image instanceof Blob) {
+					const imageFileName = `${playlist.id}.image`;
+					const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
+					await write(`/images/${imageFileName}`, imageArrayBuffer);
+					playlist.image = `/images/${imageFileName}`;
+				}
 				this.playlistsCache[index] = playlist;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}
