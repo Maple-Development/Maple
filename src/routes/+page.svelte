@@ -6,7 +6,7 @@
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { OPFS } from '$lib/opfs';
-	import { hideTips, isSmallDevice } from '$lib/store';
+	import { hideTips, isSmallDevice, title } from '$lib/store';
 	import type { Playlist } from '$lib/types/playlist';
 	import type { Song } from '$lib/types/song';
 	import {
@@ -22,6 +22,13 @@
 // @ts-ignore
 	import Lazy from 'svelte-lazy';
 	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
+
+	let onboard = true;
+	onMount(async () => {
+		onboard = await OPFS.ifExists('tracks');
+		title.set('Home');
+	});
 
 	let ascending = true;
 
