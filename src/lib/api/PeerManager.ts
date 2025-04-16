@@ -4,7 +4,11 @@ import Peer from 'peerjs';
 export class PeerManager {
 	public static createPeer = async () => {
 		try {
-			const peer = new Peer();
+			const peer = new Peer('', {
+				host: 'maple.kolf.pro',
+				port: 3000,
+				secure: true,
+			});
 			UserPeer.set(peer);
 			return peer;
 		} catch (error) {
