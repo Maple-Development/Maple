@@ -14,6 +14,8 @@ const https = require('https');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const authenticateToken = require('./middleware/authToken');
+
 console.log('[1] Starting server initialization...');
 
 process.on('uncaughtException', (error) => {
@@ -27,7 +29,13 @@ process.on('unhandledRejection', (reason, promise) => {
 var ExpressPeerServer = require('peer').ExpressPeerServer;
 
 var options = {
-	debug: true
+	debug: true,
+	generateClientId: (req) => {
+		authenticateToken(req, {}, (err) => {
+			if (err) return null;
+			return req.user.id;
+		});
+	}
 };
 
 /* const limiter = rateLimit({
@@ -80,7 +88,16 @@ try {
 		res.status(200).send('Hello! I is alive!');
 	});
 
-	app.use('/peerjs', ExpressPeerServer(server, options));
+	const peerServer = ExpressPeerServer(server, options);
+	peerServer.on('connection', (client) => {
+		console.log(`[PEER] User connected with ID: ${client.getId()}`);
+	});
+
+	peerServer.on('disconnect', (client) => {
+		console.log(`[PEER] User disconnected with ID: ${client.getId()}`);
+	});
+
+	app.use('/peerjs', peerServer);
 	app.use('/login', login);
 	app.use('/get', getPath);
 	app.use('/user/manage', manageUser);

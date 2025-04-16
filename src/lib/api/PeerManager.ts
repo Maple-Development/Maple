@@ -1,11 +1,9 @@
-import { SavedUser, UserPeer } from '$lib/store';
+import { UserPeer } from '$lib/store';
 import { Peer } from 'peerjs';
-import { get } from 'svelte/store';
-
 export class PeerManager {
 	public static createPeer = async () => {
 		try {
-			const peer = new Peer(get(SavedUser).username);
+			const peer = new Peer();
 			UserPeer.set(peer);
 			return peer;
 		} catch (error) {
