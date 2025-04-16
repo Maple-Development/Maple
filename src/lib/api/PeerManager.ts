@@ -1,5 +1,6 @@
 import { UserPeer } from '$lib/store';
-import { Peer } from 'peerjs';
+import Peer from 'peerjs';
+
 export class PeerManager {
 	public static createPeer = async () => {
 		try {
