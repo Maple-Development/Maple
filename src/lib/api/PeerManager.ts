@@ -1,13 +1,21 @@
 import { UserPeer } from '$lib/store';
 import Peer from 'peerjs';
-
+import { get } from 'svelte/store';
 export class PeerManager {
+	public static getPeer = async () => {
+		const peer = get(UserPeer);
+		if (peer) {
+			return peer;
+		}
+		return null;
+	}
+
 	public static createPeer = async () => {
 		try {
 			const response = await fetch('https://maple.kolf.pro:3000/peerjs/generate-id', {
 				credentials: 'include'
 			});
-
+			
 			if (!response.ok) {
 				throw new Error('Failed to get authenticated ID');
 			}

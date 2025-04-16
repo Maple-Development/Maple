@@ -40,65 +40,67 @@
 	}
 </script>
 
-<div class="max-w-4xl px-12 py-8">
+<div class="container mx-auto max-w-4xl px-4 py-5">
 	{#if !$isLoggedIn}
-		<div class="text-center">
-			<h1 class="mb-4 text-2xl font-semibold">You are not logged in!</h1>
+		<div class="flex flex-col items-center justify-center space-y-4">
+			<h1 class="text-2xl font-semibold">You are not logged in!</h1>
 			<Button href="/account/login" variant="secondary">
 				Login
 			</Button>
 		</div>
 	{:else}
-		<div class="mb-8 text-center">
-			<h1 class="mb-2 text-2xl font-semibold">Preferences</h1>
-			<p class="text-muted-foreground">Manage your account and notification settings</p>
+		<div class="mb-4 text-center">
+			<h1 class="text-4xl font-bold tracking-tight">Preferences</h1>
+			<p class="mt-2 text-muted-foreground">Manage your account and notification settings</p>
 		</div>
 
-		<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
-			<h2 class="mb-4 text-center text-lg font-medium">Webhook Settings</h2>
-			
-			<div class="space-y-6">
-				<div class="flex items-center justify-between rounded-lg bg-background p-2">
-					<div class="space-y-0.5">
-						<Label for="webhooks" class="text-base">Enable Webhooks</Label>
-						<p class="text-sm text-muted-foreground">Send data to a chosen webhook service</p>
+		<div class="grid gap-4">
+			<div class="rounded-lg border bg-card p-6 shadow-sm">
+				<h1 class="mb-6 text-xl font-bold">Webhook Settings</h1>
+				
+				<div class="space-y-6">
+					<div class="flex items-center justify-between rounded-lg bg-background">
+						<div class="space-y-0.5">
+							<Label for="webhooks" class="text-base">Enable Webhooks</Label>
+							<p class="text-sm text-muted-foreground">Send data to a chosen webhook service</p>
+						</div>
+						<Switch id="webhooks" bind:checked={doWebhooks} />
 					</div>
-					<Switch id="webhooks" bind:checked={doWebhooks} />
-				</div>
 
-				<div class="space-y-2">
-					<Label for="webhookUrl">Webhook URL</Label>
-					<Input
-						id="webhookUrl"
-						bind:value={webhookUrl}
-						placeholder="https://discord.com/api/webhooks/..."
-						class="w-full"
-					/>
-					<p class="text-sm text-muted-foreground">
-						Webhook URL to automatically send to. Currently supports Discord webhooks. If left blank, the community webhook will be used.
-					</p>
+					<div class="space-y-1">
+						<Label for="webhookUrl">Webhook URL</Label>
+						<Input
+							id="webhookUrl"
+							bind:value={webhookUrl}
+							placeholder="https://discord.com/api/webhooks/..."
+							class="w-full"
+						/>
+						<p class="text-sm text-muted-foreground">
+							Webhook URL to automatically send to. Currently supports Discord webhooks. If left blank, nothing will be sent.
+						</p>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
-			<h2 class="mb-4 text-center text-lg font-medium">Discord Settings</h2>
-			
-			<div class="space-y-6">
-				<div class="flex items-center justify-between rounded-lg bg-background p-2">
-					<div class="space-y-0.5">
-						<Label for="discord" class="text-base">Enable Discord RPC</Label>
-						<p class="text-sm text-muted-foreground">Show what you're listening to in Discord</p>
+			<div class="rounded-lg border bg-card p-6 shadow-sm">
+				<h1 class="mb-6 text-xl font-bold">Discord Settings</h1>
+				
+				<div class="space-y-6">
+					<div class="flex items-center justify-between rounded-lg bg-background">
+						<div class="space-y-0.5">
+							<Label for="discord" class="text-base">Enable Discord RPC</Label>
+							<p class="text-sm text-muted-foreground">Show what you're listening to in Discord</p>
+						</div>
+						<Switch id="discord" bind:checked={doDiscord} />
 					</div>
-					<Switch id="discord" bind:checked={doDiscord} />
 				</div>
 			</div>
-		</div>
 
-		<div class="mt-6 flex justify-center">
-			<Button on:click={updateSettings} variant="secondary">
-				Save Preferences
-			</Button>
+			<div class="flex justify-center">
+				<Button on:click={updateSettings} class="w-full sm:w-auto">
+					Save Preferences
+				</Button>
+			</div>
 		</div>
 	{/if}
 </div>

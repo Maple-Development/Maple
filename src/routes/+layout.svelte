@@ -74,7 +74,9 @@
 					refreshFriends();
 					refreshRequests();
 				}
-				PeerManager.createPeer();
+				if (UserSettings.preferences.p2p) {
+					PeerManager.createPeer();
+				}
 			}
 		}
 	});

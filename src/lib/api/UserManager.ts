@@ -356,13 +356,4 @@ export class UserManager {
 			return null;
 		}
 	};
-
-	/*  public static addFriend = async (friend: string) => {
-        try {
-           socket.emit('addFriend', { friendId: friend });
-        } catch (error) {
-            toast.error('Error adding friend: "' + error + '"');
-            return console.error('Error:', error);
-        }
-    } */
 }
