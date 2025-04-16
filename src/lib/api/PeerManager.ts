@@ -8,6 +8,7 @@ export class PeerManager {
 				host: 'maple.kolf.pro',
 				port: 3000,
 				secure: true,
+				path: '/peerjs'
 			});
 			UserPeer.set(peer);
 			return peer;
