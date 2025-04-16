@@ -104,6 +104,28 @@ try {
 		res.status(200).send('Hello! I is alive!');
 	});
 
+	app.get('/peerjs/generate-id', (req, res) => {
+		try {
+			const cookieString = req.headers.cookie;
+			if (!cookieString) {
+				return res.status(401).json({ error: 'No cookies found' });
+			}
+			
+			const cookies = cookieString.split(';');
+			const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+			if (!tokenCookie) {
+				return res.status(401).json({ error: 'No token found' });
+			}
+			
+			const token = tokenCookie.split('=')[1];
+			const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+			return res.json({ id: decoded.id });
+		} catch (error) {
+			console.error('[ERROR] Failed to generate PeerJS ID:', error);
+			return res.status(401).json({ error: 'Invalid token' });
+		}
+	});
+
 	const peerServer = ExpressPeerServer(server, options);
 	peerServer.on('connection', (client) => {
 		console.log(`[PEER] User connected with ID: ${client.getId()}`);
