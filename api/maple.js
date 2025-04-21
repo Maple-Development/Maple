@@ -182,18 +182,26 @@ try {
 
 		client.on('nowPlaying', async (data) => {
 			const id = client.user.id;
+			console.log(`[SOCKET] Received nowPlaying from user ${id}:`, data.nowPlaying);
 			
 			const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
 			try {
 				const pool = require('./db');
 				const [allFriends] = await pool.promise().query(sql, [id, id]);
+				console.log(`[SOCKET] Found ${allFriends.length} friends for user ${id}:`, allFriends);
+				
 				const sorted = sortFriends(allFriends, id);
+				console.log(`[SOCKET] Sorted friends for user ${id}:`, sorted);
 
 				if (allFriends !== null && allFriends.length > 0) {
+					console.log(`[SOCKET] Emitting nowPlaying to friends of user ${id}`);
 					ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+				} else {
+					console.log(`[SOCKET] No friends found for user ${id}`);
 				}
 				if (data.nowPlaying.discord === true) {
+					console.log(`[SOCKET] Emitting Discord RPC for user ${id}`);
 					ioTools.discordRPC(id, sorted, io, data.nowPlaying);
 				}
 			} catch (error) {
