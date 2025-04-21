@@ -183,6 +183,7 @@ try {
 		client.on('nowPlaying', async (data) => {
 			const id = client.user.id;
 			console.log(`[SOCKET] Received nowPlaying from user ${id} (socket ID: ${client.id}):`, data.nowPlaying);
+			console.log(`[SOCKET] Full message received:`, data);
 			
 			const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 

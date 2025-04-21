@@ -9,6 +9,12 @@ export const socketManager = () => {
 	if (browser) {
 		let socket = get(importedSocket);
 
+		socket?.on('connect', () => {
+			console.log('[CLIENT] Socket connected');
+		});
+
+		
+
 		socket?.on('friendRequest', async (data) => {
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
