@@ -50,6 +50,9 @@
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
 
+		console.log('[CLIENT] Emitting nowPlaying event:', friendPlaying);
+		console.log('[CLIENT] Current socket ID:', $socket?.id);
+
 		if (UserSettings.webhook.enabled) {			
 			const artworkUuid = uuidv4();
 			const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;

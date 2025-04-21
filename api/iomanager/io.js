@@ -41,7 +41,7 @@ module.exports = {
 				const client = await this.getSocket(io, targetId);
 				if (client) {
 					console.log(`[IO] Found socket for friend ${targetId}, emitting nowPlaying`);
-					client.emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
+					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
 				} else {
 					console.log(`[IO] No socket found for friend ${targetId}`);
 				}	
