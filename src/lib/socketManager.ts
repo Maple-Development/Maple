@@ -43,7 +43,8 @@ export const socketManager = () => {
 		});
 
 		socket?.on('nowPlaying', async (data) => {
-			console.log(data);
+			console.log('[CLIENT] Received nowPlaying event:', data);
+			console.log('[CLIENT] Current socket ID:', socket?.id);
 			refreshFriends();
 			refreshRequests();
 		});
