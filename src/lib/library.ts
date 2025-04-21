@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Song } from '$lib/types/song';
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
+import UserSettings from '$lib/preferences/usersettings';
 
 declare global { //prob fixes annoying ts warnings
     interface Window {
@@ -81,10 +82,36 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
             const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
             const files: File[] = [];
 
-            for await (const entry of dirHandle.values()) {
-                if (entry.kind === 'file') {
-                    const file: File = await entry.getFile();
-                    files.push(file);
+            if (UserSettings.preferences.jellyfinMode) {
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'directory') {
+                        const dir = await dirHandle.getDirectoryHandle(entry.name);
+                        
+                        let isArtistDir = false;
+                        for await (const subEntry of dir.values()) {
+                            if (subEntry.kind === 'directory') {
+                                isArtistDir = true;
+                                break;
+                            }
+                        }
+
+                        if (isArtistDir) {
+                            for await (const albumEntry of dir.values()) {
+                                if (albumEntry.kind === 'directory') {
+                                    await processAlbumDirectory(dir, albumEntry, files);
+                                }
+                            }
+                        } else {
+                            await processAlbumDirectory(dirHandle, entry, files);
+                        }
+                    }
+                }
+            } else {
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'file') {
+                        const file = await entry.getFile();
+                        files.push(file);
+                    }
                 }
             }
 
@@ -99,5 +126,38 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
     } catch (error) {
         console.error('Error in createLibrary:', error);
         toast.error('Failed to create library');
+    }
+}
+
+async function processAlbumDirectory(parentDir: FileSystemDirectoryHandle, albumEntry: FileSystemDirectoryHandle, files: File[]) {
+    const albumDir = await parentDir.getDirectoryHandle(albumEntry.name);
+    
+    let isMultiDisc = false;
+    for await (const subEntry of albumDir.values()) {
+        if (subEntry.kind === 'directory' && subEntry.name.toLowerCase().includes('disc')) {
+            isMultiDisc = true;
+            break;
+        }
+    }
+    // this should be illegal, but whatever
+    if (isMultiDisc) {
+        for await (const discEntry of albumDir.values()) {
+            if (discEntry.kind === 'directory' && discEntry.name.toLowerCase().includes('disc')) {
+                const discDir = await albumDir.getDirectoryHandle(discEntry.name);
+                for await (const songEntry of discDir.values()) {
+                    if (songEntry.kind === 'file') {
+                        const file = await discDir.getFileHandle(songEntry.name);
+                        files.push(await file.getFile());
+                    }
+                }
+            }
+        }
+    } else {
+        for await (const songEntry of albumDir.values()) {
+            if (songEntry.kind === 'file') {
+                const file = await albumDir.getFileHandle(songEntry.name);
+                files.push(await file.getFile());
+            }
+        }
     }
 } 
