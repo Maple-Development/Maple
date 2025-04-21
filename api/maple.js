@@ -224,11 +224,12 @@ try {
 	console.log('[12] Socket event handlers setup complete');
 
 	function sortFriends(unsorted, id) {
-		let newFriends = unsorted.map((friend) => {
-			if (friend.user_id === id) {
-				return { user_id: id, friend_id: friend.friend_id };
-			} else {
-				return { user_id: friend.user_id, friend_id: id };
+		let newFriends = [];
+		unsorted.forEach((friend) => {
+			if (friend.user_id === id && friend.friend_id !== id) {
+				newFriends.push({ user_id: id, friend_id: friend.friend_id });
+			} else if (friend.friend_id === id && friend.user_id !== id) {
+				newFriends.push({ user_id: friend.user_id, friend_id: id });
 			}
 		});
 		return newFriends;
