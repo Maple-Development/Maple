@@ -87,11 +87,10 @@
 				})
 			);
 
-			const request = await fetch(UserSettings.webhook.url, {
+			await fetch(UserSettings.webhook.url, {
 				method: 'POST',
 				body: formData
 			});
-			const response = await request.json();
 		}
 
 		if ('mediaSession' in navigator) {

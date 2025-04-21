@@ -220,7 +220,7 @@ try {
 			if (friend.user_id === id) {
 				return { user_id: id, friend_id: friend.friend_id };
 			} else {
-				return { user_id: id, friend_id: friend.user_id };
+				return { user_id: friend.user_id, friend_id: id };
 			}
 		});
 		return newFriends;

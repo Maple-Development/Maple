@@ -33,7 +33,8 @@ module.exports = {
 				[user, JSON.stringify(nowPlaying)]
 			);
 			friends.forEach(async (friend) => {
-				const client = await this.getSocket(io, friend.friend_id)
+				const targetId = friend.user_id === user ? friend.friend_id : friend.user_id;
+				const client = await this.getSocket(io, targetId);
 				if (client) {
 					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
 				}	
