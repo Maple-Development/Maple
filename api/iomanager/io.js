@@ -2,9 +2,15 @@
 const pool = require('../db');
 
 module.exports = {
-	addFriend: function (user, friend, socket, io) {
+	addFriend: async function (user, friend, socket, io) {
 		try {
-		io.to(socket.id).emit('friendRequest', { id: user });
+			const clients = await this.getSocket(io, user);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${user}, emitting friendRequest`);
+				clients.forEach(client => {
+					io.to(client.id).emit('friendRequest', { id: friend });
+				});
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -13,15 +19,11 @@ module.exports = {
 	getSocket: async function (io, id) {
 		try {
 			const clients = await io.fetchSockets();
-			for (const client of clients) {
-				if (client.user.id === id) {
-					return client;
-				}
-			}
-			return null;
+			const userSockets = clients.filter(client => client.user.id === id);
+			return userSockets;
 		} catch (error) {
 			console.error(error);
-			return null;
+			return [];
 		}
 	},
 
@@ -34,17 +36,19 @@ module.exports = {
 				[user, JSON.stringify(nowPlaying)]
 			);
 			friends.forEach(async (friend) => {
-				// Check both user_id and friend_id to find the correct socket
 				const targetId = friend.user_id === user ? friend.friend_id : friend.user_id;
-				console.log(`[IO] Looking for socket for friend ${targetId} (relationship: ${JSON.stringify(friend)})`);
+				console.log(`[IO] Looking for sockets for friend ${targetId} (relationship: ${JSON.stringify(friend)})`);
 				
-				const client = await this.getSocket(io, targetId);
-				if (client) {
+				const clients = await this.getSocket(io, targetId);
+				if (clients.length > 0) {
+					console.log(`[IO] Found ${clients.length} sockets for friend ${targetId}`);
 					const message = { nowPlaying: nowPlaying, id: user };
-					console.log(`[IO] Emitting to socket ${client.id} for user ${targetId}:`, message);
-					io.to(client.id).emit('nowPlaying', message);
+					clients.forEach(client => {
+						console.log(`[IO] Emitting to socket ${client.id} for user ${targetId}:`, message);
+						io.to(client.id).emit('nowPlaying', message);
+					});
 				} else {
-					console.log(`[IO] No socket found for friend ${targetId}`);
+					console.log(`[IO] No sockets found for friend ${targetId}`);
 				}	
 			})
 		} catch (error) {
@@ -52,15 +56,21 @@ module.exports = {
 		}
 	},
 
-	emit: function (socket, event, data, io) {
+	emit: async function (socket, event, data, io) {
 		try {
-			io.to(socket.id).emit(event, data);
+			const clients = await this.getSocket(io, socket.user.id);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${socket.user.id}, emitting ${event}`);
+				clients.forEach(client => {
+					io.to(client.id).emit(event, data);
+				});
+			}
 		} catch (error) {
 			console.error(error);
 		}
 	},
 
-	discordRPC: function (user, _friends, io, nowPlaying) {
+	discordRPC: async function (user, _friends, io, nowPlaying) {
 		try {
 			const rpcData = {
 				artist: nowPlaying.artist || undefined,
@@ -80,11 +90,13 @@ module.exports = {
 				]
 			};
 
-			io.sockets.sockets.forEach(socket => {
-				if (socket.user && socket.user.id === user) {
-					socket.emit('rpcUpdate', rpcData);
-				}
-			});
+			const clients = await this.getSocket(io, user);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${user}, emitting discordRPC`);
+				clients.forEach(client => {
+					client.emit('rpcUpdate', rpcData);
+				});
+			}
 		} catch (error) {
 			console.error('[ERROR] Error in discordRPC:', error);
 		}
