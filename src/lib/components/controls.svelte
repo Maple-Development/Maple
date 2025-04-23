@@ -7,6 +7,7 @@
 	import { SavedUser } from '$lib/store';
 	import UserSettings from '$lib/preferences/usersettings';
 	import { v4 as uuidv4 } from 'uuid';
+	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 
 	let audioUrl: string = '';
 	let colors: {
@@ -49,15 +50,15 @@
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
+		refreshFriends();
+		refreshRequests();
 
 		console.log('[CLIENT] Emitting nowPlaying event:', friendPlaying);
 		console.log('[CLIENT] Current socket ID:', $socket?.id);
 
 		if (UserSettings.webhook.enabled) {			
-			const artworkUuid = uuidv4();
-			const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
-
 			const formData = new FormData();
+			formData.append('file', image, 'album.jpg');
 			formData.append(
 				'payload_json',
 				JSON.stringify({
@@ -81,7 +82,7 @@
 								}
 							],
 							image: {
-								url: artworkUrl
+								url: 'attachment://album.jpg'
 							}
 						}
 					],

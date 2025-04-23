@@ -1,10 +1,3 @@
-// Todo: OPFS Wrapper
-// import ColorThief from './node_modules/colorthief/dist/color-thief.mjs'
-// Create/Manage Dirs
-// Create/Manage Files
-// Dir Index
-// File Index
-
 import type { Album } from '$lib/types/album';
 import type { Artist } from '$lib/types/artist';
 import type { Song } from '$lib/types/song';
