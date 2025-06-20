@@ -9,8 +9,7 @@ const ioTools = require('./iomanager/io.js');
 const socket = require('./socket');
 const app = express();
 
-const fs = require('fs');
-const https = require('https');
+const http = require('http');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -60,18 +59,7 @@ var options = {
 }); */
 
 try {
-	console.log('[2] Reading SSL certificates...');
-	const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
-	const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
-	const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
 
-	console.log('[3] SSL certificates loaded successfully');
-
-	const credentials = {
-		key: privateKey,
-		cert: certificate,
-		ca: ca
-	};
 
 	const corsOptions = {
 		origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com'],
@@ -79,7 +67,7 @@ try {
 	};
 
 	console.log('[4] Creating HTTPS server...');
-	const server = https.createServer(credentials, app);
+	const server = http.createServer(app);
 
 	const ioOptions = {
 		cors: {
