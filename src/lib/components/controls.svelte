@@ -87,7 +87,7 @@
 						}
 					],
 					username: $SavedUser?.name === '' ? 'Maple User' : $SavedUser?.name,
-					avatar_url: 'https://maple.kolf.pro:3000/public/get/pfp/' + $SavedUser?.id
+					avatar_url: 'https://api.maple.music/public/get/pfp/' + $SavedUser?.id
 				})
 			);
 
@@ -99,7 +99,7 @@
 
 		if ('mediaSession' in navigator) {
 			const artworkUuid = uuidv4();
-			const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
+			const artworkUrl = 'https://api.maple.music/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
 			
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: song.title,

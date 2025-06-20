@@ -21,7 +21,7 @@ export class PeerManager {
 
 	public static createPeer = async () => {
 		try {
-			const response = await fetch('https://maple.kolf.pro:3000/peerjs/generate-id', {
+			const response = await fetch('https://api.maple.music/peerjs/generate-id', {
 				credentials: 'include'
 			});
 			
@@ -32,8 +32,8 @@ export class PeerManager {
 			const { id } = await response.json();
 
 			const peer = new Peer(id, {
-				host: 'maple.kolf.pro',
-				port: 3000,
+				host: 'api.maple.music',
+				port: 443,
 				secure: true,
 				path: '/peerjs'
 			});

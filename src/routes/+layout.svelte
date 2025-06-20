@@ -95,7 +95,7 @@
 		if (browser) {
 			if ($isLoggedIn) {
 				if (UserSettings.preferences.socket) {
-					const io2 = io('https://maple.kolf.pro:3000', {
+					const io2 = io('https://api.maple.music', {
 						withCredentials: true
 					});
 					socket.set(io2);

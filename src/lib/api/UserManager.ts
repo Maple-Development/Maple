@@ -6,7 +6,7 @@ import { get } from 'svelte/store';
 
 export class UserManager {
 	private static DevServer = 'http://localhost:3000';
-	private static PRODServer = 'https://maple.kolf.pro:3000';
+	private static PRODServer = 'https://api.maple.music';
 	private static SERVER = this.PRODServer;
 
 	public static register = async (username: string, password: string) => {

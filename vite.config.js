@@ -13,7 +13,7 @@ export default defineConfig({
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,gif,webp,woff,woff2,ttf,eot}'],
 				runtimeCaching: [
 					{
-						urlPattern: /^https:\/\/maple\.kolf\.pro:3000\/.*/i,
+						urlPattern: /^https:\/\/play\.maple\.music\/.*/i,
 						handler: 'NetworkFirst',
 						options: {
 							cacheName: 'api-cache',

@@ -10,7 +10,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
-	private static SERVER = 'https://maple.kolf.pro:3000';
+	private static SERVER = 'https://api.maple.music';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;

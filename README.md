@@ -7,7 +7,7 @@
 </h3>
 
 <p align="center">
-    <a href="https://maple.kolf.pro/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
+    <a href="https://maple.music/" target="_blank">stable</a> · <a href="https://beta.cattn.dev/" target="_blank">beta</a>
 </p>
 
 > Need Help? Join our [Development Server](https://discord.gg/Wxrp73HVj4)
@@ -50,7 +50,7 @@ If you have any other questions, feel free to DM `cattn.` on discord, or email m
 
 ## API Documentation
 
-> API Link: https://maple.kolf.pro:3000
+> API Link: https://api.maple.music/
 
 ### ``GET`` - ``/public/get/user/:username``
 Returns a user based on the given username.
