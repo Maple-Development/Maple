@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Song } from '$lib/types/song';
+	import type { Song } from '$lib/types';
 	import { context } from '$lib/store';
 	import Controls from './controls.svelte';
 	export let track: Song;

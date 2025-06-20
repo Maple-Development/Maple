@@ -1,10 +1,6 @@
-import type { Album } from '$lib/types/album';
-import type { Artist } from '$lib/types/artist';
-import type { Song } from '$lib/types/song';
+import type { Album, Artist, Playlist, Song } from '$lib/types';
 import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
-import type { Playlist } from './types/playlist';
-
 export class OPFS {
 	private static albumsCache: Album[] | null = null;
 	private static artistsCache: Artist[] | null = null;

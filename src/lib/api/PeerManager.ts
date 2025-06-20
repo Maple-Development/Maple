@@ -1,8 +1,8 @@
 import { UserPeer } from '$lib/store';
 import Peer, { DataConnection } from 'peerjs';
 import { get } from 'svelte/store';
-import type { PeerData } from '$lib/types/peer';
-import { DataType } from '$lib/types/peer';
+import type { PeerData } from '$lib/types';
+import { DataType } from '$lib/types';
 import { toast } from 'svelte-sonner';
 import download from 'js-file-download';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { OPFS } from '$lib/opfs';
-	import type { Song } from '$lib/types/song';
+	import type { Song, Playlist } from '$lib/types';
 	import ContextMenu from '../ui/context-menu/context-menu.svelte';
 	import TrackWrapper from '../TrackWrapper.svelte';
 	// @ts-ignore
@@ -8,7 +8,6 @@
 	import { toast } from 'svelte-sonner';
 
 	import { createEventDispatcher } from 'svelte';
-	import type { Playlist } from '$lib/types/playlist';
 	const dispatch = createEventDispatcher();
 
 	async function getImageUrl(imagePath: string): Promise<string> {

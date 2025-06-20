@@ -7,8 +7,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { OPFS } from '$lib/opfs';
 	import { hideTips, isSmallDevice, title, recentlyPlayedManager } from '$lib/store';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 	import {
 		ArrowDownZA,
 		ArrowUpAZ,

@@ -5,15 +5,13 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { context, title } from '$lib/store';
-	import type { Artist } from '$lib/types/artist';
-	import type { Song } from '$lib/types/song';
+	import type { Artist, Song, Playlist } from '$lib/types';
 	import { ArrowDownZA, ArrowUpAZ, Check, List, ListFilter, Pencil, Trash } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 //@ts-ignore
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import type { Playlist } from '$lib/types/playlist';
 	import { toast } from 'svelte-sonner';
 
 	let artistName: string;

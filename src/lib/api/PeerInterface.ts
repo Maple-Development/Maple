@@ -1,8 +1,7 @@
 import { PeerManager } from './PeerManager';
 import { OPFS } from '$lib/opfs';
-import type { Song } from '$lib/types/song';
-import type { Playlist } from '$lib/types/playlist';
-import { DataType } from '$lib/types/peer';
+import type { Song, Playlist } from '$lib/types';
+import { DataType } from '$lib/types';
 import { toast } from 'svelte-sonner';
 
 export class PeerInterface {

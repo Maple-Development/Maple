@@ -6,8 +6,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { context, title } from '$lib/store';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 	import { ArrowDownZA, ArrowUpAZ, List, ListFilter } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';

@@ -1,6 +1,6 @@
 import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 import { SavedUser, UserInfo, friendNowPlaying } from '$lib/store';
-import type { User } from '$lib/types/user';
+import type { User } from '$lib/types';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 

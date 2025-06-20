@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Song } from '$lib/types/song';
+	import type { Song } from '$lib/types';
 	import { OPFS } from '$lib/opfs';
 	import { context, activeSong, audioPlayer, recentlyPlayedManager, socket } from '$lib/store';
 	import { extractColors } from 'extract-colors';

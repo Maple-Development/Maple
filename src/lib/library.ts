@@ -2,9 +2,7 @@ import { parseBlob } from 'music-metadata';
 import { OPFS } from '$lib/opfs';
 import { toast } from 'svelte-sonner';
 import { v4 as uuidv4 } from 'uuid';
-import type { Song } from '$lib/types/song';
-import type { Album } from '$lib/types/album';
-import type { Artist } from '$lib/types/artist';
+import type { Song, Album, Artist } from '$lib/types';
 import UserSettings from '$lib/preferences/usersettings';
 
 declare global { //prob fixes annoying ts warnings

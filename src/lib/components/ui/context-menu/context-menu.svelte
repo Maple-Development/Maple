@@ -2,10 +2,10 @@
 	// Converted to ts by me - Cattn
 	// Original code by Github @dukenmarga, July 2022
 
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
-	import type { Album } from '$lib/types/album';
-	import type { Artist } from '$lib/types/artist';
+	import type { Playlist } from '$lib/types';
+	import type { Song } from '$lib/types';
+	import type { Album } from '$lib/types';
+	import type { Artist } from '$lib/types';
 	import { OPFS } from '$lib/opfs';
 	import { onMount } from 'svelte';
 

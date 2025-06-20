@@ -11,8 +11,7 @@
 	import { toast } from 'svelte-sonner';
 
 	import { OPFS } from '$lib/opfs';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
@@ -192,13 +191,3 @@
 		{/if}
 	{/if}
 </div>
-
-<style>
-	@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-	.inter-normal {
-		font-family: 'Inter', serif;
-		font-optical-sizing: auto;
-		font-weight: 600;
-		font-style: normal;
-	}
-</style>

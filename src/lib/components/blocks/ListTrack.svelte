@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { OPFS } from '$lib/opfs';
-	import type { Song } from '$lib/types/song';
+	import type { Song } from '$lib/types';
 	import TrackWrapper from '../TrackWrapper.svelte';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
@@ -11,7 +11,7 @@
 	import { EllipsisVertical } from 'lucide-svelte';
 
 	import { createEventDispatcher } from 'svelte';
-	import type { Playlist } from '$lib/types/playlist';
+	import type { Playlist } from '$lib/types';
 	const dispatch = createEventDispatcher();
 
 	async function getImageUrl(imagePath: string): Promise<string> { 
