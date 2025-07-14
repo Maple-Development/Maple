@@ -82,7 +82,7 @@
 									<!-- svelte-ignore a11y-img-redundant-alt -->
 									<img
 										src="https://api.maple.music/public/get/pfp/{friend.id}"
-										on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
+										on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/peerJS/static/placeholder.png?raw=true')}
 										alt="Profile picture"
 										class="h-10 w-10 flex-shrink-0 rounded-full"
 									/>
