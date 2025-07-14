@@ -4,11 +4,11 @@ const pool = require('../db');
 module.exports = {
 	addFriend: async function (user, friend, socket, io) {
 		try {
-			const clients = await this.getSocket(io, user);
+			const clients = await this.getSocket(io, friend);
 			if (clients.length > 0) {
-				console.log(`[IO] Found ${clients.length} sockets for user ${user}, emitting friendRequest`);
+				console.log(`[IO] Found ${clients.length} sockets for user ${friend}, emitting friendRequest`);
 				clients.forEach(client => {
-					io.to(client.id).emit('friendRequest', { id: friend });
+					io.to(client.id).emit('friendRequest', { id: user });
 				});
 			}
 		} catch (error) {
