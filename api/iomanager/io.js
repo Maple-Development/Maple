@@ -18,8 +18,11 @@ module.exports = {
 
 	getSocket: async function (io, id) {
 		try {
+			console.log(`[IO] Getting socket for ${id}`);
 			const clients = await io.fetchSockets();
+			console.log(`[IO] Found ${clients.length} sockets`);
 			const userSockets = clients.filter(client => client.user.id === id);
+			console.log(`[IO] Found ${userSockets.length} sockets for user ${id}`);
 			return userSockets;
 		} catch (error) {
 			console.error(error);
@@ -104,12 +107,15 @@ module.exports = {
 
 	emitAll: async function (id, title, data, io) {
 		try {
-			const clients = this.getSocket(io, id);
+			const clients = await this.getSocket(io, id);
 			if (clients.length > 0) {
 				console.log(`[IO] Found ${clients.length} sockets for user ${id}, emitting to ALL clients`)
 				clients.forEach(client => {
 					client.emit(title, data)
 				})
+			}
+			else {
+				console.log(`[IO] No sockets found for user ${id}, NOT emitting to ALL clients`)
 			}
 		} catch (error) {
 			console.error('[ERROR] Error in emitAll: \n', error);
