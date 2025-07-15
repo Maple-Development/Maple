@@ -100,5 +100,19 @@ module.exports = {
 		} catch (error) {
 			console.error('[ERROR] Error in discordRPC:', error);
 		}
+	},
+
+	emitAll: async function (id, title, data, io) {
+		try {
+			const clients = this.getSocket(io, id);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${id}, emitting to ALL clients`)
+				clients.forEach(client => {
+					client.emit(title, data)
+				})
+			}
+		} catch (error) {
+			console.error('[ERROR] Error in emitAll: \n', error);
+		}
 	}
 };
