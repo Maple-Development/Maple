@@ -48,6 +48,15 @@ export const socketManager = () => {
 			refreshRequests();
 		});
 
+		socket?.on("acceptedRequest", async (data) => {
+			console.log(data);
+			const id = data.id;
+			const friend = await UserManager.getUserbyId(id);
+			toast.success('You are now friends with '+ friend.name + ' (' + friend.username + ')!');
+			refreshFriends();
+			refreshRequests();
+		});
+
 		socket?.on('nowPlaying', async (data) => {
 			console.log('[CLIENT] Received nowPlaying event:', data);
 			console.log('[CLIENT] Current socket ID:', socket?.id);

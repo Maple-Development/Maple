@@ -109,8 +109,10 @@ router.post('/accept/:id', async (req, res) => {
 
 	if (id !== friendId) {
 		ioTools.emitAll(friendId, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
+		ioTools.emitAll(id, "acceptedRequest", { id: friendId, message: 'Friend request accepted!' }, io);
 	} else {
 		ioTools.emitAll(id, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+		ioTools.emitAll(friendId, "acceptedRequest", { id: id, message: 'Friend request accepted!' }, io);
 	}
 
 	return res.status(200).json({ message: 'Friend request accepted successfully' });
