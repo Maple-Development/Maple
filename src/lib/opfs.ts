@@ -1,23 +1,12 @@
-// Todo: OPFS Wrapper
-// import ColorThief from './node_modules/colorthief/dist/color-thief.mjs'
-// Create/Manage Dirs
-// Create/Manage Files
-// Dir Index
-// File Index
-
-import type { Album } from '$lib/types/album';
-import type { Artist } from '$lib/types/artist';
-import type { Song } from '$lib/types/song';
+import type { Album, Artist, Playlist, Song } from '$lib/types';
 import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
-import type { Playlist } from './types/playlist';
-
 export class OPFS {
 	private static albumsCache: Album[] | null = null;
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
-	private static SERVER = 'https://maple.kolf.pro:3000';
+	private static SERVER = 'https://api.maple.music';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;

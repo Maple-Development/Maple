@@ -11,8 +11,7 @@
 	import { toast } from 'svelte-sonner';
 
 	import { OPFS } from '$lib/opfs';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 
 	let tracks: Song[] = [];
 	let playlists: Playlist[] = [];
@@ -82,8 +81,8 @@
 								<div class="flex min-w-0 items-center gap-4">
 									<!-- svelte-ignore a11y-img-redundant-alt -->
 									<img
-										src="https://maple.kolf.pro:3000/public/get/pfp/{friend.id}"
-										on:error={(e) => (e.target.src = 'https://github.com/Cattn/Maple/blob/server/static/placeholder.png?raw=true')}
+										src="https://api.maple.music/public/get/pfp/{friend.id}"
+										on:error={(e) => (e.target.src = 'https://rawcdn.githack.com/Cattn/Maple/refs/heads/main/static/placeholder.png')}
 										alt="Profile picture"
 										class="h-10 w-10 flex-shrink-0 rounded-full"
 									/>
@@ -192,13 +191,3 @@
 		{/if}
 	{/if}
 </div>
-
-<style>
-	@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-	.inter-normal {
-		font-family: 'Inter', serif;
-		font-optical-sizing: auto;
-		font-weight: 600;
-		font-style: normal;
-	}
-</style>

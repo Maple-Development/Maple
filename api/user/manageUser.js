@@ -35,8 +35,8 @@ router.post('/setProfile/:id', upload.single('pfp'), (req, res) => {
 
 	const imageBuffer = req.file.buffer;
 
-	if (imageBuffer.length > 3 * 1024 * 1024) {
-		return res.status(400).json({ error: 'File size exceeds 3MB limit.' });
+	if (imageBuffer.length > 9 * 1024 * 1024) {
+		return res.status(400).json({ error: 'File size exceeds 9MB limit.' });
 	}
 
 	const getUserSql = 'SELECT username, id FROM users WHERE id = ?';
@@ -69,8 +69,8 @@ router.post('/setAlbumArt/:id', upload.single('albumArt'), (req, res) => {
 
 	const imageBuffer = req.file.buffer;
 
-	if (imageBuffer.length > 3 * 1024 * 1024) {
-		return res.status(400).json({ error: 'File size exceeds 3MB limit.' });
+	if (imageBuffer.length > 9 * 1024 * 1024) {
+		return res.status(400).json({ error: 'File size exceeds 9MB limit.' });
 	}
 
 	const getUserSql = 'SELECT username, id FROM users WHERE id = ?';

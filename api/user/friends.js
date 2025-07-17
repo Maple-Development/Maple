@@ -31,10 +31,7 @@ router.post('/add/:id', async (req, res) => {
 	  );
   
 	  if (alreadyFriends.length > 0) {
-		const userSocket = await ioTools.getSocket(io, id);
-		if (userSocket) {
-		  ioTools.emit(userSocket, "error", 'You are already friends', io);
-		}
+		ioTools.emitAll(id, "error", 'You are already friends', io);
 		return res.status(409).json({ error: 'You are already friends.' });
 	}
 
@@ -44,10 +41,7 @@ router.post('/add/:id', async (req, res) => {
 	);
 
 	if (existingRequests.length > 0) {
-	  const userSocket = await ioTools.getSocket(io, id);
-	  if (userSocket) {
-		ioTools.emit(userSocket, "error", 'Friend request already sent/pending', io);
-	  }
+		ioTools.emitAll(id, "error", 'Friend request already sent/pending', io);
 	  return res.status(409).json({ error: 'Friend request already sent/pending.' });
 	}
 
@@ -82,10 +76,7 @@ router.post('/accept/:id', async (req, res) => {
 	);
 
 	if (alreadyFriends.length > 0) {
-	  const userSocket = await ioTools.getSocket(io, id);
-	  if (userSocket) {
-		ioTools.emit(userSocket, "error", 'You are already friends', io);
-	  }
+	  ioTools.emitAll(id, "error", 'You are already friends', io);
 	  return res.status(409).json({ error: 'You are already friends.' });
 	}
 
@@ -95,10 +86,7 @@ router.post('/accept/:id', async (req, res) => {
 	);
 
 	if (pendingResults.length === 0) {
-	  const userSocket = await ioTools.getSocket(io, id);
-	  if (userSocket) {
-		ioTools.emit(userSocket, "error", 'Friend request not found', io);
-	  }
+	  ioTools.emitAll(id, "error", 'Friend request not found', io);
 	  return res.status(404).json({ error: 'Friend request not found' });
 	}
 
@@ -112,16 +100,19 @@ router.post('/accept/:id', async (req, res) => {
 	  [id, friendId]
 	);
 
-	const userSocket = await ioTools.getSocket(io, id);
-	if (userSocket && id !== friendId) {
-		ioTools.emit(userSocket, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
-	} else if (userSocket) {
-		ioTools.emit(userSocket, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
-	}
+	// const userSocket = await ioTools.getSocket(io, id);
+	// if (userSocket && id !== friendId) {
+	// 	ioTools.emitAll(id, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+	// } else if (userSocket) {
+	// 	ioTools.emitAll(id, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
+	// }
 
-	const friendSocket = await ioTools.getSocket(io, friendId);
-	if (friendSocket) {
-	  ioTools.emit(friendSocket, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
+	if (id !== friendId) {
+		ioTools.emitAll(friendId, "requestAccepted", { id: id, message: 'Friend request accepted!' }, io);
+		ioTools.emitAll(id, "acceptedRequest", { id: friendId, message: 'Friend request accepted!' }, io);
+	} else {
+		ioTools.emitAll(id, "requestAccepted", { id: friendId, message: 'Friend request accepted!' }, io);
+		ioTools.emitAll(friendId, "acceptedRequest", { id: id, message: 'Friend request accepted!' }, io);
 	}
 
 	return res.status(200).json({ message: 'Friend request accepted successfully' });

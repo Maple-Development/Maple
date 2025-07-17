@@ -16,10 +16,7 @@
 	import { collapsed, title, SavedUser } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { OPFS } from '$lib/opfs';
-	import type { Song } from '$lib/types/song';
-	import type { Album } from '$lib/types/album';
-	import type { Artist } from '$lib/types/artist';
-	import type { Playlist } from '$lib/types/playlist';
+	import type { Song, Album, Artist, Playlist } from '$lib/types';
 	import { page } from '$app/stores';
 	import TrackWrapper from './TrackWrapper.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';

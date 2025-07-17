@@ -6,8 +6,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { context, isSmallDevice, title } from '$lib/store';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 	import {
 		ArrowDownZA,
 		ArrowUpAZ,
@@ -450,6 +449,7 @@
 		<div class="mx-4 mb-5 mt-2 flex flex-col">
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-missing-attribute -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<a
 				on:click={() => (openAdd = true)}
 				class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
@@ -532,6 +532,7 @@
 					{#each filteredSongs as song}
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<a
 							on:click={() => toggleSongSelection(song)}
 							class="flex flex-row items-center rounded-sm px-4 py-3 hover:bg-secondary"

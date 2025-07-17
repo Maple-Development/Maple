@@ -9,12 +9,9 @@ const ioTools = require('./iomanager/io.js');
 const socket = require('./socket');
 const app = express();
 
-const fs = require('fs');
-const https = require('https');
+const http = require('http');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
-const authenticateToken = require('./middleware/authToken');
 
 console.log('[1] Starting server initialization...');
 
@@ -31,10 +28,28 @@ var ExpressPeerServer = require('peer').ExpressPeerServer;
 var options = {
 	debug: true,
 	generateClientId: (req) => {
-		authenticateToken(req, {}, (err) => {
-			if (err) return null;
-			return req.user.id;
-		});
+		try {
+			if (!req || !req.headers || !req.headers.cookie) {
+				console.log('[PEER] No request object or cookies found, generating random ID');
+				return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
+			}
+			
+			const cookieString = req.headers.cookie;
+			const cookies = cookieString.split(';');
+			const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+			if (!tokenCookie) {
+				console.log('[PEER] No token cookie found, generating random ID');
+				return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
+			}
+			
+			const token = tokenCookie.split('=')[1];
+			const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+			return decoded.id;
+		} catch (error) {
+			console.error('[ERROR] Failed to generate PeerJS client ID:', error);
+			// Generate a random ID as fallback
+			return (Math.random().toString(36) + "0000000000000000000").substr(2, 16);
+		}
 	}
 };
 
@@ -44,30 +59,19 @@ var options = {
 }); */
 
 try {
-	console.log('[2] Reading SSL certificates...');
-	const privateKey = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/privkey.pem', 'utf8');
-	const certificate = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/cert.pem', 'utf8');
-	const ca = fs.readFileSync('/etc/letsencrypt/live/maple.kolf.pro/chain.pem', 'utf8');
 
-	console.log('[3] SSL certificates loaded successfully');
-
-	const credentials = {
-		key: privateKey,
-		cert: certificate,
-		ca: ca
-	};
 
 	const corsOptions = {
-		origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com'],
+		origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://play.maple.music'],
 		credentials: true
 	};
 
 	console.log('[4] Creating HTTPS server...');
-	const server = https.createServer(credentials, app);
+	const server = http.createServer(app);
 
 	const ioOptions = {
 		cors: {
-			origin: ['https://maple.kolf.pro', 'https://maple.kolf.pro:3000', 'https://discord.com'],
+			origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://play.maple.music'],
 			credentials: true
 		},
 		maxHttpBufferSize: 5e7
@@ -86,6 +90,28 @@ try {
 
 	app.get('/', (req, res) => {
 		res.status(200).send('Hello! I is alive!');
+	});
+
+	app.get('/peerjs/generate-id', (req, res) => {
+		try {
+			const cookieString = req.headers.cookie;
+			if (!cookieString) {
+				return res.status(401).json({ error: 'No cookies found' });
+			}
+			
+			const cookies = cookieString.split(';');
+			const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+			if (!tokenCookie) {
+				return res.status(401).json({ error: 'No token found' });
+			}
+			
+			const token = tokenCookie.split('=')[1];
+			const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+			return res.json({ id: decoded.id });
+		} catch (error) {
+			console.error('[ERROR] Failed to generate PeerJS ID:', error);
+			return res.status(401).json({ error: 'Invalid token' });
+		}
 	});
 
 	const peerServer = ExpressPeerServer(server, options);
@@ -144,18 +170,27 @@ try {
 
 		client.on('nowPlaying', async (data) => {
 			const id = client.user.id;
+			console.log(`[SOCKET] Received nowPlaying from user ${id} (socket ID: ${client.id}):`, data.nowPlaying);
+			console.log(`[SOCKET] Full message received:`, data);
 			
 			const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
 			try {
 				const pool = require('./db');
 				const [allFriends] = await pool.promise().query(sql, [id, id]);
+				console.log(`[SOCKET] Found ${allFriends.length} friends for user ${id}:`, allFriends);
+				
 				const sorted = sortFriends(allFriends, id);
+				console.log(`[SOCKET] Sorted friends for user ${id}:`, sorted);
 
 				if (allFriends !== null && allFriends.length > 0) {
+					console.log(`[SOCKET] Emitting nowPlaying to friends of user ${id}`);
 					ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+				} else {
+					console.log(`[SOCKET] No friends found for user ${id}`);
 				}
 				if (data.nowPlaying.discord === true) {
+					console.log(`[SOCKET] Emitting Discord RPC for user ${id}`);
 					ioTools.discordRPC(id, sorted, io, data.nowPlaying);
 				}
 			} catch (error) {
@@ -178,11 +213,12 @@ try {
 	console.log('[12] Socket event handlers setup complete');
 
 	function sortFriends(unsorted, id) {
-		let newFriends = unsorted.map((friend) => {
-			if (friend.user_id === id) {
-				return { user_id: id, friend_id: friend.friend_id };
-			} else {
-				return { user_id: id, friend_id: friend.user_id };
+		let newFriends = [];
+		unsorted.forEach((friend) => {
+			if (friend.user_id === id && friend.friend_id !== id) {
+				newFriends.push({ user_id: id, friend_id: friend.friend_id });
+			} else if (friend.friend_id === id && friend.user_id !== id) {
+				newFriends.push({ user_id: friend.user_id, friend_id: id });
 			}
 		});
 		return newFriends;

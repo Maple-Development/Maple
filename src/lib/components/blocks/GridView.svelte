@@ -2,10 +2,7 @@
 	import ContextMenu from '$lib/components/ui/context-menu/context-menu.svelte';
 	import TrackWrapper from '$lib/components/TrackWrapper.svelte';
 	import { OPFS } from '$lib/opfs';
-	import type { Song } from '$lib/types/song';
-	import type { Album } from '$lib/types/album';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Artist } from '$lib/types/artist';
+	import type { Song, Album, Playlist, Artist } from '$lib/types';
 	import { toast } from 'svelte-sonner';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';

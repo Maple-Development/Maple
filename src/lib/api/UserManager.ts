@@ -1,12 +1,12 @@
 import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 import { SavedUser, UserInfo, friendNowPlaying } from '$lib/store';
-import type { User } from '$lib/types/user';
+import type { User } from '$lib/types';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
 export class UserManager {
 	private static DevServer = 'http://localhost:3000';
-	private static PRODServer = 'https://maple.kolf.pro:3000';
+	private static PRODServer = 'https://api.maple.music';
 	private static SERVER = this.PRODServer;
 
 	public static register = async (username: string, password: string) => {
@@ -356,13 +356,4 @@ export class UserManager {
 			return null;
 		}
 	};
-
-	/*  public static addFriend = async (friend: string) => {
-        try {
-           socket.emit('addFriend', { friendId: friend });
-        } catch (error) {
-            toast.error('Error adding friend: "' + error + '"');
-            return console.error('Error:', error);
-        }
-    } */
 }

@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { UserManager } from '$lib/api/UserManager';
+	import { PeerManager } from '$lib/api/PeerManager';
 	import AccTopBar from '$lib/components/AccTopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import MobileNavBar from '$lib/components/MobileNavBar.svelte';
@@ -20,12 +21,19 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	//@ts-ignore
 	import { registerSW } from 'virtual:pwa-register';
+	import { goto } from '$app/navigation';
 	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
-	const intervalMS = 60 * 60 * 1000; // 1 hour
+	const intervalMS = 60 * 60 * 1000; 	
+
+	const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
+	let kIndex = 0;
+	let kStartTime: number | null = null;
+	const kTimeout = 30000;
 
 	if (browser) {
 		registerSW({
+			// still need to add these at some point
 			onNeedRefresh() {
 				//need to add a prompt to the user to update the app
 			},
@@ -36,6 +44,31 @@
 				r && setInterval(() => {
 					r.update();
 				}, intervalMS);
+			}
+		});
+
+		window.addEventListener('keydown', (e) => {
+			const currentTime = Date.now();
+			
+			if (kStartTime && currentTime - kStartTime > kTimeout) {
+				kIndex = 0;
+				kStartTime = null;
+			}
+
+			if (kIndex === 0) {
+				kStartTime = currentTime;
+			}
+
+			if (e.key === code[kIndex]) {
+				kIndex++;
+				if (kIndex === code.length) {
+					goto('/game/index.html');
+					kIndex = 0;
+					kStartTime = null;
+				}
+			} else {
+				kIndex = 0;
+				kStartTime = null;
 			}
 		});
 	}
@@ -62,7 +95,7 @@
 		if (browser) {
 			if ($isLoggedIn) {
 				if (UserSettings.preferences.socket) {
-					const io2 = io('https://maple.kolf.pro:3000', {
+					const io2 = io('https://api.maple.music', {
 						withCredentials: true
 					});
 					socket.set(io2);
@@ -72,6 +105,9 @@
 					socketManager();
 					refreshFriends();
 					refreshRequests();
+				}
+				if (UserSettings.preferences.p2p) {
+					PeerManager.createPeer();
 				}
 			}
 		}

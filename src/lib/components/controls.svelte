@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Song } from '$lib/types/song';
+	import type { Song } from '$lib/types';
 	import { OPFS } from '$lib/opfs';
 	import { context, activeSong, audioPlayer, recentlyPlayedManager, socket } from '$lib/store';
 	import { extractColors } from 'extract-colors';
@@ -7,6 +7,7 @@
 	import { SavedUser } from '$lib/store';
 	import UserSettings from '$lib/preferences/usersettings';
 	import { v4 as uuidv4 } from 'uuid';
+	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 
 	let audioUrl: string = '';
 	let colors: {
@@ -32,22 +33,14 @@
 
 	async function webHookSend(song: Song) {
 		const isLoggedIn = await UserManager.isLoggedIn();
-		let pfp;
 		if (!isLoggedIn) return;
-		if ($SavedUser.pfp !== '' && $SavedUser.pfp !== null) {
-			pfp = await base64ToFile($SavedUser.pfp);
-		}
 
 		const image = await getImage(song.image);
 		const imageBuffer = await image.arrayBuffer();
 		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
-
 		await UserManager.setAlbumArt(imageFile);
 		await new Promise(resolve => setTimeout(resolve, 100));
-		
-		const artworkUuid = uuidv4();
-		const artworkUrl = 'https://maple.kolf.pro:3000/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
-		
+
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
@@ -57,49 +50,57 @@
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
+		refreshFriends();
+		refreshRequests();
 
-		const formData = new FormData();
-		formData.append('file', image, 'album.jpg');
-		if (pfp) formData.append('file', pfp, 'pfp.png');
-		formData.append(
-			'payload_json',
-			JSON.stringify({
-				embeds: [
-					{
-						title: 'Now Playing',
-						description: `**${song.title}** by ${song.artist}`,
-						color: parseInt(colors?.[0]?.hex.replace(/^#/, ''), 16),
-						fields: [
-							{
-								name: 'Album',
-								value: song.album
-							},
-							{
-								name: 'Year',
-								value: song.year ? song.year.toString() : 'N/A'
-							},
-							{
-								name: 'Track Number',
-								value: song.trackNumber ? song.trackNumber.toString() : 'N/A'
+		console.log('[CLIENT] Emitting nowPlaying event:', friendPlaying);
+		console.log('[CLIENT] Current socket ID:', $socket?.id);
+
+		if (UserSettings.webhook.enabled) {			
+			const formData = new FormData();
+			formData.append('file', image, 'album.jpg');
+			formData.append(
+				'payload_json',
+				JSON.stringify({
+					embeds: [
+						{
+							title: 'Now Playing',
+							description: `**${song.title}** by ${song.artist}`,
+							color: parseInt(colors?.[0]?.hex.replace(/^#/, ''), 16),
+							fields: [
+								{
+									name: 'Album',
+									value: song.album
+								},
+								{
+									name: 'Year',
+									value: song.year ? song.year.toString() : 'N/A'
+								},
+								{
+									name: 'Track Number',
+									value: song.trackNumber ? song.trackNumber.toString() : 'N/A'
+								}
+							],
+							image: {
+								url: 'attachment://album.jpg'
 							}
-						],
-						image: {
-							url: 'attachment://album.jpg'
 						}
-					}
-				],
-				username: $SavedUser?.name === '' ? 'Maple User' : $SavedUser?.name,
-				avatar_url: 'https://maple.kolf.pro:3000/public/get/pfp/' + $SavedUser?.id
-			})
-		);
+					],
+					username: $SavedUser?.name === '' ? 'Maple User' : $SavedUser?.name,
+					avatar_url: 'https://api.maple.music/public/get/pfp/' + $SavedUser?.id
+				})
+			);
 
-		const request = await fetch(UserSettings.webhook.url, {
-			method: 'POST',
-			body: formData
-		});
-		const response = await request.json();
+			await fetch(UserSettings.webhook.url, {
+				method: 'POST',
+				body: formData
+			});
+		}
 
 		if ('mediaSession' in navigator) {
+			const artworkUuid = uuidv4();
+			const artworkUrl = 'https://api.maple.music/public/get/albumArt/' + $SavedUser.id + '/' + artworkUuid;
+			
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: song.title,
 				artist: song.artist,
@@ -156,9 +157,7 @@
 			onEnded: nextSong
 		}));
 
-		if (UserSettings.webhook.enabled) {
-			webHookSend(song);
-		}
+		webHookSend(song);
 	}
 
 	export function nextSong() {

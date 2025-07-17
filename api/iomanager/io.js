@@ -2,9 +2,15 @@
 const pool = require('../db');
 
 module.exports = {
-	addFriend: function (user, friend, socket, io) {
+	addFriend: async function (user, friend, socket, io) {
 		try {
-		io.to(socket.id).emit('friendRequest', { id: user });
+			const clients = await this.getSocket(io, friend);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${friend}, emitting friendRequest`);
+				clients.forEach(client => {
+					io.to(client.id).emit('friendRequest', { id: user });
+				});
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -12,46 +18,62 @@ module.exports = {
 
 	getSocket: async function (io, id) {
 		try {
+			console.log(`[IO] Getting socket for ${id}`);
 			const clients = await io.fetchSockets();
-			for (const client of clients) {
-				if (client.user.id === id) {
-					return client;
-				}
-			}
-			return null;
+			console.log(`[IO] Found ${clients.length} sockets`);
+			const userSockets = clients.filter(client => client.user.id === id);
+			console.log(`[IO] Found ${userSockets.length} sockets for user ${id}`);
+			return userSockets;
 		} catch (error) {
 			console.error(error);
-			return null;
+			return [];
 		}
 	},
 
 	nowPlaying: function (user, friends, io, nowPlaying) {
 		try {
+			console.log(`[IO] Processing nowPlaying for user ${user} with ${friends.length} friends`);
 			pool.promise().query(
 				'INSERT INTO live_status (user_id, playing) VALUES (?, ?) ' +
 				'ON DUPLICATE KEY UPDATE playing = VALUES(playing)',
 				[user, JSON.stringify(nowPlaying)]
 			);
 			friends.forEach(async (friend) => {
-				const client = await this.getSocket(io, friend.friend_id)
-				if (client) {
-					io.to(client.id).emit('nowPlaying', { nowPlaying: nowPlaying, id: user });
-				}
+				const targetId = friend.user_id === user ? friend.friend_id : friend.user_id;
+				console.log(`[IO] Looking for sockets for friend ${targetId} (relationship: ${JSON.stringify(friend)})`);
+				
+				const clients = await this.getSocket(io, targetId);
+				if (clients.length > 0) {
+					console.log(`[IO] Found ${clients.length} sockets for friend ${targetId}`);
+					const message = { nowPlaying: nowPlaying, id: user };
+					clients.forEach(client => {
+						console.log(`[IO] Emitting to socket ${client.id} for user ${targetId}:`, message);
+						io.to(client.id).emit('nowPlaying', message);
+					});
+				} else {
+					console.log(`[IO] No sockets found for friend ${targetId}`);
+				}	
 			})
 		} catch (error) {
-			console.error(error);
+			console.error('[ERROR] Error in nowPlaying:', error);
 		}
 	},
 
-	emit: function (socket, event, data, io) {
+	emit: async function (socket, event, data, io) {
 		try {
-			io.to(socket.id).emit(event, data);
+			const clients = await this.getSocket(io, socket.user.id);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${socket.user.id}, emitting ${event}`);
+				clients.forEach(client => {
+					io.to(client.id).emit(event, data);
+				});
+			}
 		} catch (error) {
 			console.error(error);
 		}
 	},
 
-	discordRPC: function (user, _friends, io, nowPlaying) {
+	discordRPC: async function (user, _friends, io, nowPlaying) {
 		try {
 			const rpcData = {
 				artist: nowPlaying.artist || undefined,
@@ -71,13 +93,32 @@ module.exports = {
 				]
 			};
 
-			io.sockets.sockets.forEach(socket => {
-				if (socket.user && socket.user.id === user) {
-					socket.emit('rpcUpdate', rpcData);
-				}
-			});
+			const clients = await this.getSocket(io, user);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${user}, emitting discordRPC`);
+				clients.forEach(client => {
+					client.emit('rpcUpdate', rpcData);
+				});
+			}
 		} catch (error) {
 			console.error('[ERROR] Error in discordRPC:', error);
+		}
+	},
+
+	emitAll: async function (id, title, data, io) {
+		try {
+			const clients = await this.getSocket(io, id);
+			if (clients.length > 0) {
+				console.log(`[IO] Found ${clients.length} sockets for user ${id}, emitting to ALL clients`)
+				clients.forEach(client => {
+					client.emit(title, data)
+				})
+			}
+			else {
+				console.log(`[IO] No sockets found for user ${id}, NOT emitting to ALL clients`)
+			}
+		} catch (error) {
+			console.error('[ERROR] Error in emitAll: \n', error);
 		}
 	}
 };

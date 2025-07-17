@@ -7,8 +7,7 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { title } from '$lib/store';
-	import type { Playlist } from '$lib/types/playlist';
-	import type { Song } from '$lib/types/song';
+	import type { Playlist, Song } from '$lib/types';
 	import { Check, Pencil, Plus, Search } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
@@ -189,6 +188,7 @@
 							</ContextMenu>
 						{:else}
 							<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+								<!-- svelte-ignore a11y_consider_explicit_label -->
 								<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
 									<div class="h-44 w-44 animate-pulse rounded-lg bg-muted md:h-52 md:w-52"></div>
 								</a>
@@ -196,6 +196,7 @@
 						{/if}
 						{:catch error}
 							<ContextMenu type={'playlist'} on:delete={(e) => openAlert(playlist)}>
+								<!-- svelte-ignore a11y_consider_explicit_label -->
 								<a class="pointer" href={`/playlist?playlist=${playlist.id}`}>
 									<div class="h-44 w-44 animate-pulse rounded-lg bg-muted md:h-52 md:w-52"></div>
 								</a>
@@ -297,6 +298,7 @@
 		<div class="mx-0 mb-5 mt-2 flex flex-col md:mx-4">
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<!-- svelte-ignore a11y-missing-attribute -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<a
 				on:click={() => (open = true)}
 				class="flex flex-row items-center rounded-sm px-2 py-2 hover:bg-secondary"
@@ -364,6 +366,7 @@
 					{#each filteredSongs as song}
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<a
 							on:click={() => toggleSongSelection(song)}
 							class="flex flex-row items-center rounded-sm px-4 py-3 hover:bg-secondary"

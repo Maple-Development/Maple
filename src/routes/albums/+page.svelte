@@ -5,7 +5,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { isSmallDevice, title } from '$lib/store';
-	import type { Album } from '$lib/types/album';
+	import type { Album } from '$lib/types';
 	import { ArrowDownZA, ArrowUpAZ, EllipsisVertical, List, ListFilter } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Song } from '$lib/types/song';
+	import type { Song } from '$lib/types';
 	import { context } from '$lib/store';
 	import Controls from './controls.svelte';
 	export let track: Song;
@@ -15,6 +15,7 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class={className} on:click={() => playSong(track)}>
 	<slot />
 </div>

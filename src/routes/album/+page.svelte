@@ -7,13 +7,11 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { OPFS } from '$lib/opfs';
 	import { context, title } from '$lib/store';
-	import type { Album } from '$lib/types/album';
-	import type { Song } from '$lib/types/song';
+	import type { Album, Song, Playlist } from '$lib/types';
 	import { ArrowDownZA, ArrowUpAZ, Check, List, ListFilter, Pencil, Trash } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
-	import type { Playlist } from '$lib/types/playlist';
 
 	let albumName: string;
 	let album: Album | undefined;

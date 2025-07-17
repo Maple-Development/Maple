@@ -21,6 +21,7 @@
 	let showLogging = false;
 	let p2p = true;
 	let socket = true;
+	let jellyfinMode = false;
 
 	let deferredPrompt;
 
@@ -40,6 +41,7 @@
 		devMode = UserSettings.preferences.devMode;
 		showLogging = UserSettings.preferences.showLogging;
 		socket = UserSettings.preferences.socket;
+		jellyfinMode = UserSettings.preferences.jellyfinMode;
 	});
 
 	let device = 'chrome';
@@ -182,7 +184,6 @@
 
 	function clearLibrary() {
 		OPFS.clearLibrary();
-		localStorage.clear();
 		getLength();
 	}
 
@@ -191,6 +192,7 @@
 		preferences.set('devMode', devMode);
 		preferences.set('showLogging', showLogging);
 		preferences.set('socket', socket);
+		preferences.set('jellyfinMode', jellyfinMode);
 		toast.success('Settings updated',
 			{
 				action: {
@@ -283,6 +285,14 @@
 					<p class="text-sm text-muted-foreground">Enable real-time communication features</p>
 				</div>
 				<Switch id="socket" bind:checked={socket} />
+			</div>
+
+			<div class="flex items-center justify-between rounded-lg bg-background p-2">
+				<div class="space-y-0.5">
+					<Label for="jellyfinMode" class="text-base">Jellyfin Library Mode</Label>
+					<p class="text-sm text-muted-foreground">Use Jellyfin-style folder structure for importing music</p>
+				</div>
+				<Switch id="jellyfinMode" bind:checked={jellyfinMode} />
 			</div>
 		</div>
 
