@@ -10,5 +10,9 @@
 
 <TopBar />
 <SideBar />
-{@render children()}
+<div class="fixed inset-0 left-23 top-14 bottom-30 overflow-y-auto overflow-x-hidden">
+	<div>
+		{@render children()}
+	</div>
+</div>
 <BottomBar />
