@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
+import { sitemapPlugin } from 'sveltekit-sitemap/dist/plugin.js';
 import manifest from './static/manifest.json';
 
 export default defineConfig({
@@ -29,7 +30,8 @@ export default defineConfig({
 				enabled: true,
 				type: 'module'
 			}
-		})
+		}),
+		sitemapPlugin({ routesDir: './src/routes', sitemapFile: './src/sitemap.ts' })
 	],
 	optimizeDeps: {
 		include: ['src/routes/**/+*.{js,ts,svelte}', 'src/hooks*.{js,ts}']
