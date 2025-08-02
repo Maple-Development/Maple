@@ -2,7 +2,19 @@ import type { RO_Sitemap } from 'sveltekit-sitemap';
 
 export const sitemap = (<const>{
    "/": true,
-   "/blah": false,
+   "/albums": true,
+   "/albums/album/[slug]": false,
+   "/albums/album": true,
+   "/artists": true,
+   "/artists/artist/[slug]": false,
+   "/artists/artist": true,
+   "/friends": false,
+   "/login": false,
+   "/playlists": true,
+   "/playlists/playlist/[slug]": false,
+   "/playlists/playlist": true,
+   "/register": false,
+   "/settings": false,
    "/tracks": false,
    "/upload": false
 }) satisfies RO_Sitemap
