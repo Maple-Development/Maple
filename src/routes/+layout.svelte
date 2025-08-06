@@ -4,6 +4,7 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
+	import { Toaster } from 'svelte-sonner';
 
 	let { children } = $props();
 </script>
@@ -16,3 +17,4 @@
 	</div>
 </div>
 <BottomBar />
+<Toaster />

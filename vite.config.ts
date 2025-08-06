@@ -1,3 +1,4 @@
+import devtoolsJson from 'vite-plugin-devtools-json';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
@@ -19,21 +20,26 @@ export default defineConfig({
 						options: {
 							cacheName: 'api-cache',
 							networkTimeoutSeconds: 10,
-							cacheableResponse: {
-								statuses: [0, 200]
-							}
+							cacheableResponse: { statuses: [0, 200] }
 						}
 					}
 				]
 			},
-			devOptions: {
-				enabled: true,
-				type: 'module'
+			devOptions: { enabled: true, type: 'module' },
+			hmr: {
+				protocol: 'wss',
 			}
 		}),
-		sitemapPlugin({ routesDir: './src/routes', sitemapFile: './src/sitemap.ts' })
+		sitemapPlugin({
+			routesDir: './src/routes',
+			sitemapFile: './src/sitemap.ts'
+		}),
+		devtoolsJson()
 	],
 	optimizeDeps: {
-		include: ['src/routes/**/+*.{js,ts,svelte}', 'src/hooks*.{js,ts}']
+		include: [
+			'src/routes/**/+*.{js,ts,svelte}',
+			'src/hooks*.{js,ts}'
+		]
 	}
 });

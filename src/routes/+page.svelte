@@ -1,6 +1,10 @@
 <script lang="ts">
     import { Button, Card } from 'm3-svelte';
     import Track from '$lib/components/Track.svelte';
+    import { tracks } from '$lib/global.svelte';
+    import type { Song } from '$lib/types';
+
+    let sortedTracks: Song[] = $derived.by(() => [...tracks()].sort((a, b) => a.title.localeCompare(b.title)).slice(0, 5));
 </script>
 
 <div class="flex w-full mt-5 justify-center">
@@ -20,12 +24,9 @@
 <div class="flex flex-col w-full mt-5">
     <h1 class="text-2xl font-bold ml-10">Recently Played</h1>
     <div class="grid grid-cols-1 mx-24 gap-x-2 gap-y-2 sm:grid-cols-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2">
-        <Track />
-        <Track />
-        <Track />
-        <Track />
-        <Track />
-        <Track />
+        {#each sortedTracks as track}
+            <Track track={track} />
+        {/each}
     </div>
 </div>
 
