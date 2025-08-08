@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Song, Playlist } from '$lib/types';
+	import type { Song, Playlist, Album, Artist } from '$lib/types';
 	import { playlists } from '$lib/global.svelte';
 	import { OPFS } from '$lib/opfs';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
 
-	const CONTEXT_MENU_EVENT = 'track-context-menu-open';
+	const DEFAULT_PLACEHOLDER = 'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
+
+    const CONTEXT_MENU_EVENT = 'track-context-menu-open';
 
 	let pos = $state({ x: 0, y: 0 });
 	let menu = $state({ h: 0, w: 0 });
@@ -16,7 +18,22 @@
 	let content: HTMLDivElement | undefined = $state(undefined);
 	let hideSubmenuTimeout: number | null = null;
 	
-	let { track, type = 'track' }: { track: Song; type?: string } = $props();
+	let { track, playlist, album, artist, type = 'track' }: { track?: Song; playlist?: Playlist; album?: Album; artist?: Artist; type?: string } = $props();
+
+    const USE_ARTIST_SVG = true;
+
+	function portalToBody(node: HTMLElement) {
+		if (typeof document !== 'undefined' && node.parentNode !== document.body) {
+			document.body.appendChild(node);
+		}
+		return {
+			destroy() {
+				if (typeof document !== 'undefined' && node.parentNode === document.body) {
+					document.body.removeChild(node);
+				}
+			}
+		};
+	}
 
 	onMount(() => {
 		const handleOtherMenuOpen = (e: CustomEvent) => {
@@ -151,6 +168,7 @@
 	<div
 		bind:this={content}
 		use:getContextMenuDimension
+		use:portalToBody
 		style="position: fixed; top: {pos.y}px; left: {pos.x}px; z-index: 1000;"
 		class="opacity-100 transform scale-100 transition-all duration-100"
 	>
@@ -165,6 +183,7 @@
 				<span class="text-sm font-medium">Delete</span>
 			</button>
 
+			{#if type === 'track'}
 			<div class="relative">
 				<button
 					onmouseenter={handlePlaylistHover}
@@ -210,7 +229,8 @@
 						</button>
 					</div>
 				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}
@@ -219,46 +239,58 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="flex flex-col w-full mt-5 ml-10" oncontextmenu={rightClickContextMenu}>
-    {#if track.image}
-        {#await OPFS.getImageUrl(track.image)}
-			<Lazy height={200} keep={true}>
-				<img 
-					src="https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg" 
-					class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-					alt="{track.title} - {track.artist}"
-					draggable="false"
-				/>
-			</Lazy>
+    {#if track?.image || playlist?.image || album?.image || artist?.image}
+        {#await OPFS.getImageUrl(track?.image || playlist?.image || album?.image || artist?.image)}
+            <Lazy height={200} keep={true}>
+                {#if type === 'artist' && USE_ARTIST_SVG}
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+                {:else}
+                    <img 
+                        src={DEFAULT_PLACEHOLDER}
+                        class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
+                        alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
+                        draggable="false"
+                    />
+                {/if}
+            </Lazy>
         {:then imageUrl}
 			<Lazy height={200} keep={true}>
 				<img 
 					src={imageUrl} 
 					class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-					alt="{track.title} - {track.artist}"
+					alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
 					draggable="false"
 				/>
 			</Lazy>
         {:catch}
-			<Lazy height={200} keep={true}>
-				<img 
-					src="https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg" 
-					class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-					alt="{track.title} - {track.artist}"
-					draggable="false"
-				/>
-			</Lazy>
+            <Lazy height={200} keep={true}>
+                {#if type === 'artist' && USE_ARTIST_SVG}
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+                {:else}
+                    <img 
+                        src={DEFAULT_PLACEHOLDER}
+                        class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
+                        alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
+                        draggable="false"
+                    />
+                {/if}
+            </Lazy>
         {/await}
     {:else}
-        <img 
-            src="https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg" 
-            class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-            alt="{track.title} - {track.artist}"
-            draggable="false"
-        />
+        {#if type === 'artist' && USE_ARTIST_SVG}
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+		{:else}
+            <img 
+                src={DEFAULT_PLACEHOLDER}
+                class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
+                alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
+                draggable="false"
+            />
+        {/if}
     {/if}
     <div class="flex flex-col">
-        <p class="song-titles mt-2">{track.title}</p>
-        <p class="song-artists">{track.artist}</p>
+        <p class="song-titles mt-2">{track?.title || playlist?.name || album?.name || artist?.name}</p>
+        <p class="song-artists">{track?.artist || "" || album?.artist || ""}</p>
     </div>
 </div>
 
