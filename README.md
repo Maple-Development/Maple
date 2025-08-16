@@ -146,7 +146,7 @@ Maple was inspired by various experiences, such as being on a plane without inte
 
 ## Wondering how we use your data?
 
-You can view our privacy policy [here](https://maple.music/privacy.html/)!
+You can view our privacy policy [here](https://maple.music/privacy)!
 
 ## Credits
 
