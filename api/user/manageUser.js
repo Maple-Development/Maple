@@ -123,4 +123,25 @@ router.post('/setDisplayName/:id', (req, res) => {
 	});
 });
 
+router.delete('/delete/:id', async (req, res) => {
+	const id = req.params.id;
+
+	const connection = await pool.promise().getConnection();
+	try {
+		await connection.beginTransaction();
+		await connection.query('DELETE FROM pending_requests WHERE user_id = ? OR friend_id = ?', [id, id]);
+		await connection.query('DELETE FROM friends_db WHERE user_id = ? OR friend_id = ?', [id, id]);
+		await connection.query('DELETE FROM live_status WHERE user_id = ?', [id]);
+		await connection.query('DELETE FROM users WHERE id = ?', [id]);
+		await connection.commit();
+		return res.status(200).json({ message: 'User data successfully deleted.' });
+	} catch (error) {
+		console.error(error);
+		await connection.rollback();
+		return res.status(500).json({ error: 'Error deleting user' });
+	} finally {
+		connection.release();
+	}
+});
+
 module.exports = router;
