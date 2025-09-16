@@ -5,6 +5,7 @@
 	import { OPFS } from '$lib/opfs';
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
+	import { goto } from '$app/navigation';
 
 	const DEFAULT_PLACEHOLDER = 'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
 
@@ -162,6 +163,18 @@
 			hideSubmenuTimeout = null;
 		}, 300);
 	}
+
+	function handleTrackClick() {
+		if (type === 'track') {
+			// play later
+		} else if (type === 'playlist') {
+			goto(`/playlists/playlist/${playlist?.id}`);
+		} else if (type === 'album') {
+			goto(`/albums/album/${album?.id}`);
+		} else if (type === 'artist') {
+			goto(`/artists/artist/${artist?.id}`);
+		}
+	}
 </script>
 
 {#if showMenu}
@@ -243,9 +256,16 @@
         {#await OPFS.getImageUrl(track?.image || playlist?.image || album?.image || artist?.image)}
             <Lazy height={200} keep={true}>
                 {#if type === 'artist' && USE_ARTIST_SVG}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<svg 
+					onclick={handleTrackClick}
+					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
                 {:else}
+                    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <img 
+						onclick={handleTrackClick}
                         src={DEFAULT_PLACEHOLDER}
                         class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
                         alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
@@ -255,7 +275,10 @@
             </Lazy>
         {:then imageUrl}
 			<Lazy height={200} keep={true}>
+				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<img 
+					onclick={handleTrackClick}
 					src={imageUrl} 
 					class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
 					alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
@@ -265,9 +288,15 @@
         {:catch}
             <Lazy height={200} keep={true}>
                 {#if type === 'artist' && USE_ARTIST_SVG}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<svg
+					 onclick={handleTrackClick}
+					 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
                 {:else}
-                    <img 
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<img 
+						onclick={handleTrackClick}
                         src={DEFAULT_PLACEHOLDER}
                         class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
                         alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
@@ -278,9 +307,15 @@
         {/await}
     {:else}
         {#if type === 'artist' && USE_ARTIST_SVG}
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<svg 
+			onclick={handleTrackClick}
+			xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
 		{:else}
-            <img 
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<img 
+				onclick={handleTrackClick}
                 src={DEFAULT_PLACEHOLDER}
                 class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
                 alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"

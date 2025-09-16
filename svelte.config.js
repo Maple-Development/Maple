@@ -32,7 +32,12 @@ const config = {
 				}
 			})
 	},
-	preprocess: [vitePreprocess({})]
+	preprocess: [vitePreprocess({})],
+	compilerOptions: {
+		experimental: {
+			async: true
+		}
+	}
 }; 
 
 export default config;

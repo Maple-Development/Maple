@@ -89,7 +89,7 @@
 		<div class="mb-3 flex justify-center">
 			<Button
 				onclick={() => {
-					goto('/upload');
+					createLibrary();
 				}}
 				variant="filled"
 				iconType="full"
