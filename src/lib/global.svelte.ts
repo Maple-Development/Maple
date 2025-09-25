@@ -19,6 +19,17 @@ async function initialize() {
     }
 }
 
+export async function refreshLibrary() {
+    try {
+        tracksState = await OPFS.get().tracks();
+        playlistsState = await OPFS.get().playlists();
+        artistsState = await OPFS.get().artists();
+        albumsState = await OPFS.get().albums();
+    } catch (error) {
+        console.error('Failed to refresh library:', error);
+    }
+}
+
 if (browser) {
     initialize().catch(error => {
         console.error('Initialization failed:', error);
