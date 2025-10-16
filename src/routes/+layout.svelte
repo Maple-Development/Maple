@@ -5,8 +5,14 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { Toaster } from 'svelte-sonner';
+    import { UserInfo, isLoggedIn } from '$lib/store';
 
-	let { children } = $props();
+	let { children, data } = $props();
+    $effect(() => {
+		console.log(data?.user);
+        isLoggedIn.set(Boolean(data?.user));
+        UserInfo.set(data?.user ?? null);
+	});
 </script>
 
 <TopBar />

@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { Peer } from 'peerjs';
+//import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
 import { derived, writable } from 'svelte/store';
 import type { AddedFriend, PendingRequest, Song, User } from '$lib/types';
@@ -9,16 +9,9 @@ export const friends = writable([] as AddedFriend[]);
 export const isLoggedIn = writable(false);
 export const friendNowPlaying = writable({} as any);
 export const socket = writable(null as Socket | null);
-export const UserPeer = writable(null as Peer | null);
+//export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
-export const UserInfo = writable(null as any);
-UserInfo.subscribe((value) => {
-	if (browser) {
-		if (!value) return;
-		if (value === undefined) return;
-		localStorage.setItem('UserInfo', JSON.stringify(value));
-	}
-});
+export const UserInfo = writable(null as User | null);
 export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
@@ -167,10 +160,5 @@ if (browser) {
 		hideTips.set(true);
 	} else {
 		hideTips.set(false);
-	}
-
-	const storedUserInfo = localStorage.getItem('UserInfo');
-	if (storedUserInfo) {
-		UserInfo.set(JSON.parse(storedUserInfo));
 	}
 }

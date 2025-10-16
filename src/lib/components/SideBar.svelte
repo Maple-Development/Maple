@@ -2,6 +2,7 @@
 	import { Button } from 'm3-svelte';
 	import { goto } from '$app/navigation';
 	import { createLibrary } from '$lib/library';
+	import { UserInfo, SavedUser } from '$lib/store';
 </script>
 
 <div class="flex items-center justify-center">
@@ -16,11 +17,15 @@
 					variant="filled"
 					iconType="full"
 					onclick={() => {
-						goto('/');
+						goto('/login');
 					}}
 				>
-				<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><path fill="currentColor" d="M9.775 12q-.9 0-1.5-.675T7.8 9.75l.325-2.45q.2-1.425 1.3-2.363T12 4t2.575.938t1.3 2.362l.325 2.45q.125.9-.475 1.575t-1.5.675zM4 18v-.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2v.8q0 .825-.587 1.413T18 20H6q-.825 0-1.412-.587T4 18"/></svg>
-				</Button>
+				{#if $UserInfo && $SavedUser.pfp}
+					<img src={$SavedUser.pfp} alt="Profile" class="w-16 h-16 rounded-full" />
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"><path fill="currentColor" d="M9.775 12q-.9 0-1.5-.675T7.8 9.75l.325-2.45q.2-1.425 1.3-2.363T12 4t2.575.938t1.3 2.362l.325 2.45q.125.9-.475 1.575t-1.5.675zM4 18v-.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2v.8q0 .825-.587 1.413T18 20H6q-.825 0-1.412-.587T4 18"/></svg>
+				{/if}
+			</Button>
 			</div>
 
 			<div class="button-mod mt-5 flex flex-col items-center justify-center gap-2">
