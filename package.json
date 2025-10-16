@@ -30,6 +30,7 @@
 	},
 	"dependencies": {
 		"@vite-pwa/sveltekit": "^1.0.0",
+		"express": "^5.1.0",
 		"m3-svelte": "^4.6.2",
 		"music-metadata": "^11.7.3",
 		"opfs-tools": "^0.7.2",
