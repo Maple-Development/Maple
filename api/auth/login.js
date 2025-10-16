@@ -56,8 +56,11 @@ router.post('/create', (req, res) => {
 			}
 
 			const id = uuidv4();
-			const sql = 'INSERT INTO users (id, username, password) VALUES (?, ?, ?)';
-			pool.query(sql, [id, username, hash], (error, results) => {
+			const now = new Date();
+			const dateString = now.toISOString().slice(0, 19).replace('T', ' ');
+			console.log(dateString);
+			const sql = 'INSERT INTO users (id, username, password, creation_date) VALUES (?, ?, ?, ?)';
+			pool.query(sql, [id, username, hash, dateString], (error, results) => {
 				if (error) {
 					console.error(error);
 					return res.status(500).json({ error: 'Error creating user' });
