@@ -16,8 +16,8 @@ const uploadsPath = path.join(__dirname, 'SMS', 'uploads');
 if (fs.existsSync(uploadsPath)) {
     app.use('/SMS/uploads', express.static(uploadsPath));
   
-    app.use('/SMS/uploads/:path(*)', (req, res) => {
-      res.status(404).send('404, no media found!');
+    app.use('/SMS/uploads/:path(.*)', (req, res) => {
+        res.status(404).send('404, no media found!');
     });
   
     app.use('/SMS/upload', (req, res) => {
