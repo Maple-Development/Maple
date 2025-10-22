@@ -172,26 +172,38 @@ try {
 			const id = client.user.id;
 			console.log(`[SOCKET] Received nowPlaying from user ${id} (socket ID: ${client.id}):`, data.nowPlaying);
 			console.log(`[SOCKET] Full message received:`, data);
-			
+
+			const validation = validateNowPlaying(data.nowPlaying);
+
+
 			const sql = 'SELECT * FROM friends_db WHERE user_id = ? OR friend_id = ?';
 
 			try {
-				const pool = require('./db');
-				const [allFriends] = await pool.promise().query(sql, [id, id]);
-				console.log(`[SOCKET] Found ${allFriends.length} friends for user ${id}:`, allFriends);
-				
-				const sorted = sortFriends(allFriends, id);
-				console.log(`[SOCKET] Sorted friends for user ${id}:`, sorted);
-
-				if (allFriends !== null && allFriends.length > 0) {
-					console.log(`[SOCKET] Emitting nowPlaying to friends of user ${id}`);
-					ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+				if (validation.valid === false) {
+					console.warn('[SOCKET] Invalid nowPlaying data received for user ' + id + ': ' + validation.message.join(', '));
+					client.emit('invalidNowPlaying', { message: validation.message });
 				} else {
-					console.log(`[SOCKET] No friends found for user ${id}`);
-				}
-				if (data.nowPlaying.discord === true) {
-					console.log(`[SOCKET] Emitting Discord RPC for user ${id}`);
-					ioTools.discordRPC(id, sorted, io, data.nowPlaying);
+					if (validation.flag === true) {
+						console.warn('[SOCKET] Semi-valid nowPlaying data received for user ' + id + ': ' + validation.message.join(', '));
+						client.emit('semiValidNowPlaying', { message: validation.message });
+					}
+					const pool = require('./db');
+					const [allFriends] = await pool.promise().query(sql, [id, id]);
+					console.log(`[SOCKET] Found ${allFriends.length} friends for user ${id}:`, allFriends);
+					
+					const sorted = sortFriends(allFriends, id);
+					console.log(`[SOCKET] Sorted friends for user ${id}:`, sorted);
+
+					if (allFriends !== null && allFriends.length > 0) {
+						console.log(`[SOCKET] Emitting nowPlaying to friends of user ${id}`);
+						ioTools.nowPlaying(id, sorted, io, data.nowPlaying);
+					} else {
+						console.log(`[SOCKET] No friends found for user ${id}`);
+					}
+					if (data.nowPlaying.discord === true) {
+						console.log(`[SOCKET] Emitting Discord RPC for user ${id}`);
+						ioTools.discordRPC(id, sorted, io, data.nowPlaying);
+					}
 				}
 			} catch (error) {
 				console.error('[ERROR] Error in nowPlaying:', error);
@@ -222,6 +234,68 @@ try {
 			}
 		});
 		return newFriends;
+	}
+
+	function validateNowPlaying(data) {
+		const errors = [];
+
+		if (!data) {
+			return { valid: false, message: ['Data is not provided'], flag: false };
+		} else if (typeof data !== 'object') {
+			return { valid: false, message: ['Data is not an object'], flag: false };
+		}
+
+		if (!data.id) {
+			errors.push('id is not provided');
+		} else if (typeof data.id !== 'string' || data.id.trim() === '') {
+			errors.push('id is not a string or is empty');
+		}
+
+		if (!data.album) {
+			errors.push('album is not provided');
+		} else if (typeof data.album !== 'string' || data.album.trim() === '') {
+			errors.push('album is not a string or is empty');
+		}
+
+		if (!data.title) {
+			errors.push('title is not provided');
+		} else if (typeof data.title !== 'string' || data.title.trim() === '') {
+			errors.push('title is not a string or is empty');
+		}
+
+		if (!data.artist) {
+			errors.push('artist is not provided');
+		} else if (typeof data.artist !== 'string' || data.artist.trim() === '') {
+			errors.push('artist is not a string or is empty');
+		}
+
+		if (!('discord' in data)) {
+			errors.push('discord is not provided');
+		} else if (typeof data.discord !== 'boolean') {
+			errors.push('discord is not a boolean');
+		}
+
+		if (errors.length > 0) {
+			return { valid: false, message: errors, flag: false };
+		}
+
+		// Check optional fields
+		const warnings = [];
+		const hasTimePlayed = typeof data.timePlayed === 'string' && data.timePlayed.trim() !== '';
+		const hasSource = typeof data.source === 'string' && data.source.trim() !== '';
+
+		if (!hasTimePlayed) {
+			warnings.push('timePlayed is missing or invalid');
+		}
+		if (!hasSource) {
+			warnings.push('source is missing or invalid');
+		}
+
+		if (warnings.length > 0) {
+			return { valid: true, message: warnings, flag: true };
+		}
+
+		return { valid: true, message: [], flag: false };
 	}
 
 	console.log('[13] Starting server on port 3000...');
