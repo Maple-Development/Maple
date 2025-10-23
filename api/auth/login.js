@@ -56,8 +56,11 @@ router.post('/create', (req, res) => {
 			}
 
 			const id = uuidv4();
-			const sql = 'INSERT INTO users (id, username, password) VALUES (?, ?, ?)';
-			pool.query(sql, [id, username, hash], (error, results) => {
+			const now = new Date();
+			const dateString = now.toISOString().slice(0, 19).replace('T', ' ');
+			console.log(dateString);
+			const sql = 'INSERT INTO users (id, username, password, creation_date, last_login) VALUES (?, ?, ?, ?, ?)';
+			pool.query(sql, [id, username, hash, dateString, dateString], (error, results) => {
 				if (error) {
 					console.error(error);
 					return res.status(500).json({ error: 'Error creating user' });
@@ -100,6 +103,14 @@ router.post('/', (req, res) => {
 				secure: true,
 				expires: new Date(Date.now() + 604800000),
 				sameSite: 'None'
+			});
+			const now = new Date();
+			const dateString = now.toISOString().slice(0, 19).replace('T', ' ');
+			const updateLastLoginSql = 'UPDATE users SET last_login = ? WHERE id = ?';
+			pool.query(updateLastLoginSql, [dateString, user.id], (error) => {
+				if (error) {
+					console.error(error);
+				}
 			});
 			return res
 				.status(200)
