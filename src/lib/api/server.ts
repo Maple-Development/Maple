@@ -1,1 +1,1 @@
-export const SERVER = 'https://api.maple.music'
+export const SERVER = 'http://localhost:3000'

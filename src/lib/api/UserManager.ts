@@ -1,10 +1,26 @@
 import { SERVER } from '$lib/api/server';
 import { SavedUser, UserInfo } from '$lib/store';
 import type { User } from '$lib/types';
+import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
 export class UserManager {
-    public static login = async (username: string, password: string) => {
+	public static register = async (username: string, password: string) => {
+		try {
+			const response = await fetch(`${SERVER}/login/create`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username, password })
+			});
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	};
+
+	public static login = async (username: string, password: string) => {
         try {
             const response = await fetch(`${SERVER}/login`, {
                 credentials: 'include',
