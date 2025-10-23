@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 const express = require('express'),
-	cookieParser = require('cookie-parser');
+cookieParser = require('cookie-parser');
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 const router = express.Router();
