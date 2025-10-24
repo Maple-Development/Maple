@@ -41,12 +41,16 @@
 		await UserManager.setAlbumArt(imageFile);
 		await new Promise(resolve => setTimeout(resolve, 100));
 
+		const formatted = new Date().toISOString().slice(0, 19).replace('T', ' '); 
+
 		let friendPlaying = {
 			title: song.title,
 			artist: song.artist,
 			album: song.album,
 			discord: UserSettings.discord.enabled,
-			id: $SavedUser.id
+			id: $SavedUser.id,
+			timePlayed: formatted,
+			source: 'Web'
 		};
 
 		$socket?.emit('nowPlaying', { nowPlaying: friendPlaying });
