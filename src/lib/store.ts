@@ -12,6 +12,13 @@ export const socket = writable(null as Socket | null);
 //export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
 export const UserInfo = writable(null as User | null);
+UserInfo.subscribe((value) => {
+	if (browser) {
+		if (!value) return;
+		if (value === undefined) return;
+		localStorage.setItem('UserInfo', JSON.stringify(value));
+	}
+});
 export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
@@ -160,5 +167,10 @@ if (browser) {
 		hideTips.set(true);
 	} else {
 		hideTips.set(false);
+	}
+
+	const storedUserInfo = localStorage.getItem('UserInfo');
+	if (storedUserInfo) {
+		UserInfo.set(JSON.parse(storedUserInfo));
 	}
 }

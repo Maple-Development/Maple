@@ -60,5 +60,29 @@ export class UserManager {
             return { id: '', username: '', name: '', pfp: null } as User;
         }
     };
+
+	public static checkSession = async () => {
+		try {
+			const response = await fetch(`${SERVER}/get/user/${get(UserInfo)?.id}`, {
+				credentials: 'include',
+				method: 'GET'
+			});
+			if (response.ok) {
+				const data = await response.json();
+				const returnUser: User = {
+					id: data.id,
+					username: data.username,
+					name: data.name,
+					pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : null
+				};
+				UserInfo.set({ username: returnUser.username, id: returnUser.id });
+				SavedUser.set(returnUser);
+				return returnUser;
+			}
+			return null;
+		} catch (_error) {
+			return null;
+		}
+	};
 }
 

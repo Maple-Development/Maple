@@ -10,6 +10,7 @@ export const sitemap = (<const>{
    "/artists/artist": true,
    "/friends": false,
    "/login": false,
+   "/onboard": false,
    "/playlists": true,
    "/playlists/playlist/[slug]": false,
    "/playlists/playlist": true,

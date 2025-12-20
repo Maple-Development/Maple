@@ -5,13 +5,19 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
 	import { Toaster } from 'svelte-sonner';
-    import { UserInfo, isLoggedIn } from '$lib/store';
+    import { isLoggedIn } from '$lib/store';
+	import { UserManager } from '$lib/api/UserManager';
+	import { onMount } from 'svelte';
 
 	let { children, data } = $props();
-    $effect(() => {
-		console.log(data?.user);
-        isLoggedIn.set(Boolean(data?.user));
-        UserInfo.set(data?.user ?? null);
+	
+	onMount(async () => {
+		const user = await UserManager.checkSession();
+		if (user) {
+			isLoggedIn.set(true);
+		} else {
+			isLoggedIn.set(false);
+		}
 	});
 </script>
 
