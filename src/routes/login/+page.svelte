@@ -2,6 +2,8 @@
 	import { UserManager } from '$lib/api/UserManager';
 	import { Button, TextFieldOutlined } from 'm3-svelte';
 	import { goto } from '$app/navigation';
+	import { isLoggedIn } from '$lib/store';
+	import { onMount } from 'svelte';
     
 	let username = $state('');
 	let password = $state('');
@@ -9,11 +11,17 @@
 	async function onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		const data = await UserManager.login(username, password);
-		if (data.success) {
+		if (data) {
+			isLoggedIn.set(true);
 			goto('/');
-		} else {
 		}
 	}
+
+	onMount(() => {
+		if ($isLoggedIn) {
+			goto('/settings');
+		}
+	});
 </script>
 
 <div class="h-full w-full flex items-center justify-center p-4">

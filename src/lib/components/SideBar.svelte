@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { Button } from 'm3-svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { createLibrary } from '$lib/library';
 	import { UserInfo, SavedUser } from '$lib/store';
+
+	const isActive = (path: string) => page.url.pathname === path;
 </script>
 
 <div class="flex items-center justify-center">
@@ -12,7 +15,7 @@
 		<div class="mt-3 mb-3 flex flex-col items-center justify-center gap-2">
 			<div class="large-button-mod">
 				<Button
-					variant="filled"
+					variant={'filled'}
 					iconType="full"
 					onclick={() => {
 						goto('/login');
@@ -25,7 +28,19 @@
 			<div class="button-mod mt-5 flex flex-col items-center justify-center gap-2">
 				<div class="flex flex-col items-center justify-center">
 					<Button
-						variant="tonal"
+						variant={isActive('/') ? 'filled' : 'outlined'}
+						iconType="full"
+						onclick={() => {
+							goto('/');
+						}}
+					>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4 19v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-3q-.425 0-.712-.288T14 20v-5q0-.425-.288-.712T13 14h-2q-.425 0-.712.288T10 15v5q0 .425-.288.713T9 21H6q-.825 0-1.412-.587T4 19"/></svg>
+					</Button>
+					<h1 class="text-on-secondary roboto-flex-home-link">Home</h1>
+				</div>
+				<div class="flex flex-col items-center justify-center">
+					<Button
+						variant={isActive('/tracks') ? 'filled' : 'outlined'}
 						iconType="full"
 						onclick={() => {
 							goto('/tracks');
@@ -37,7 +52,7 @@
 				</div>
 				<div class="flex flex-col items-center justify-center">
 					<Button
-						variant="tonal"
+						variant={isActive('/playlists') ? 'filled' : 'outlined'}
 						iconType="full"
 						onclick={() => {
 							goto('/playlists');
@@ -49,7 +64,7 @@
 				</div>
 				<div class="flex flex-col items-center justify-center">
 					<Button
-						variant="tonal"
+						variant={isActive('/albums') ? 'filled' : 'outlined'}
 						iconType="full"
 						onclick={() => {
 							goto('/albums');
@@ -61,7 +76,7 @@
 				</div>
 				<div class="flex flex-col items-center justify-center">
 					<Button
-						variant="tonal"
+						variant={isActive('/artists') ? 'filled' : 'outlined'}
 						iconType="full"
 						onclick={() => {
 							goto('/artists');
@@ -73,7 +88,7 @@
 				</div>
 				<div class="flex flex-col items-center justify-center">
 					<Button
-						variant="tonal"
+						variant={isActive('/friends') ? 'filled' : 'outlined'}
 						iconType="full"
 						onclick={() => {
 							goto('/friends');
@@ -81,6 +96,18 @@
 					>
 					<svg xmlns="http://www.w3.org/2000/svg" width="120" height="96" viewBox="0 0 640 512"><path fill="currentColor" d="M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32S80 82.1 80 144s50.1 112 112 112m76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2M480 256c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96s43 96 96 96m48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4c24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48c0-61.9-50.1-112-112-112"/></svg>					</Button>
 					<h1 class="text-on-secondary roboto-flex-home-link">Friends</h1>
+				</div>
+				<div class="flex flex-col items-center justify-center">
+					<Button
+						variant={isActive('/settings') ? 'filled' : 'outlined'}
+						iconType="full"
+						onclick={() => {
+							goto('/settings');
+						}}
+					>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M10.825 22q-.675 0-1.162-.45t-.588-1.1L8.85 18.8q-.325-.125-.612-.3t-.563-.375l-1.55.65q-.625.275-1.25.05t-.975-.8l-1.175-2.05q-.35-.575-.2-1.225t.675-1.075l1.325-1Q4.5 12.5 4.5 12.337v-.675q0-.162.025-.337l-1.325-1Q2.675 9.9 2.525 9.25t.2-1.225L3.9 5.975q.35-.575.975-.8t1.25.05l1.55.65q.275-.2.575-.375t.6-.3l.225-1.65q.1-.65.588-1.1T10.825 2h2.35q.675 0 1.163.45t.587 1.1l.225 1.65q.325.125.613.3t.562.375l1.55-.65q.625-.275 1.25-.05t.975.8l1.175 2.05q.35.575.2 1.225t-.675 1.075l-1.325 1q.025.175.025.338v.674q0 .163-.05.338l1.325 1q.525.425.675 1.075t-.2 1.225l-1.2 2.05q-.35.575-.975.8t-1.25-.05l-1.5-.65q-.275.2-.575.375t-.6.3l-.225 1.65q-.1.65-.587 1.1t-1.163.45zm1.225-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5"/></svg>
+					</Button>
+					<h1 class="text-on-secondary roboto-flex-home-link">Settings</h1>
 				</div>
 			</div>
 		</div>
