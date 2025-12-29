@@ -3,12 +3,12 @@
 	
 </script>
 
-<div class="fixed bottom-5 rounded-full left-23 mx-8 right-0 flex h-24 items-center justify-between bg-secondary">
+<div class="fixed bottom-5 rounded-full left-23 mx-8 right-0 flex h-24 items-center justify-between bg-surface-container">
     <div class="grid grid-cols-3 w-full h-full items-center">
 		<div class="flex items-center gap-2 ml-6 justify-start">
 			<img src="https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg" alt="Song Art" class="w-14 h-14 rounded-lg" />
 			<div class="flex flex-col">
-				<p class="song-title text-on-secondary-fixed">
+				<p class="song-title text-primary">
 					Song Name
 				</p>
 				<p class="artist-title">
@@ -18,7 +18,7 @@
 		</div>
 		<div class="flex justify-center gap-2">
 			<div>
-				<Button iconType="full" square variant="elevated">
+				<Button iconType="full" square variant="outlined">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M14 20v-2h2.6l-3.175-3.175L14.85 13.4L18 16.55V14h2v6zm-8.6 0L4 18.6L16.6 6H14V4h6v6h-2V7.4zm3.775-9.425L4 5.4L5.4 4l5.175 5.175z"/></svg>
 				</Button>
 			</div>
@@ -38,7 +38,7 @@
 				</Button>
 			</div>
 			<div>
-				<Button iconType="full" square variant="elevated">
+				<Button iconType="full" square variant="outlined">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6c0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8m0 14c-3.31 0-6-2.69-6-6c0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4l-4-4z"/></svg>
 				</Button>
 			</div>
@@ -66,7 +66,7 @@
 
 <style>
 	.song-title {
-		color: var(--color-on-secondary-fixed);
+		color: var(--color-primary);
 		font-size: 20px;
 		font-family: 'Roboto Flex', sans-serif;
 		font-weight: 1000;
@@ -87,7 +87,7 @@
 	}
 
 	.artist-title {
-		color: var(--color-on-secondary-fixed-variant);
+		color: var(--color-on-surface-variant);
 		font-size: 16px;
 		font-family: 'Roboto Flex', sans-serif;
 		font-weight: 658;
@@ -131,18 +131,8 @@
 		transform: scaleX(1.3);
 	}
 
-	.slider-stuff :global(div ::before) {
-        background-color: rgb(var(--m3-scheme-on-secondary-fixed)) !important;
-    }
-    .slider-stuff :global(div ::after) {
-        background-color: rgb(var(--m3-scheme-on-secondary-fixed-variant)) !important;
-    }
-	.slider-stuff :global(div:nth-child(3)) {
-        background-color: rgb(var(--m3-scheme-on-secondary-fixed-variant)) !important;
-    }
-
 	.fill-icon-color {
-		color: rgb(var(--m3-scheme-on-secondary-fixed-variant));
+		color: rgb(var(--m3-scheme-on-surface-variant));
 		scale: 1.2;
 	}
 </style>

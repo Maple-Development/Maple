@@ -4,10 +4,10 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { Toaster } from 'svelte-sonner';
     import { isLoggedIn } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
+	import { Snackbar } from 'm3-svelte';
 
 	let { children, data } = $props();
 	
@@ -21,12 +21,11 @@
 	});
 </script>
 
-<TopBar />
 <SideBar />
-<div class="fixed inset-0 left-23 top-14 bottom-30 overflow-y-auto overflow-x-hidden">
+<div class="fixed inset-0 left-23 bottom-30 overflow-y-auto overflow-x-hidden">
 	<div>
 		{@render children()}
 	</div>
 </div>
 <BottomBar />
-<Toaster />
+<Snackbar />

@@ -12,7 +12,7 @@ body {
 	margin: 0;
 	padding: 0;
 	background: rgb(var(--m3-scheme-background));
-	color: rgb(var(--m3-scheme-on-background));
+	color: rgb(var(--m3-scheme-on-surface));
 	font-family: 'Roboto Flex', sans-serif;
 	font-optical-sizing: auto;
 	font-style: normal;
