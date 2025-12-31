@@ -6,6 +6,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
+	private static imageUrlCache: Map<string, string> = new Map();
 	private static SERVER = 'https://api.maple.music';
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
@@ -81,10 +82,14 @@ export class OPFS {
 	}
 
 	public static async getImageUrl(path: string) {
+		const cached = this.imageUrlCache.get(path);
+		if (cached) return cached;
 		const response = await OPFS.get().image(path);
 		const arrayBuffer = await response.arrayBuffer();
 		const blob = new Blob([arrayBuffer]);
-		return URL.createObjectURL(blob);
+		const url = URL.createObjectURL(blob);
+		this.imageUrlCache.set(path, url);
+		return url;
 	}
 
 	public static async addAlbum(album: Album, id: string) {
