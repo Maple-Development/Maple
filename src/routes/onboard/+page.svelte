@@ -2,6 +2,7 @@
     import { Button } from 'm3-svelte';
     import { Card } from 'm3-svelte';
     import { goto } from '$app/navigation';
+    import { createLibrary } from '$lib/library';
 </script>
 
 <div class="flex flex-col items-center justify-center min-h-[70vh] px-6 py-8">
@@ -16,7 +17,7 @@
             <p class="text-lg text-on-surface-variant text-center max-w-xl leading-relaxed">
                 Your personal music library, beautifully organized. Upload your collection and let Maple sort everything into albums, artists, and playlists.
             </p>
-            <Button variant="filled" onclick={() => goto('/upload')}>
+            <Button variant="filled" onclick={() => createLibrary()}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="mr-2">
                     <path fill="currentColor" d="M6 20q-.825 0-1.412-.587T4 18v-2q0-.425.288-.712T5 15t.713.288T6 16v2h12v-2q0-.425.288-.712T19 15t.713.288T20 16v2q0 .825-.587 1.413T18 20zm5-12.15L9.125 9.725q-.3.3-.712.288T7.7 9.7q-.275-.3-.288-.7t.288-.7l3.6-3.6q.15-.15.325-.212T12 4.425t.375.063t.325.212l3.6 3.6q.3.3.288.7t-.288.7q-.3.3-.712.313t-.713-.288L13 7.85V15q0 .425-.288.713T12 16t-.712-.288T11 15z"/>
                 </svg>
