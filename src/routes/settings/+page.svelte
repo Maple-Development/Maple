@@ -160,5 +160,118 @@
                 </Card>
             </section>
         </div>
+
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex flex-col gap-1">
+                <h1 class="text-4xl font-black">App Settings</h1>
+                <p class="text-sm text-on-surface-variant">Additional options that change the way the app works.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+            <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col gap-1">
+                        <p class="text-xs uppercase tracking-[0.16em] text-on-surface-variant">Preferences</p>
+                        <p class="text-sm text-on-surface-variant">Manage your app preferences.</p>
+                    </div>
+                </div>
+
+                <Card variant="outlined" class="flex flex-col gap-6 p-6">
+                    <div class="flex flex-col gap-5">
+                        <div class="flex flex-col gap-3 rounded-xl bg-surface-container-high p-4 ring-1 ring-outline/50">
+                            <div class="flex flex-col gap-1">
+                                <p class="text-xs uppercase font-semibold tracking-wide text-on-surface">Network Settings</p>
+                            </div>
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-sm font-semibold text-on-surface-variant">Enable P2P Transfers</p>
+                                        <p class="text-xs text-on-surface-variant">Allow you to transfer your library to other devices via peer-to-peer connections.</p>
+                                    </div>
+                                    <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
+                                        <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
+                                    </label>
+                                </div>
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-sm font-semibold text-on-surface-variant">Enable Socket.io Communication</p>
+                                        <p class="text-xs text-on-surface-variant">Allow you to communicate with the server in real-time via socket.io.</p>
+                                    </div>
+                                    <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
+                                        <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3 rounded-xl bg-surface-container-high p-4 ring-1 ring-outline/50">
+                            <div class="flex flex-col gap-1">
+                                <p class="text-xs uppercase font-semibold tracking-wide text-on-surface">Library Settings</p>
+                            </div>
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-sm font-semibold text-on-surface-variant">Enable Jellyfin Support</p>
+                                    <p class="text-xs text-on-surface-variant">Allows for importing libraries in the jellyfin format.</p>
+                                </div>
+                                <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                                    <input type="checkbox" class="peer sr-only" bind:checked={discordRpcEnabled} />
+                                    <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
+                                    <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </section>
+
+            <section class="flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col gap-1">
+                        <p class="text-xs uppercase tracking-[0.16em] text-on-surface-variant">Developer</p>
+                        <p class="text-sm text-on-surface-variant">Developer options for advanced users.</p>
+                    </div>
+                </div>
+
+                <Card variant="outlined" class="flex flex-col gap-6 p-6">
+                    <div class="flex flex-col gap-5">
+                        <div class="flex flex-col gap-3 rounded-xl bg-surface-container-high p-4 ring-1 ring-outline/50">
+                            <div class="flex flex-col gap-1">
+                                <p class="text-xs uppercase font-semibold tracking-wide text-on-surface">Advanced Settings</p>
+                            </div>
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-sm font-semibold text-on-surface-variant">Enable Logging</p>
+                                        <p class="text-xs text-on-surface-variant">Save logs to a file for debugging purposes.</p>
+                                    </div>
+                                    <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
+                                        <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
+                                    </label>
+                                </div>
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="flex flex-col gap-1">
+                                        <p class="text-sm font-semibold text-on-surface-variant">Enable Developer Mode</p>
+                                        <p class="text-xs text-on-surface-variant">Enable developer mode for advanced users.</p>
+                                    </div>
+                                    <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
+                                        <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </section>
+        </div>
     </div>
 </div>
