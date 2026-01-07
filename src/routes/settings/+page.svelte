@@ -10,6 +10,16 @@
     let initialWebhookUrl = $state('');
     let discordRpcEnabled = $state(false);
     let initialDiscordRpcEnabled = $state(false);
+    let p2pTransfersEnabled = $state(true);
+    let initialP2pTransfersEnabled = $state(true);
+    let socketCommunicationEnabled = $state(true);
+    let initialSocketCommunicationEnabled = $state(true);
+    let jellyfinModeEnabled = $state(false);
+    let initialJellyfinModeEnabled = $state(false);
+    let loggingEnabled = $state(false);
+    let initialLoggingEnabled = $state(false);
+    let developerModeEnabled = $state(false);
+    let initialDeveloperModeEnabled = $state(false);
     $effect(() => {
         name = $UserInfo?.name ?? '';
         initialName = $UserInfo?.name ?? '';
@@ -19,7 +29,12 @@
             name !== initialName ||
             webhookEnabled !== initialWebhookEnabled ||
             webhookUrl !== initialWebhookUrl ||
-            discordRpcEnabled !== initialDiscordRpcEnabled
+            discordRpcEnabled !== initialDiscordRpcEnabled ||
+            p2pTransfersEnabled !== initialP2pTransfersEnabled ||
+            socketCommunicationEnabled !== initialSocketCommunicationEnabled ||
+            jellyfinModeEnabled !== initialJellyfinModeEnabled ||
+            loggingEnabled !== initialLoggingEnabled ||
+            developerModeEnabled !== initialDeveloperModeEnabled
     );
 </script>
 
@@ -191,7 +206,7 @@
                                         <p class="text-xs text-on-surface-variant">Allow you to transfer your library to other devices via peer-to-peer connections.</p>
                                     </div>
                                     <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <input type="checkbox" class="peer sr-only" bind:checked={p2pTransfersEnabled} />
                                         <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
                                         <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
                                     </label>
@@ -202,7 +217,7 @@
                                         <p class="text-xs text-on-surface-variant">Allow you to communicate with the server in real-time via socket.io.</p>
                                     </div>
                                     <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <input type="checkbox" class="peer sr-only" bind:checked={socketCommunicationEnabled} />
                                         <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
                                         <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
                                     </label>
@@ -220,7 +235,7 @@
                                     <p class="text-xs text-on-surface-variant">Allows for importing libraries in the jellyfin format.</p>
                                 </div>
                                 <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                                    <input type="checkbox" class="peer sr-only" bind:checked={discordRpcEnabled} />
+                                    <input type="checkbox" class="peer sr-only" bind:checked={jellyfinModeEnabled} />
                                     <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
                                     <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
                                 </label>
@@ -251,7 +266,7 @@
                                         <p class="text-xs text-on-surface-variant">Save logs to a file for debugging purposes.</p>
                                     </div>
                                     <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <input type="checkbox" class="peer sr-only" bind:checked={loggingEnabled} />
                                         <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
                                         <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
                                     </label>
@@ -262,7 +277,7 @@
                                         <p class="text-xs text-on-surface-variant">Enable developer mode for advanced users.</p>
                                     </div>
                                     <label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
-                                        <input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+                                        <input type="checkbox" class="peer sr-only" bind:checked={developerModeEnabled} />
                                         <div class="h-6 w-11 rounded-full bg-outline-variant transition peer-checked:bg-primary/90"></div>
                                         <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition peer-checked:translate-x-5"></span>
                                     </label>
