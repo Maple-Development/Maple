@@ -16,7 +16,7 @@
     });
 
     let hasChanges = $derived(
-        name !== initialName ||
+            name !== initialName ||
             webhookEnabled !== initialWebhookEnabled ||
             webhookUrl !== initialWebhookUrl ||
             discordRpcEnabled !== initialDiscordRpcEnabled
