@@ -188,6 +188,10 @@ export class OPFS {
 			this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 		}
 
+		const now = Date.now();
+		playlist.createdAt ??= now;
+		playlist.modifiedAt ??= playlist.createdAt;
+
 		const imageFileName = `${playlist.id}.image`;
 		const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
 		await write(`/images/${imageFileName}`, imageArrayBuffer);
@@ -249,6 +253,21 @@ export class OPFS {
 			if (!this.playlistsCache) {
 				this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 			}
+			let changed = false;
+			const now = Date.now();
+			for (const p of this.playlistsCache) {
+				if (p.createdAt == null) {
+					p.createdAt = now;
+					changed = true;
+				}
+				if (p.modifiedAt == null) {
+					p.modifiedAt = p.createdAt;
+					changed = true;
+				}
+			}
+			if (changed) {
+				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+			}
 			return this.playlistsCache;
 		},
 
@@ -256,7 +275,23 @@ export class OPFS {
 			if (!this.playlistsCache) {
 				this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 			}
-			return this.playlistsCache.find((p) => p.id === id);
+			const found = this.playlistsCache.find((p) => p.id === id);
+			if (found) {
+				const now = Date.now();
+				let changed = false;
+				if (found.createdAt == null) {
+					found.createdAt = now;
+					changed = true;
+				}
+				if (found.modifiedAt == null) {
+					found.modifiedAt = found.createdAt;
+					changed = true;
+				}
+				if (changed) {
+					await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+				}
+			}
+			return found;
 		}
 	});
 
@@ -334,6 +369,9 @@ export class OPFS {
 			}
 			const index = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 			if (index !== -1) {
+				const now = Date.now();
+				playlist.createdAt ??= now;
+				playlist.modifiedAt = now;
 				if (playlist.image instanceof Blob) {
 					const imageFileName = `${playlist.id}.image`;
 					const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
@@ -363,6 +401,9 @@ export class OPFS {
 			const playlistIndex = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 			if (playlistIndex !== -1) {
 				this.playlistsCache[playlistIndex].tracks?.splice(trackIndex, 1);
+				const now = Date.now();
+				this.playlistsCache[playlistIndex].createdAt ??= now;
+				this.playlistsCache[playlistIndex].modifiedAt = now;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}
 		}
@@ -418,6 +459,9 @@ export class OPFS {
 					this.playlistsCache[playlistIndex].tracks = [];
 				}
 				this.playlistsCache[playlistIndex].tracks?.push(track.id);
+				const now = Date.now();
+				this.playlistsCache[playlistIndex].createdAt ??= now;
+				this.playlistsCache[playlistIndex].modifiedAt = now;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}
 		}

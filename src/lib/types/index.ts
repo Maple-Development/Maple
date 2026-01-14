@@ -47,6 +47,8 @@ export type Playlist = {
 	description: string;
 	tracks?: String[];
 	image?: any;
+	createdAt?: number;
+	modifiedAt?: number;
 };
 
 export type PendingRequest = {
