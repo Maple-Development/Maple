@@ -5,12 +5,18 @@
     import { tracks } from '$lib/global.svelte';
     import { flip } from 'svelte/animate';
     import { cubicOut } from 'svelte/easing';
+    import { title } from '$lib/store';
+    import { onMount } from 'svelte';
 
     let sortedTracks: Song[] = $state(tracks());
 
     function handleFiltersChange(payload: { sorted: Song[]; sortKey: string; descending: boolean }) {
         sortedTracks = payload.sorted;
     }
+
+    onMount(async () => {
+		title.set('Tracks');
+	});
 </script>
 
 <Filters

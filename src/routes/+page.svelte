@@ -3,8 +3,14 @@
     import Track from '$lib/components/Track.svelte';
     import { tracks } from '$lib/global.svelte';
     import type { Song } from '$lib/types';
+    import { onMount } from 'svelte';
+    import { title } from '$lib/store';
 
     let sortedTracks: Song[] = $derived.by(() => [...tracks()].sort((a, b) => a.title.localeCompare(b.title)).slice(0, 5));
+
+    onMount(async () => {
+		title.set('Home');
+	});
 </script>
 
 <div class="flex w-full mt-5 justify-center">

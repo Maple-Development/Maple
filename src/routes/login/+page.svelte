@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { isLoggedIn } from '$lib/store';
 	import { onMount } from 'svelte';
-    
+	import { title } from '$lib/store';
 	let username = $state('');
 	let password = $state('');
 
@@ -21,6 +21,10 @@
 		if ($isLoggedIn) {
 			goto('/settings');
 		}
+	});
+
+	onMount(async () => {
+		title.set('Login');
 	});
 </script>
 

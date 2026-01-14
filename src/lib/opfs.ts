@@ -414,6 +414,9 @@ export class OPFS {
 			const playlistIndex = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 
 			if (playlistIndex !== -1) {
+				if (!this.playlistsCache[playlistIndex].tracks) {
+					this.playlistsCache[playlistIndex].tracks = [];
+				}
 				this.playlistsCache[playlistIndex].tracks?.push(track.id);
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}

@@ -1,6 +1,8 @@
 <script lang="ts">
     import { Card, Button } from 'm3-svelte';
     import { isLoggedIn, UserInfo, SavedUser } from '$lib/store';
+    import { onMount } from 'svelte';
+    import { title } from '$lib/store';
 
     let name = $state('');
     let initialName = $state('');
@@ -36,6 +38,10 @@
             loggingEnabled !== initialLoggingEnabled ||
             developerModeEnabled !== initialDeveloperModeEnabled
     );
+
+    onMount(async () => {
+		title.set('Settings');
+	});
 </script>
 
 <div class="flex w-full justify-center px-4 py-12">

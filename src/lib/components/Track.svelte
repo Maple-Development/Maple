@@ -6,6 +6,7 @@
 	// @ts-ignore
 	import Lazy from 'svelte-lazy';
 	import { goto } from '$app/navigation';
+	import { refreshLibrary } from '$lib/global.svelte';
 
 	const DEFAULT_PLACEHOLDER = 'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
 
@@ -146,6 +147,17 @@
 		if (hideSubmenuTimeout) {
 			clearTimeout(hideSubmenuTimeout);
 			hideSubmenuTimeout = null;
+		}
+
+		if (type !== 'track' || !track) return;
+		if (playlist === 'new') {
+			goto(`/playlists/create?addTrack=${track.id}`);
+			return;
+		}
+		if (playlist && typeof playlist === 'object') {
+			OPFS.track()
+				.addToPlaylist(track, playlist)
+				.then(() => refreshLibrary());
 		}
 	}
 

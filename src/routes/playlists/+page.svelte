@@ -6,6 +6,9 @@
     import { flip } from 'svelte/animate';
     import { cubicOut } from 'svelte/easing';
     import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { refreshLibrary } from '$lib/global.svelte';
+	import { title } from '$lib/store';
 
     let sortedPlaylists: Playlist[] = $state(playlists());
 
@@ -16,6 +19,11 @@
     function createPlaylist() {
         goto('/playlists/create');
     }
+
+	onMount(async () => {
+		title.set('Playlists');
+		await refreshLibrary();
+	});
 </script>
  
 <Filters

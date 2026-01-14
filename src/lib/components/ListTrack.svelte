@@ -1,6 +1,9 @@
 <script lang="ts">
     import type { Song } from '$lib/types';
     import { playlists } from '$lib/global.svelte';
+    import { OPFS } from '$lib/opfs';
+    import { refreshLibrary } from '$lib/global.svelte';
+    import { goto } from '$app/navigation';
 
     const CONTEXT_MENU_EVENT = 'track-context-menu-open';
 
@@ -87,6 +90,17 @@
         if (hideSubmenuTimeout) {
             clearTimeout(hideSubmenuTimeout);
             hideSubmenuTimeout = null;
+        }
+
+        if (!track) return;
+        if (playlist === 'new') {
+            goto(`/playlists/create?addTrack=${track.id}`);
+            return;
+        }
+        if (playlist && typeof playlist === 'object') {
+            OPFS.track()
+                .addToPlaylist(track, playlist)
+                .then(() => refreshLibrary());
         }
     }
 

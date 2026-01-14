@@ -2,6 +2,8 @@
 	import { UserManager } from '$lib/api/UserManager';
 	import { Button, TextFieldOutlined } from 'm3-svelte';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { title } from '$lib/store';
 
 	let username = $state('');
 	let password = $state('');
@@ -10,6 +12,10 @@
 		event.preventDefault();
 		await UserManager.register(username, password);
 	}
+
+	onMount(async () => {
+		title.set('Register');
+	});
 </script>
 
 <div class="h-full w-full flex items-center justify-center p-4">

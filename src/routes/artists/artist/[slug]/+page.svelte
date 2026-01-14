@@ -6,6 +6,8 @@
     import { ConnectedButtons, Button } from 'm3-svelte';
     import { flip } from 'svelte/animate';
     import { cubicOut } from 'svelte/easing';
+    import { onMount } from 'svelte';
+    import { title } from '$lib/store';
 
     let { data }: { data: { artistId: string } } = $props();
 
@@ -85,6 +87,10 @@
             }
         });
     });
+
+    onMount(async () => {
+		title.set(artist?.name ?? 'Artist');
+	});
 </script>
 
 <div class="flex flex-col gap-8 pt-10 md:pt-14 px-6 md:px-14 lg:px-28 mb-5">

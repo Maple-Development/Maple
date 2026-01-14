@@ -5,6 +5,8 @@
     import { flip } from 'svelte/animate';
     import { cubicOut } from 'svelte/easing';
     import ListTrack from '$lib/components/ListTrack.svelte';
+    import { onMount } from 'svelte';
+    import { title } from '$lib/store';
 
     let { data }: { data: { albumId: string } } = $props();
 
@@ -164,6 +166,10 @@
             }
         });
     });
+
+    onMount(async () => {
+		title.set(album?.name ?? 'Album');
+	});
 </script>
 
 <div class="flex flex-col md:flex-row gap-8 pt-10 md:pt-14 pl-6 md:pl-14 lg:pl-28 pr-5 md:pr-20">
