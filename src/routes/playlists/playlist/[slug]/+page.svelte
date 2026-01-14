@@ -99,7 +99,11 @@
 	);
 	let canReorder = $derived.by(() => canDrag && sortKey === 'playlistIndex' && !descending);
 
-	function handleFiltersChange(payload: { sorted: (Song & { playlistIndex: number })[]; sortKey: string; descending: boolean }) {
+	function handleFiltersChange(payload: {
+		sorted: (Song & { playlistIndex: number })[];
+		sortKey: string;
+		descending: boolean;
+	}) {
 		sortedPlaylistTracks = payload.sorted;
 		sortKey = payload.sortKey;
 		descending = payload.descending;
@@ -172,36 +176,40 @@
 	});
 </script>
 
-	<div class="flex flex-col md:flex-row gap-8 pt-10 md:pt-14 pl-6 md:pl-14 lg:pl-28 pr-5 md:pr-20">
-		<div class="md:w-1/2 lg:w-2/5">
-			{#if playlist?.image}
-				{#await OPFS.getImageUrl(playlist.image as string) then imageUrl}
-					<img src={imageUrl} alt={playlist?.name} class="w-full max-w-sm rounded-lg shadow-md object-cover aspect-square" />
-				{:catch}
-					<div class="w-full max-w-sm rounded-lg bg-surface-container aspect-square"></div>
-				{/await}
-			{:else}
-				<div class="w-full max-w-sm rounded-lg bg-surface-container aspect-square"></div>
-			{/if}
+<div class="flex flex-col gap-8 pt-10 pr-5 pl-6 md:flex-row md:pt-14 md:pr-20 md:pl-14 lg:pl-28">
+	<div class="md:w-1/2 lg:w-2/5">
+		{#if playlist?.image}
+			{#await OPFS.getImageUrl(playlist.image as string) then imageUrl}
+				<img
+					src={imageUrl}
+					alt={playlist?.name}
+					class="aspect-square w-full max-w-sm rounded-lg object-cover shadow-md"
+				/>
+			{:catch}
+				<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
+			{/await}
+		{:else}
+			<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
+		{/if}
 		{#if editModeOn}
-		<div class="mt-4 space-y-2">
-			<label class="text-sm font-medium text-on-surface" for="playlist-photo">Change image</label>
-			<input id="playlist-photo" type="file" accept="image/*" onchange={handlePhotoChange} />
-		</div>
+			<div class="mt-4 space-y-2">
+				<label class="text-on-surface text-sm font-medium" for="playlist-photo">Change image</label>
+				<input id="playlist-photo" type="file" accept="image/*" onchange={handlePhotoChange} />
+			</div>
 		{/if}
 
 		<div class="mt-4 space-y-1">
 			{#if editModeOn}
 				<input
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface text-xl font-bold"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2 text-xl font-bold"
 					bind:value={changedName}
 				/>
 			{:else}
-				<h1 class="text-2xl font-bold text-on-surface">{playlist?.name}</h1>
+				<h1 class="text-on-surface text-2xl font-bold">{playlist?.name}</h1>
 			{/if}
 			{#if editModeOn}
 				<input
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2"
 					bind:value={changedDescription}
 				/>
 			{:else}
@@ -216,20 +224,26 @@
 		</div>
 	</div>
 
-	<div class="md:flex-1 space-y-6">
+	<div class="space-y-6 md:flex-1">
 		<div class="flex justify-end gap-2">
-			<button class="px-4 py-2 rounded-lg bg-surface-container-high text-on-surface" onclick={() => goto('/playlists')}>
+			<button
+				class="bg-surface-container-high text-on-surface rounded-lg px-4 py-2"
+				onclick={() => goto('/playlists')}
+			>
 				Back
 			</button>
-			<button class="px-4 py-2 rounded-lg bg-error text-on-error" onclick={deletePlaylist}>
+			<button class="bg-error text-on-error rounded-lg px-4 py-2" onclick={deletePlaylist}>
 				Delete
 			</button>
 			{#if editModeOn}
-				<button class="px-4 py-2 rounded-lg bg-primary text-on-primary" onclick={saveDetails}>
+				<button class="bg-primary text-on-primary rounded-lg px-4 py-2" onclick={saveDetails}>
 					Save
 				</button>
 			{:else}
-				<button class="px-4 py-2 rounded-lg bg-primary text-on-primary" onclick={() => (editModeOn = true)}>
+				<button
+					class="bg-primary text-on-primary rounded-lg px-4 py-2"
+					onclick={() => (editModeOn = true)}
+				>
 					Edit
 				</button>
 			{/if}
@@ -237,7 +251,7 @@
 
 		<div class="flex flex-col gap-6">
 			<div class="space-y-3">
-				<h2 class="text-lg font-semibold text-on-surface">Tracks</h2>
+				<h2 class="text-on-surface text-lg font-semibold">Tracks</h2>
 				<Filters
 					items={playlistTracksWithIndex}
 					sortOptions={[
@@ -253,8 +267,8 @@
 					idPrefix="playlist-tracks"
 					onChange={handleFiltersChange}
 				/>
-				<div class="rounded-xl bg-surface-container">
-					<ul class="divide-y divide-outline-variant">
+				<div class="bg-surface-container rounded-xl">
+					<ul class="divide-outline-variant divide-y">
 						{#each displayedTracks as t (t.id)}
 							<li animate:flip={{ duration: 300, easing: cubicOut }}>
 								<ListTrack
@@ -286,7 +300,8 @@
 										dragIndex = null;
 										dropIndex = null;
 										if (Number.isFinite(fromIndex)) {
-											const adjustedTarget = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
+											const adjustedTarget =
+												fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
 											await moveTrack(fromIndex, Math.max(0, adjustedTarget));
 										}
 									}}
@@ -302,49 +317,60 @@
 			</div>
 
 			<div class="space-y-3">
-				<h2 class="text-lg font-semibold text-on-surface">Add tracks</h2>
+				<h2 class="text-on-surface text-lg font-semibold">Add tracks</h2>
 				<input
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2"
 					bind:value={searchQuery}
 					oninput={filterTracks}
 					placeholder="Search"
 				/>
-				<div class="flex items-center justify-between text-sm text-on-surface-variant">
+				<div class="text-on-surface-variant flex items-center justify-between text-sm">
 					<span>{selectedToAdd.length} selected</span>
-					<button class="px-4 py-2 rounded-lg bg-primary text-on-primary" onclick={addSelectedTracks}>
+					<button
+						class="bg-primary text-on-primary rounded-lg px-4 py-2"
+						onclick={addSelectedTracks}
+					>
 						Add Selected
 					</button>
 				</div>
-				<div class="rounded-xl bg-surface-container">
-					<ul class="divide-y divide-outline-variant max-h-[60vh] overflow-auto pr-1">
+				<div class="bg-surface-container rounded-xl">
+					<ul class="divide-outline-variant max-h-[60vh] divide-y overflow-auto pr-1">
 						{#each filteredTracks as song (song.id)}
 							<li>
 								<button
-									class="w-full text-left px-4 py-3 hover:bg-surface-container-high/50"
+									class="hover:bg-surface-container-high/50 w-full px-4 py-3 text-left"
 									onclick={() => toggleAdd(song)}
 								>
 									<div class="flex items-center justify-between gap-4">
-										<div class="flex items-center gap-3 min-w-0">
+										<div class="flex min-w-0 items-center gap-3">
 											{#if song.image}
 												{#await OPFS.getImageUrl(song.image as string) then imageUrl}
-													<img src={imageUrl} alt="{song.title} - {song.artist}" class="h-12 w-12 rounded-md object-cover" />
+													<img
+														src={imageUrl}
+														alt="{song.title} - {song.artist}"
+														class="h-12 w-12 rounded-md object-cover"
+													/>
 												{:catch}
-													<div class="h-12 w-12 rounded-md bg-surface-container-high"></div>
+													<div class="bg-surface-container-high h-12 w-12 rounded-md"></div>
 												{/await}
 											{:else}
-												<div class="h-12 w-12 rounded-md bg-surface-container-high"></div>
+												<div class="bg-surface-container-high h-12 w-12 rounded-md"></div>
 											{/if}
 											<div class="min-w-0">
-												<div class="truncate font-semibold text-on-surface">{song.title}</div>
-												<div class="truncate text-sm text-on-surface-variant">{song.artist} • {song.album}</div>
+												<div class="text-on-surface truncate font-semibold">{song.title}</div>
+												<div class="text-on-surface-variant truncate text-sm">
+													{song.artist} • {song.album}
+												</div>
 											</div>
 										</div>
 										<div class="flex items-center gap-3">
-											<span class="inline-flex items-center justify-center rounded-full border border-outline-variant bg-surface-container-high px-2 py-0.5 text-xs font-medium text-on-surface-variant">
+											<span
+												class="border-outline-variant bg-surface-container-high text-on-surface-variant inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium"
+											>
 												{song.trackNumber}
 											</span>
 											{#if isAddSelected(song)}
-												<div class="text-sm font-medium text-primary">Selected</div>
+												<div class="text-primary text-sm font-medium">Selected</div>
 											{/if}
 										</div>
 									</div>

@@ -1,14 +1,14 @@
 export type AddedFriend = {
-    id: string;
-    name: string;
-    username: string;
-    pfp?: string;
-    nowPlaying?: {
-        title: string;
-        artist: string;
-        album: string;
-    };
-}
+	id: string;
+	name: string;
+	username: string;
+	pfp?: string;
+	nowPlaying?: {
+		title: string;
+		artist: string;
+		album: string;
+	};
+};
 
 export type Album = {
 	id: string;
@@ -29,17 +29,17 @@ export type Artist = {
 };
 
 export enum DataType {
-    FILE = 'FILE',
-    OTHER = 'OTHER'
+	FILE = 'FILE',
+	OTHER = 'OTHER'
 }
 
 export interface PeerData {
-    dataType: DataType;
-    file?: Blob;
-    fileName?: string;
-    fileType?: string;
-    message?: string;
-} 
+	dataType: DataType;
+	file?: Blob;
+	fileName?: string;
+	fileType?: string;
+	message?: string;
+}
 
 export type Playlist = {
 	id: string;
@@ -52,8 +52,8 @@ export type Playlist = {
 };
 
 export type PendingRequest = {
-    user_id: string,
-    friend_id: string
+	user_id: string;
+	friend_id: string;
 };
 
 export type Song = {

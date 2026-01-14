@@ -8,9 +8,10 @@
 	import { refreshLibrary } from '$lib/global.svelte';
 	import { v4 as uuidv4 } from 'uuid';
 
-	const DEFAULT_PLACEHOLDER = 'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
+	const DEFAULT_PLACEHOLDER =
+		'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
 
-    const CONTEXT_MENU_EVENT = 'track-context-menu-open';
+	const CONTEXT_MENU_EVENT = 'track-context-menu-open';
 
 	let pos = $state({ x: 0, y: 0 });
 	let menu = $state({ h: 0, w: 0 });
@@ -19,10 +20,22 @@
 	let showPlaylistSubmenu = $state(false);
 	let content: HTMLDivElement | undefined = $state(undefined);
 	let hideSubmenuTimeout: number | null = null;
-	
-	let { track, playlist, album, artist, type = 'track' }: { track?: Song; playlist?: Playlist; album?: Album; artist?: Artist; type?: string } = $props();
 
-    const USE_ARTIST_SVG = true;
+	let {
+		track,
+		playlist,
+		album,
+		artist,
+		type = 'track'
+	}: {
+		track?: Song;
+		playlist?: Playlist;
+		album?: Album;
+		artist?: Artist;
+		type?: string;
+	} = $props();
+
+	const USE_ARTIST_SVG = true;
 
 	function portalToBody(node: HTMLElement) {
 		if (typeof document !== 'undefined' && node.parentNode !== document.body) {
@@ -50,7 +63,7 @@
 		};
 
 		window.addEventListener(CONTEXT_MENU_EVENT, handleOtherMenuOpen as EventListener);
-		
+
 		return () => {
 			window.removeEventListener(CONTEXT_MENU_EVENT, handleOtherMenuOpen as EventListener);
 			if (hideSubmenuTimeout) {
@@ -64,9 +77,11 @@
 		e.preventDefault();
 		e.stopPropagation();
 
-		window.dispatchEvent(new CustomEvent(CONTEXT_MENU_EVENT, { 
-			detail: content 
-		}));
+		window.dispatchEvent(
+			new CustomEvent(CONTEXT_MENU_EVENT, {
+				detail: content
+			})
+		);
 
 		browser = {
 			w: window.innerWidth,
@@ -163,7 +178,7 @@
 			...existing,
 			id: newId,
 			name: `${existing.name} (Copy)`,
-			tracks: ((existing.tracks ?? []) as unknown as string[]),
+			tracks: (existing.tracks ?? []) as unknown as string[],
 			image,
 			createdAt: now,
 			modifiedAt: now
@@ -258,15 +273,24 @@
 		use:getContextMenuDimension
 		use:portalToBody
 		style="position: fixed; top: {pos.y}px; left: {pos.x}px; z-index: 1000;"
-		class="opacity-100 transform scale-100 transition-all duration-100"
+		class="scale-100 transform opacity-100 transition-all duration-100"
 	>
-		<div class="bg-surface-container border border-outline rounded-xl shadow-lg py-2 min-w-48">
+		<div class="bg-surface-container border-outline min-w-48 rounded-xl border py-2 shadow-lg">
 			<button
 				onclick={handleDelete}
-				class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors duration-150 text-left"
+				class="text-on-surface hover:bg-surface-container-high flex w-full items-center px-4 py-3 text-left transition-colors duration-150"
 			>
-				<svg class="mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-					<path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zM9 17h2V8H9zm4 0h2V8h-2zM7 6v13z"/>
+				<svg
+					class="mr-3 flex-shrink-0"
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+				>
+					<path
+						fill="currentColor"
+						d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zM9 17h2V8H9zm4 0h2V8h-2zM7 6v13z"
+					/>
 				</svg>
 				<span class="text-sm font-medium">Delete</span>
 			</button>
@@ -274,61 +298,85 @@
 			{#if type === 'playlist'}
 				<button
 					onclick={handleDuplicate}
-					class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors duration-150 text-left"
+					class="text-on-surface hover:bg-surface-container-high flex w-full items-center px-4 py-3 text-left transition-colors duration-150"
 				>
-					<svg class="mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M7 17q-.825 0-1.412-.587T5 15V5q0-.825.588-1.412T7 3h8q.825 0 1.413.588T17 5v2h-2V5H7v10h2v2zm4 4q-.825 0-1.412-.587T9 19V9q0-.825.588-1.412T11 7h8q.825 0 1.413.588T21 9v10q0 .825-.587 1.413T19 21zm0-2h8V9h-8z"/>
+					<svg
+						class="mr-3 flex-shrink-0"
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+					>
+						<path
+							fill="currentColor"
+							d="M7 17q-.825 0-1.412-.587T5 15V5q0-.825.588-1.412T7 3h8q.825 0 1.413.588T17 5v2h-2V5H7v10h2v2zm4 4q-.825 0-1.412-.587T9 19V9q0-.825.588-1.412T11 7h8q.825 0 1.413.588T21 9v10q0 .825-.587 1.413T19 21zm0-2h8V9h-8z"
+						/>
 					</svg>
 					<span class="text-sm font-medium">Duplicate</span>
 				</button>
 			{/if}
 
 			{#if type === 'track' || type === 'album'}
-			<div class="relative">
-				<button
-					onmouseenter={handlePlaylistHover}
-					onmouseleave={handlePlaylistLeave}
-					class="w-full flex items-center justify-between px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors duration-150 text-left"
-				>
-					<div class="flex items-center">
-						<svg class="mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-							<path fill="currentColor" d="M11 17h2v-4h4v-2h-4V7h-2v4H7v2h4zm1 5q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"/>
-						</svg>
-						<span class="text-sm font-medium">Add to Playlist</span>
-					</div>
-					<svg class="w-4 h-4 transform transition-transform duration-200 {showPlaylistSubmenu ? 'rotate-90' : ''}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z"/>
-					</svg>
-				</button>
-
-				{#if showPlaylistSubmenu}
-					<div
-						role="menu"
-						tabindex="-1"
+				<div class="relative">
+					<button
 						onmouseenter={handlePlaylistHover}
 						onmouseleave={handlePlaylistLeave}
-						class="absolute left-full top-0 ml-1 bg-surface-container border border-outline rounded-xl shadow-lg py-2 min-w-40 z-50"
+						class="text-on-surface hover:bg-surface-container-high flex w-full items-center justify-between px-4 py-3 text-left transition-colors duration-150"
 					>
-						{#each playlists() as playlist}
-							<button
-								onclick={() => handleAddToPlaylist(playlist)}
-								class="w-full px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-high transition-colors duration-150"
+						<div class="flex items-center">
+							<svg
+								class="mr-3 flex-shrink-0"
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
 							>
-								{playlist.name}
-							</button>
-						{/each}
-						<hr class="my-2 border-outline-variant">
-						<button
-							onclick={() => handleAddToPlaylist('new')}
-							class="w-full flex items-center px-4 py-2 text-left text-sm text-on-surface hover:bg-surface-container-high transition-colors duration-150"
-						>
-							<svg class="mr-2 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-								<path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/>
+								<path
+									fill="currentColor"
+									d="M11 17h2v-4h4v-2h-4V7h-2v4H7v2h4zm1 5q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"
+								/>
 							</svg>
-							Create New Playlist
-						</button>
-					</div>
-				{/if}
+							<span class="text-sm font-medium">Add to Playlist</span>
+						</div>
+						<svg
+							class="h-4 w-4 transform transition-transform duration-200 {showPlaylistSubmenu
+								? 'rotate-90'
+								: ''}"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+						>
+							<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z" />
+						</svg>
+					</button>
+
+					{#if showPlaylistSubmenu}
+						<div
+							role="menu"
+							tabindex="-1"
+							onmouseenter={handlePlaylistHover}
+							onmouseleave={handlePlaylistLeave}
+							class="bg-surface-container border-outline absolute top-0 left-full z-50 ml-1 min-w-40 rounded-xl border py-2 shadow-lg"
+						>
+							{#each playlists() as playlist}
+								<button
+									onclick={() => handleAddToPlaylist(playlist)}
+									class="text-on-surface hover:bg-surface-container-high w-full px-4 py-2 text-left text-sm transition-colors duration-150"
+								>
+									{playlist.name}
+								</button>
+							{/each}
+							<hr class="border-outline-variant my-2" />
+							<button
+								onclick={() => handleAddToPlaylist('new')}
+								class="text-on-surface hover:bg-surface-container-high flex w-full items-center px-4 py-2 text-left text-sm transition-colors duration-150"
+							>
+								<svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" />
+								</svg>
+								Create New Playlist
+							</button>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -338,86 +386,117 @@
 <svelte:window on:click={onPageClick} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="flex flex-col w-full mt-5 ml-10" oncontextmenu={rightClickContextMenu}>
-    {#if track?.image || playlist?.image || album?.image || artist?.image}
-        {#await OPFS.getImageUrl(track?.image || playlist?.image || album?.image || artist?.image)}
-            <Lazy height={200} keep={true}>
-                {#if type === 'artist' && USE_ARTIST_SVG}
+<div class="mt-5 ml-10 flex w-full flex-col" oncontextmenu={rightClickContextMenu}>
+	{#if track?.image || playlist?.image || album?.image || artist?.image}
+		{#await OPFS.getImageUrl(track?.image || playlist?.image || album?.image || artist?.image)}
+			<Lazy height={200} keep={true}>
+				{#if type === 'artist' && USE_ARTIST_SVG}
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<svg 
-					onclick={handleTrackClick}
-					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                {:else}
-                    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                    <!-- svelte-ignore a11y_click_events_have_key_events -->
-                    <img 
+					<svg
 						onclick={handleTrackClick}
-                        src={DEFAULT_PLACEHOLDER}
-                        class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-                        alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
-                        draggable="false"
-                    />
-                {/if}
-            </Lazy>
-        {:then imageUrl}
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						class="text-primary bg-primary-container h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+						><path
+							fill="currentColor"
+							d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"
+						/></svg
+					>
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+				{:else}
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<img
+						onclick={handleTrackClick}
+						src={DEFAULT_PLACEHOLDER}
+						class="h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+						alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist ||
+							'' ||
+							album?.artist ||
+							''}"
+						draggable="false"
+					/>
+				{/if}
+			</Lazy>
+		{:then imageUrl}
 			<Lazy height={200} keep={true}>
 				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<img 
+				<img
 					onclick={handleTrackClick}
-					src={imageUrl} 
-					class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-					alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
+					src={imageUrl}
+					class="h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+					alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist ||
+						'' ||
+						album?.artist ||
+						''}"
 					draggable="false"
 				/>
 			</Lazy>
-        {:catch}
-            <Lazy height={200} keep={true}>
-                {#if type === 'artist' && USE_ARTIST_SVG}
+		{:catch}
+			<Lazy height={200} keep={true}>
+				{#if type === 'artist' && USE_ARTIST_SVG}
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<svg
-					 onclick={handleTrackClick}
-					 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
-                {:else}
+						onclick={handleTrackClick}
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						class="text-primary bg-primary-container h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+						><path
+							fill="currentColor"
+							d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"
+						/></svg
+					>
+				{:else}
 					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<img 
+					<img
 						onclick={handleTrackClick}
-                        src={DEFAULT_PLACEHOLDER}
-                        class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-                        alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
-                        draggable="false"
-                    />
-                {/if}
-            </Lazy>
-        {/await}
-    {:else}
-        {#if type === 'artist' && USE_ARTIST_SVG}
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<svg 
+						src={DEFAULT_PLACEHOLDER}
+						class="h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+						alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist ||
+							'' ||
+							album?.artist ||
+							''}"
+						draggable="false"
+					/>
+				{/if}
+			</Lazy>
+		{/await}
+	{:else if type === 'artist' && USE_ARTIST_SVG}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<svg
 			onclick={handleTrackClick}
-			xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none text-primary bg-primary-container"><path fill="currentColor" d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"/></svg>
-		{:else}
-			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<img 
-				onclick={handleTrackClick}
-                src={DEFAULT_PLACEHOLDER}
-                class="h-44 w-44 object-cover rounded-lg md:h-52 md:w-52 cursor-pointer transition-all duration-300 ease-in-out hover:scale-102 hover:shadow-lg active:scale-98 select-none"
-                alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist || "" || album?.artist || ""}"
-                draggable="false"
-            />
-        {/if}
-    {/if}
-    <div class="flex flex-col select-none">
-        <p class="song-titles mt-2">{track?.title || playlist?.name || album?.name || artist?.name}</p>
-        <p class="song-artists">{track?.artist || "" || album?.artist || ""}</p>
-    </div>
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			class="text-primary bg-primary-container h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+			><path
+				fill="currentColor"
+				d="M17.5 20q-1.05 0-1.775-.725T15 17.5t.725-1.775T17.5 15q.2 0 .45.038t.55.162V11q0-.425.288-.712T19.5 10H21q.425 0 .713.288T22 11t-.288.713T21 12h-1v5.5q0 1.05-.725 1.775T17.5 20M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m-7 8q-.425 0-.712-.288T3 19v-1.8q0-.875.438-1.575T4.6 14.55q1.55-.775 3.15-1.162T11 13q.7 0 1.388.075t1.387.225q.425.1.537.525t-.237.775q-.525.625-.788 1.363t-.262 1.537q0 .325.038.638t.137.637q.125.45-.112.838t-.663.387z"
+			/></svg
+		>
+	{:else}
+		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<img
+			onclick={handleTrackClick}
+			src={DEFAULT_PLACEHOLDER}
+			class="h-44 w-44 cursor-pointer rounded-lg object-cover transition-all duration-300 ease-in-out select-none hover:scale-102 hover:shadow-lg active:scale-98 md:h-52 md:w-52"
+			alt="{track?.title || playlist?.name || album?.name || artist?.name} - {track?.artist ||
+				'' ||
+				album?.artist ||
+				''}"
+			draggable="false"
+		/>
+	{/if}
+	<div class="flex flex-col select-none">
+		<p class="song-titles mt-2">{track?.title || playlist?.name || album?.name || artist?.name}</p>
+		<p class="song-artists">{track?.artist || '' || album?.artist || ''}</p>
+	</div>
 </div>
 
 <style>
-    .song-titles {
+	.song-titles {
 		color: var(--color-secondary);
 		font-size: 20px;
 		font-family: 'Roboto Flex', sans-serif;
@@ -438,7 +517,7 @@
 			'YTUC' 712;
 	}
 
-    .song-artists {
+	.song-artists {
 		color: var(--color-secondary-fixed);
 		font-size: 16px;
 		font-family: 'Roboto Flex', sans-serif;

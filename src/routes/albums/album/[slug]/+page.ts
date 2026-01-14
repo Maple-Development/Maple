@@ -1,6 +1,5 @@
 export async function load({ params }) {
-    return {
-      albumId: params.slug
-    };
-  }
-  
+	return {
+		albumId: params.slug
+	};
+}

@@ -18,13 +18,13 @@
 	});
 </script>
 
-<div class="h-full w-full flex items-center justify-center p-4">
+<div class="flex h-full w-full items-center justify-center p-4">
 	<div
-		class="w-full max-w-md flex flex-col gap-8 p-8 rounded-3xl mt-10 bg-surface-container-high shadow-md"
+		class="bg-surface-container-high mt-10 flex w-full max-w-md flex-col gap-8 rounded-3xl p-8 shadow-md"
 	>
 		<div class="flex flex-col gap-2 text-center">
-			<h1 class="text-4xl font-medium tracking-tight text-on-surface">Create an account</h1>
-			<p class="text-base text-on-surface-variant">Join Maple to start listening with friends.</p>
+			<h1 class="text-on-surface text-4xl font-medium tracking-tight">Create an account</h1>
+			<p class="text-on-surface-variant text-base">Join Maple to start listening with friends.</p>
 		</div>
 
 		<form onsubmit={onSubmit} class="flex flex-col gap-6">
@@ -36,13 +36,15 @@
 		</form>
 
 		<div class="flex items-center gap-4">
-			<div class="flex-1 h-px bg-outline-variant"></div>
-			<span class="text-sm text-on-surface-variant">or</span>
-			<div class="flex-1 h-px bg-outline-variant"></div>
+			<div class="bg-outline-variant h-px flex-1"></div>
+			<span class="text-on-surface-variant text-sm">or</span>
+			<div class="bg-outline-variant h-px flex-1"></div>
 		</div>
 
 		<div class="flex flex-col gap-3">
-			<Button variant="outlined" onclick={() => goto('/login')}>Already have an account? Sign in</Button>
+			<Button variant="outlined" onclick={() => goto('/login')}
+				>Already have an account? Sign in</Button
+			>
 		</div>
 	</div>
 </div>

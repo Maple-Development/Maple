@@ -1,5 +1,5 @@
 export async function load({ params }) {
-  return {
-    playlistId: params.slug
-  };
+	return {
+		playlistId: params.slug
+	};
 }

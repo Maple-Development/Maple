@@ -52,7 +52,7 @@ export const recentlyPlayedManager = writable({
 				Song?,
 				Song?,
 				Song?,
-				Song?, 
+				Song?,
 				Song?,
 				Song?,
 				Song?,

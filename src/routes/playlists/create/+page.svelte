@@ -121,12 +121,15 @@
 
 <div class="mx-24 my-8 space-y-6">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-on-surface">Create Playlist</h1>
+		<h1 class="text-on-surface text-2xl font-bold">Create Playlist</h1>
 		<div class="flex gap-2">
-			<button class="px-4 py-2 rounded-lg bg-surface-container-high text-on-surface" onclick={() => goto('/playlists')}>
+			<button
+				class="bg-surface-container-high text-on-surface rounded-lg px-4 py-2"
+				onclick={() => goto('/playlists')}
+			>
 				Cancel
 			</button>
-			<button class="px-4 py-2 rounded-lg bg-primary text-on-primary" onclick={createPlaylist}>
+			<button class="bg-primary text-on-primary rounded-lg px-4 py-2" onclick={createPlaylist}>
 				Save
 			</button>
 		</div>
@@ -135,68 +138,72 @@
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<div class="space-y-3">
 			<div class="space-y-1">
-				<label class="text-sm font-medium text-on-surface" for="playlist-name">Name</label>
+				<label class="text-on-surface text-sm font-medium" for="playlist-name">Name</label>
 				<input
 					id="playlist-name"
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2"
 					bind:value={name}
 					placeholder="Playlist name"
 				/>
 			</div>
 
 			<div class="space-y-1">
-				<label class="text-sm font-medium text-on-surface" for="playlist-description">Description</label>
+				<label class="text-on-surface text-sm font-medium" for="playlist-description"
+					>Description</label
+				>
 				<input
 					id="playlist-description"
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2"
 					bind:value={description}
 					placeholder="Playlist description"
 				/>
 			</div>
 
 			<div class="space-y-1">
-				<label class="text-sm font-medium text-on-surface" for="playlist-photo">Image</label>
+				<label class="text-on-surface text-sm font-medium" for="playlist-photo">Image</label>
 				<input id="playlist-photo" type="file" accept="image/*" onchange={handlePhotoChange} />
 			</div>
 
 			<img
 				src={imagePreviewUrl}
 				alt="Playlist preview"
-				class="h-52 w-52 rounded-lg object-cover border border-outline"
+				class="border-outline h-52 w-52 rounded-lg border object-cover"
 				draggable="false"
 			/>
 
-			<div class="text-sm text-on-surface-variant">
+			<div class="text-on-surface-variant text-sm">
 				Selected: {selectedTrackIds.length}
 			</div>
 		</div>
 
 		<div class="space-y-3">
 			<div class="space-y-1">
-				<label class="text-sm font-medium text-on-surface" for="track-search">Search tracks</label>
+				<label class="text-on-surface text-sm font-medium" for="track-search">Search tracks</label>
 				<input
 					id="track-search"
-					class="w-full rounded-lg border border-outline bg-surface px-3 py-2 text-on-surface"
+					class="border-outline bg-surface text-on-surface w-full rounded-lg border px-3 py-2"
 					bind:value={searchQuery}
 					oninput={filterTracks}
 					placeholder="Title / Artist / Album"
 				/>
 			</div>
 
-			<ul class="space-y-2 max-h-[60vh] overflow-auto pr-1">
+			<ul class="max-h-[60vh] space-y-2 overflow-auto pr-1">
 				{#each filteredTracks as song (song.id)}
 					<li>
 						<button
-							class="w-full text-left rounded-lg border border-outline px-3 py-2 hover:bg-surface-container-high"
+							class="border-outline hover:bg-surface-container-high w-full rounded-lg border px-3 py-2 text-left"
 							onclick={() => toggleSongSelection(song)}
 						>
 							<div class="flex items-center justify-between gap-4">
 								<div class="min-w-0">
-									<div class="truncate font-semibold text-on-surface">{song.title}</div>
-									<div class="truncate text-sm text-on-surface-variant">{song.artist} • {song.album}</div>
+									<div class="text-on-surface truncate font-semibold">{song.title}</div>
+									<div class="text-on-surface-variant truncate text-sm">
+										{song.artist} • {song.album}
+									</div>
 								</div>
 								{#if isSelected(song)}
-									<div class="text-sm font-medium text-primary">Selected</div>
+									<div class="text-primary text-sm font-medium">Selected</div>
 								{/if}
 							</div>
 						</button>
