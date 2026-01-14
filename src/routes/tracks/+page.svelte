@@ -29,6 +29,7 @@
         { key: 'duration', label: 'Duration' }
     ]}
     initialSortKey="title"
+    idPrefix="tracks"
     onChange={handleFiltersChange}
 />
 

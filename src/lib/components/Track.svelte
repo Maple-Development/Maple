@@ -3,10 +3,10 @@
 	import type { Song, Playlist, Album, Artist } from '$lib/types';
 	import { playlists } from '$lib/global.svelte';
 	import { OPFS } from '$lib/opfs';
-	// @ts-ignore
 	import Lazy from 'svelte-lazy';
 	import { goto } from '$app/navigation';
 	import { refreshLibrary } from '$lib/global.svelte';
+	import { v4 as uuidv4 } from 'uuid';
 
 	const DEFAULT_PLACEHOLDER = 'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
 
@@ -130,6 +130,50 @@
 		}
 	}
 
+	async function handleDuplicate() {
+		console.log('Duplicate clicked');
+		showMenu = false;
+		showPlaylistSubmenu = false;
+		if (hideSubmenuTimeout) {
+			clearTimeout(hideSubmenuTimeout);
+			hideSubmenuTimeout = null;
+		}
+
+		if (type !== 'playlist' || !playlist) return;
+
+		await refreshLibrary();
+		const existing = await OPFS.get().playlist(playlist.id);
+		if (!existing) return;
+
+		const now = Date.now();
+		let image: any = null;
+		if (typeof existing.image === 'string' && existing.image) {
+			const res = await OPFS.get().image(existing.image);
+			const buf = await res.arrayBuffer();
+			image = new Blob([buf]);
+		} else if (existing.image instanceof Blob) {
+			image = existing.image;
+		} else {
+			const placeholder = await fetch('/placeholder.png');
+			image = await placeholder.blob();
+		}
+
+		const newId = uuidv4();
+		const duplicated: Playlist = {
+			...existing,
+			id: newId,
+			name: `${existing.name} (Copy)`,
+			tracks: ((existing.tracks ?? []) as unknown as string[]),
+			image,
+			createdAt: now,
+			modifiedAt: now
+		};
+
+		await OPFS.addPlaylist(duplicated);
+		await refreshLibrary();
+		goto(`/playlists/playlist/${newId}`);
+	}
+
 	function handleRemove() {
 		console.log('Remove clicked');
 		showMenu = false;
@@ -140,7 +184,7 @@
 		}
 	}
 
-	function handleAddToPlaylist(playlist?: any) {
+	async function handleAddToPlaylist(playlist?: any) {
 		console.log('Add to playlist clicked', playlist);
 		showMenu = false;
 		showPlaylistSubmenu = false;
@@ -149,15 +193,34 @@
 			hideSubmenuTimeout = null;
 		}
 
-		if (type !== 'track' || !track) return;
-		if (playlist === 'new') {
-			goto(`/playlists/create?addTrack=${track.id}`);
+		if (type === 'track' && track) {
+			if (playlist === 'new') {
+				goto(`/playlists/create?addTrack=${track.id}`);
+				return;
+			}
+			if (playlist && typeof playlist === 'object') {
+				await OPFS.track().addToPlaylist(track, playlist);
+				await refreshLibrary();
+			}
 			return;
 		}
-		if (playlist && typeof playlist === 'object') {
-			OPFS.track()
-				.addToPlaylist(track, playlist)
-				.then(() => refreshLibrary());
+
+		if (type === 'album' && album) {
+			if (playlist === 'new') {
+				goto(`/playlists/create?addAlbum=${album.id}`);
+				return;
+			}
+			if (playlist && typeof playlist === 'object') {
+				await refreshLibrary();
+				const albumData = await OPFS.get().album(album.id);
+				const existingPlaylist = await OPFS.get().playlist(playlist.id);
+				if (!albumData || !existingPlaylist) return;
+				const toAdd = (albumData.tracks ?? []) as unknown as string[];
+				const merged = Array.from(new Set([...(existingPlaylist.tracks ?? ([] as any)), ...toAdd]));
+				await OPFS.playlist().edit({ ...existingPlaylist, tracks: merged });
+				await refreshLibrary();
+			}
+			return;
 		}
 	}
 
@@ -208,7 +271,19 @@
 				<span class="text-sm font-medium">Delete</span>
 			</button>
 
-			{#if type === 'track'}
+			{#if type === 'playlist'}
+				<button
+					onclick={handleDuplicate}
+					class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors duration-150 text-left"
+				>
+					<svg class="mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M7 17q-.825 0-1.412-.587T5 15V5q0-.825.588-1.412T7 3h8q.825 0 1.413.588T17 5v2h-2V5H7v10h2v2zm4 4q-.825 0-1.412-.587T9 19V9q0-.825.588-1.412T11 7h8q.825 0 1.413.588T21 9v10q0 .825-.587 1.413T19 21zm0-2h8V9h-8z"/>
+					</svg>
+					<span class="text-sm font-medium">Duplicate</span>
+				</button>
+			{/if}
+
+			{#if type === 'track' || type === 'album'}
 			<div class="relative">
 				<button
 					onmouseenter={handlePlaylistHover}
@@ -335,7 +410,7 @@
             />
         {/if}
     {/if}
-    <div class="flex flex-col">
+    <div class="flex flex-col select-none">
         <p class="song-titles mt-2">{track?.title || playlist?.name || album?.name || artist?.name}</p>
         <p class="song-artists">{track?.artist || "" || album?.artist || ""}</p>
     </div>

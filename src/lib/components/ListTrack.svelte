@@ -4,16 +4,18 @@
     import { OPFS } from '$lib/opfs';
     import { refreshLibrary } from '$lib/global.svelte';
     import { goto } from '$app/navigation';
+    import Lazy from 'svelte-lazy';
 
     const CONTEXT_MENU_EVENT = 'track-context-menu-open';
 
-    let { track, index, trackNo }: { track: Song; index: number; trackNo?: number } = $props();
+    let { track, index, trackNo, showThumbnail = false, onRemove, draggable = false, onDragStart, onDragOver, onDrop, onDragEnd, showDropIndicator = false }: { track: Song; index: number; trackNo?: number; showThumbnail?: boolean; onRemove?: () => void; draggable?: boolean; onDragStart?: (e: DragEvent) => void; onDragOver?: (e: DragEvent) => void; onDrop?: (e: DragEvent) => void; onDragEnd?: (e: DragEvent) => void; showDropIndicator?: boolean } = $props();
 
     let showMenu = $state(false);
     let showPlaylistSubmenu = $state(false);
     let content: HTMLDivElement | undefined = $state(undefined);
     let menuPosition = $state<{ top: number; left: number } | null>(null);
     let hideSubmenuTimeout: number | null = null;
+    let longPressTimeout: number | null = null;
 
     function portalToBody(node: HTMLElement) {
         if (typeof document !== 'undefined' && node.parentNode !== document.body) {
@@ -31,11 +33,7 @@
 
     function onRowClick() {}
 
-    function onOpenMenu(e: MouseEvent) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const target = e.currentTarget as HTMLElement;
+    function openMenuFromTarget(target: HTMLElement) {
         const rect = target.getBoundingClientRect();
         const menuMinWidth = 192;
         const horizontalPadding = 8;
@@ -53,6 +51,29 @@
             hideSubmenuTimeout = null;
         }
         showMenu = true;
+    }
+
+    function onOpenMenu(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        openMenuFromTarget(e.currentTarget as HTMLElement);
+    }
+
+    function onTouchStart(e: TouchEvent) {
+        if (longPressTimeout) {
+            clearTimeout(longPressTimeout);
+        }
+        const target = e.currentTarget as HTMLElement;
+        longPressTimeout = window.setTimeout(() => {
+            openMenuFromTarget(target);
+        }, 450);
+    }
+
+    function onTouchEnd() {
+        if (longPressTimeout) {
+            clearTimeout(longPressTimeout);
+            longPressTimeout = null;
+        }
     }
 
     function onPageClick(e: MouseEvent) {
@@ -82,6 +103,13 @@
             clearTimeout(hideSubmenuTimeout);
             hideSubmenuTimeout = null;
         }
+    }
+
+    function handleRemove() {
+        if (onRemove) {
+            onRemove();
+        }
+        handleDelete();
     }
     
     function handleAddToPlaylist(playlist?: any) {
@@ -155,32 +183,61 @@
 
 <svelte:window onclick={onPageClick} />
 
-<li
+<div
     class="relative"
     oncontextmenu={(e) => e.preventDefault()}
+    role="presentation"
 >
+    {#if showDropIndicator}
+        <div class="absolute left-0 right-0 top-0 h-0.5 bg-primary/70"></div>
+    {/if}
     <div
-        class="group flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-surface-container-high/50 transition-colors duration-150"
+        class="group flex items-center justify-between px-4 py-3 cursor-pointer select-none hover:bg-surface-container-high/50 transition-colors duration-150"
         class:pointer-events-none={showMenu}
         onclick={onRowClick}
         role="button"
         tabindex="0"
         onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onRowClick()}
+        ontouchstart={onTouchStart}
+        ontouchend={onTouchEnd}
+        ontouchcancel={onTouchEnd}
+        draggable={draggable}
+        ondragstart={onDragStart}
+        ondragover={onDragOver}
+        ondrop={onDrop}
+        ondragend={onDragEnd}
     >
-    <div class="flex items-center gap-3">
-        <span class="w-6 text-right text-on-surface-variant">{index}</span>
-        <div>
-            <p class="text-on-surface">{track.title}</p>
-            <p class="text-sm text-on-surface-variant">{track.artist}</p>
+    <div class="flex items-center gap-3 min-w-0">
+        <span class="w-4 shrink-0 text-right text-on-surface-variant">{index}</span>
+        {#if showThumbnail}
+            {#if track.image}
+                {#await OPFS.getImageUrl(track.image as string) then imageUrl}
+                    <Lazy height={40} keep={true}>
+                        <img src={imageUrl} alt="{track.title} - {track.artist}" class="h-10 w-10 shrink-0 rounded-md object-cover" draggable="false" />
+                    </Lazy>
+                {:catch}
+                    <Lazy height={40} keep={true}>
+                        <div class="h-10 w-10 shrink-0 rounded-md bg-surface-container-high"></div>
+                    </Lazy>
+                {/await}
+            {:else}
+                <Lazy height={40} keep={true}>
+                    <div class="h-10 w-10 shrink-0 rounded-md bg-surface-container-high"></div>
+                </Lazy>
+            {/if}
+        {/if}
+        <div class="min-w-0 flex-1">
+            <p class="text-on-surface truncate">{track.title}</p>
+            <p class="text-sm text-on-surface-variant truncate">{track.artist}</p>
         </div>
     </div>
     <div class="flex items-center gap-2">
         {#if trackNo != null}
             <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 inline-flex items-center justify-center rounded-full border border-outline-variant bg-surface-container-high px-2 py-0.5 text-xs font-medium text-on-surface-variant">{trackNo}</span>
         {/if}
-        <span class="text-sm text-on-surface-variant">{formatDuration(track.duration)}</span>
+        <span class="hidden sm:inline text-sm text-on-surface-variant">{formatDuration(track.duration)}</span>
         <button
-            class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 rounded-full p-1 text-on-surface hover:bg-surface-container-high"
+            class="hidden sm:inline-flex opacity-0 group-hover:opacity-100 transition-opacity duration-150 rounded-full p-1 text-on-surface hover:bg-surface-container-high"
             aria-label="Open menu"
             onclick={onOpenMenu}
         >
@@ -200,11 +257,11 @@
         >
             <div class="bg-surface border border-outline rounded-xl shadow-2xl py-2 min-w-48">
                 <button
-                    onclick={handleDelete}
+                    onclick={onRemove ? handleRemove : handleDelete}
                     class="w-full flex items-center px-4 py-3 text-on-surface hover:bg-surface-container-high transition-colors duration-150 text-left"
                 >
                     <svg class="mr-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zM9 17h2V8H9zm4 0h2V8h-2zM7 6v13z"/></svg>
-                    <span class="text-sm font-medium">Delete</span>
+                    <span class="text-sm font-medium">{onRemove ? 'Remove' : 'Delete'}</span>
                 </button>
 
                 <div class="relative">
@@ -253,5 +310,5 @@
         </div>
     {/if}
     
-</li>
+</div>
 

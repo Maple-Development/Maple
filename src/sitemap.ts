@@ -12,6 +12,7 @@ export const sitemap = (<const>{
    "/login": false,
    "/onboard": false,
    "/playlists": true,
+   "/playlists/create": false,
    "/playlists/playlist/[slug]": false,
    "/playlists/playlist": true,
    "/register": false,

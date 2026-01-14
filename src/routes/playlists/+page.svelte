@@ -28,8 +28,9 @@
  
 <Filters
     items={playlists()}
-    sortOptions={[{ key: 'name', label: 'Name' }]}
-    initialSortKey="name"
+    sortOptions={[{ key: 'createdAt', label: 'Created' }, { key: 'modifiedAt', label: 'Modified' }, { key: 'name', label: 'Name' }]}
+    initialSortKey="modifiedAt"
+	initialDescending={true}
     onChange={handleFiltersChange}
 />
 
