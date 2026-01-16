@@ -1,5 +1,6 @@
 const express = require('express');
 const rateLimit = require("express-rate-limit");
+const slowDown = require("express-slow-down");
 const cors = require('cors');
 const login = require('./auth/login');
 const getPath = require('./get/get.js');
@@ -53,10 +54,22 @@ var options = {
 	}
 };
 
-/* const limiter = rateLimit({
+const limiter = slowDown({
 	windowMs: 2 * 60 * 1000,
-	max: 20,
-}); */
+	// max: 20,
+	delayAfter: 5, 
+	delayMs: (hits) => {
+		if (hits <= 20) return (hits - 5) * 100
+		else return (hits - 20 ) * 1000 + 2000
+	},
+	// delayMs: () => 10000,
+	maxDelayMs: 15000,
+}); 
+
+// const limiter = rateLimit({
+// 	windowMs: 15 * 60 * 1000,
+// 	limit: 5,
+// })
 
 try {
 
@@ -84,8 +97,8 @@ try {
 	console.log('[7] Setting up routes...');
 	const friends = require('./user/friends.js');
 
-	/* app.use(limiter);
-	 */
+	app.use(limiter);
+	
 	app.use(cors(corsOptions));
 
 	app.get('/', (req, res) => {
