@@ -243,17 +243,9 @@
 
 		<div class="mt-4 flex gap-1">
 			{#if editModeOn}
-				<Button square variant="filled" onclick={saveDetails}>
-					Save
-				</Button>
+				<Button square variant="filled" onclick={saveDetails}>Save</Button>
 			{:else}
-				<Button
-					variant="filled"
-					square
-					onclick={() => (editModeOn = true)}
-				>
-					Edit
-			</Button>
+				<Button variant="filled" square onclick={() => (editModeOn = true)}>Edit</Button>
 			{/if}
 			<Button square variant="tonal" onclick={playPlaylist}>Play</Button>
 			<Button square variant="tonal" onclick={shufflePlaylist}>Shuffle</Button>
