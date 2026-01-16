@@ -396,7 +396,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="mt-5 ml-10 flex w-full flex-col" oncontextmenu={rightClickContextMenu}>
 	{#if track?.image || playlist?.image || album?.image || artist?.image}
-		{#await OPFS.getImageUrl(track?.image || playlist?.image || album?.image || artist?.image)}
+		{#await OPFS.getImageUrl((track?.image || playlist?.image || album?.image || artist?.image) as string)}
 			<Lazy height={200} keep={true}>
 				{#if type === 'artist' && USE_ARTIST_SVG}
 					<!-- svelte-ignore a11y_click_events_have_key_events -->

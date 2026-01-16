@@ -1,7 +1,6 @@
 import { SERVER } from '$lib/api/server';
 import { SavedUser, UserInfo } from '$lib/store';
 import type { User } from '$lib/types';
-import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
 export class UserManager {
@@ -50,14 +49,15 @@ export class UserManager {
 				id: data.id,
 				username: data.username,
 				name: data.name,
-				pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : null
+				pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : undefined
 			};
 			if (response.ok) {
 				SavedUser.set(returnUser);
 			}
 			return returnUser;
-		} catch (_error) {
-			return { id: '', username: '', name: '', pfp: null } as User;
+		} catch (e) {
+			console.error('Error:', e);
+			return { id: '', username: '', name: '', pfp: undefined };
 		}
 	};
 
@@ -73,14 +73,15 @@ export class UserManager {
 					id: data.id,
 					username: data.username,
 					name: data.name,
-					pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : null
+					pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : undefined
 				};
 				UserInfo.set({ username: returnUser.username, id: returnUser.id });
 				SavedUser.set(returnUser);
 				return returnUser;
 			}
 			return null;
-		} catch (_error) {
+		} catch (e) {
+			console.error('Error:', e);
 			return null;
 		}
 	};

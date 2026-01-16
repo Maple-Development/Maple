@@ -14,18 +14,18 @@ export type Album = {
 	id: string;
 	name: string;
 	artist: string;
-	image: any;
+	image: string | Blob;
 	year: number;
 	genre?: string;
-	tracks?: String[];
+	tracks?: string[];
 };
 
 export type Artist = {
 	id: string;
 	name: string;
-	image?: any;
-	tracks?: String[];
-	albums?: String[];
+	image?: string | Blob;
+	tracks?: string[];
+	albums?: string[];
 };
 
 export enum DataType {
@@ -45,8 +45,8 @@ export type Playlist = {
 	id: string;
 	name: string;
 	description: string;
-	tracks?: String[];
-	image?: any;
+	tracks?: string[];
+	image?: string | Blob;
 	createdAt?: number;
 	modifiedAt?: number;
 };
@@ -65,7 +65,7 @@ export type Song = {
 	genre?: string;
 	fileName: string;
 	duration: number;
-	image?: any;
+	image?: string | Blob;
 	trackNumber: number;
 	disk: number;
 	ext: string;
@@ -75,5 +75,5 @@ export type User = {
 	id: string;
 	username: string;
 	name?: string;
-	pfp?: any;
+	pfp?: string;
 };

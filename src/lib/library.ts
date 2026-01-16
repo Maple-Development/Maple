@@ -41,7 +41,7 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 								: metadata.common.genre || 'Unknown Genre',
 							duration: metadata.format.duration || 0,
 							image: metadata.common.picture
-								? new Blob([metadata.common.picture[0].data], {
+								? new Blob([metadata.common.picture[0].data.slice()], {
 										type: metadata.common.picture[0].format
 									})
 								: blob,
@@ -60,7 +60,7 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 								? metadata.common.genre[0]
 								: metadata.common.genre || 'Unknown Genre',
 							image: metadata.common.picture
-								? new Blob([metadata.common.picture[0].data], {
+								? new Blob([metadata.common.picture[0].data.slice()], {
 										type: metadata.common.picture[0].format
 									})
 								: blob

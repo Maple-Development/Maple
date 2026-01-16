@@ -3,4 +3,4 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 api
-src\lib\components\BottomBar.svelte
+src/sitemap.ts
