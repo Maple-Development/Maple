@@ -12,6 +12,8 @@
 
 > Need Help? Join our [Development Server](https://discord.gg/Wxrp73HVj4)
 
+https://github.com/user-attachments/assets/83778c71-c67c-4830-9b1e-c57177d8fa05
+
 <p align="center">
     Maple is a music library and organization tool. It allows you to upload your music library and watch it be organized into albums, artists, playlists, and more! You are given robust controls to play and organize your music. In the future, it will include optional social and stat-tracking features.
 </p>
