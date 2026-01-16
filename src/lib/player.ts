@@ -57,7 +57,7 @@ async function playAtIndex(index: number) {
 	updateQueue(state.items, normalized, state.source);
 	activeSong.set(song);
 	statsManager.recordPlay(song, state.source);
-	get(recentlyPlayedManager).add(song);
+	recentlyPlayedManager.add(song);
 	const buffer = await OPFS.getSong(song);
 	if (!buffer) return;
 	const arrayBuffer = await buffer.arrayBuffer();
@@ -171,7 +171,7 @@ export function seekTo(time: number) {
 }
 
 export async function playRecent(index = 0) {
-	const recent = (get(recentlyPlayedManager).get() as Song[]).filter(Boolean);
+	const recent = recentlyPlayedManager.get().filter(Boolean);
 	if (!recent.length) return;
 	const startIndex = index >= 0 && index < recent.length ? index : 0;
 	await startPlayback(recent, recent[startIndex].id, { type: 'recent' });

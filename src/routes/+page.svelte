@@ -1,14 +1,10 @@
 <script lang="ts">
-	import { Button, Card } from 'm3-svelte';
+	import { Card } from 'm3-svelte';
 	import Track from '$lib/components/Track.svelte';
-	import { tracks } from '$lib/global.svelte';
-	import type { Song } from '$lib/types';
 	import { onMount } from 'svelte';
-	import { title } from '$lib/store';
+	import { title, recentlyPlayed } from '$lib/store';
 
-	let sortedTracks: Song[] = $derived.by(() =>
-		[...tracks()].sort((a, b) => a.title.localeCompare(b.title)).slice(0, 5)
-	);
+	let recent = $derived($recentlyPlayed.filter(Boolean));
 
 	onMount(async () => {
 		title.set('Home');
@@ -36,8 +32,8 @@
 	<div
 		class="mx-24 grid grid-cols-1 gap-x-2 gap-y-2 sm:grid-cols-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2"
 	>
-		{#each sortedTracks as track}
-			<Track {track} queue={sortedTracks} queueSource={{ type: 'recent', label: 'Home' }} />
+		{#each recent as track}
+			<Track {track} queue={recent} queueSource={{ type: 'recent', label: 'Recently Played' }} />
 		{/each}
 	</div>
 </div>
