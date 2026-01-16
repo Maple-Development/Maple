@@ -56,19 +56,17 @@ var options = {
 
 const limiter = slowDown({
 	windowMs: 2 * 60 * 1000,
-	// max: 20,
-	delayAfter: 5, 
+	delayAfter: 5,
 	delayMs: (hits) => {
-		if (hits <= 20) return (hits - 5) * 100
-		else return (hits - 20 ) * 1000 + 2000
+		if (hits <= 15) return hits * 100;
+		return (hits - 15) * 1000 + 2000;
 	},
-	// delayMs: () => 10000,
 	maxDelayMs: 15000,
-}); 
+});
 
 // const limiter = rateLimit({
 // 	windowMs: 15 * 60 * 1000,
-// 	limit: 5,
+// 	limit: 20,
 // })
 
 try {
