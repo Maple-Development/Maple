@@ -4,7 +4,8 @@
 	import type { Playlist, Song } from '$lib/types';
 	import { OPFS } from '$lib/opfs';
 	import { refreshLibrary, tracks } from '$lib/global.svelte';
-	import { title } from '$lib/store';
+	import { title, shuffleEnabled } from '$lib/store';
+	import { startPlayback } from '$lib/player';
 	import { Button } from 'm3-svelte';
 	import ListTrack from '$lib/components/ListTrack.svelte';
 	import Filters from '$lib/components/Filters.svelte';
@@ -165,6 +166,28 @@
 		filterTracks();
 	}
 
+	function playPlaylist() {
+		const resolved = resolvePlaylistTracks();
+		if (!resolved.length) return;
+		startPlayback(resolved, resolved[0], {
+			type: 'playlist',
+			id: playlist?.id,
+			label: playlist?.name
+		});
+	}
+
+	function shufflePlaylist() {
+		const resolved = resolvePlaylistTracks();
+		if (!resolved.length) return;
+		shuffleEnabled.set(true);
+		const randomIndex = Math.floor(Math.random() * resolved.length);
+		startPlayback(resolved, resolved[randomIndex], {
+			type: 'playlist',
+			id: playlist?.id,
+			label: playlist?.name
+		});
+	}
+
 	onMount(async () => {
 		await refreshLibrary();
 		allTracks = [...tracks()].sort((a, b) => a.title.localeCompare(b.title));
@@ -218,37 +241,26 @@
 			<p class="text-on-surface-variant">{resolvePlaylistTracks().length} tracks</p>
 		</div>
 
-		<div class="mt-4 flex gap-3">
-			<Button variant="filled">Play</Button>
-			<Button variant="tonal">Shuffle</Button>
+		<div class="mt-4 flex gap-1">
+			{#if editModeOn}
+				<Button square variant="filled" onclick={saveDetails}>
+					Save
+				</Button>
+			{:else}
+				<Button
+					variant="filled"
+					square
+					onclick={() => (editModeOn = true)}
+				>
+					Edit
+			</Button>
+			{/if}
+			<Button square variant="tonal" onclick={playPlaylist}>Play</Button>
+			<Button square variant="tonal" onclick={shufflePlaylist}>Shuffle</Button>
 		</div>
 	</div>
 
 	<div class="space-y-6 md:flex-1">
-		<div class="flex justify-end gap-2">
-			<button
-				class="bg-surface-container-high text-on-surface rounded-lg px-4 py-2"
-				onclick={() => goto('/playlists')}
-			>
-				Back
-			</button>
-			<button class="bg-error text-on-error rounded-lg px-4 py-2" onclick={deletePlaylist}>
-				Delete
-			</button>
-			{#if editModeOn}
-				<button class="bg-primary text-on-primary rounded-lg px-4 py-2" onclick={saveDetails}>
-					Save
-				</button>
-			{:else}
-				<button
-					class="bg-primary text-on-primary rounded-lg px-4 py-2"
-					onclick={() => (editModeOn = true)}
-				>
-					Edit
-				</button>
-			{/if}
-		</div>
-
 		<div class="flex flex-col gap-6">
 			<div class="space-y-3">
 				<h2 class="text-on-surface text-lg font-semibold">Tracks</h2>

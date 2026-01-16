@@ -91,7 +91,7 @@
 			{/each}
 		</ConnectedButtons>
 	</div>
-	<div class={`mr-10 flex justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}>
+	<div class={`mr-2 flex justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}>
 		<SettingsGear />
 	</div>
 </div>
