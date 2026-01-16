@@ -11,7 +11,10 @@ import {
 	recentlyPlayedManager,
 	SavedUser,
 	setCurTime,
-	socket
+	socket,
+	loopEnabled,
+	shuffleEnabled,
+	originalQueue
 } from '$lib/store';
 import { statsManager } from '$lib/stats';
 import type { QueueSnapshot } from '$lib/store';
@@ -80,25 +83,46 @@ export async function startPlayback(
 	start: Song | string,
 	source?: { type?: QueueSourceState['type']; id?: string; label?: string }
 ) {
-	const queue = items.filter(Boolean);
-	if (!queue.length) return;
+	const unshuffled = items.filter(Boolean);
+	if (!unshuffled.length) return;
+	originalQueue.set(unshuffled.slice());
 	const startId = typeof start === 'string' ? start : start.id;
 	const startIndex = Math.max(
-		queue.findIndex((s) => s.id === startId),
+		unshuffled.findIndex((s) => s.id === startId),
 		0
 	);
-	updateQueue(queue.slice(), startIndex, {
+	const startSong = unshuffled[startIndex];
+	let queue = unshuffled.slice();
+	if (get(shuffleEnabled) && queue.length > 1) {
+		const otherSongs = queue.filter((_, i) => i !== startIndex);
+		for (let i = otherSongs.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[otherSongs[i], otherSongs[j]] = [otherSongs[j], otherSongs[i]];
+		}
+		queue = [startSong, ...otherSongs];
+	}
+	updateQueue(queue, get(shuffleEnabled) ? 0 : startIndex, {
 		type: source?.type ?? 'custom',
 		id: source?.id,
 		label: source?.label
 	});
 	statsManager.recordQueueStart(get(queueState).source, queue.length);
-	await playAtIndex(startIndex);
+	await playAtIndex(get(shuffleEnabled) ? 0 : startIndex);
 }
 
 export async function next() {
 	const state = get(queueState);
 	if (!state.items.length) return;
+	const isLastTrack = state.currentIndex >= state.items.length - 1;
+	if (isLastTrack && !get(loopEnabled)) {
+		audioPlayer.update((value) => {
+			if (value.audio instanceof HTMLAudioElement) {
+				value.audio.pause();
+			}
+			return { ...value, playing: false };
+		});
+		return;
+	}
 	statsManager.recordSkip();
 	await playAtIndex(state.currentIndex + 1);
 }
@@ -156,4 +180,30 @@ export async function playRecent(index = 0) {
 export function setQueueSource(source: QueueSourceState) {
 	const state = get(queueState);
 	updateQueue(state.items, state.currentIndex, source);
+}
+
+export function toggleShuffle() {
+	const current = get(shuffleEnabled);
+	shuffleEnabled.set(!current);
+	const state = get(queueState);
+	if (state.items.length <= 1) return;
+	const currentSong = state.items[state.currentIndex];
+	if (!current) {
+		const otherSongs = state.items.filter((_, i) => i !== state.currentIndex);
+		for (let i = otherSongs.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[otherSongs[i], otherSongs[j]] = [otherSongs[j], otherSongs[i]];
+		}
+		const shuffled = [currentSong, ...otherSongs];
+		updateQueue(shuffled, 0, state.source);
+	} else {
+		const original = get(originalQueue);
+		if (!original.length) return;
+		const newIndex = original.findIndex((s) => s.id === currentSong.id);
+		updateQueue(original.slice(), newIndex >= 0 ? newIndex : 0, state.source);
+	}
+}
+
+export function toggleLoop() {
+	loopEnabled.update((v) => !v);
 }

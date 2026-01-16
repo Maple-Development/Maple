@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, Slider } from 'm3-svelte';
-	import { activeSong, audioPlayer, curTime, currentDuration } from '$lib/store';
-	import { next, previous, togglePlay, seekTo, setVolumeLevel } from '$lib/player';
+	import { activeSong, audioPlayer, curTime, currentDuration, loopEnabled, shuffleEnabled } from '$lib/store';
+	import { next, previous, togglePlay, seekTo, setVolumeLevel, toggleShuffle, toggleLoop } from '$lib/player';
 	import { OPFS } from '$lib/opfs';
 	import { browser } from '$app/environment';
 
@@ -150,7 +150,7 @@
 			</div>
 			<div class="flex justify-center gap-2">
 				<div>
-					<Button iconType="full" square variant="outlined">
+					<Button iconType="full" square variant={$shuffleEnabled ? 'filled' : 'outlined'} onclick={toggleShuffle}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
 							><path
 								fill="currentColor"
@@ -193,7 +193,7 @@
 					</Button>
 				</div>
 				<div>
-					<Button iconType="full" square variant="outlined">
+					<Button iconType="full" square variant={$loopEnabled ? 'filled' : 'outlined'} onclick={toggleLoop}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
 							><path
 								fill="currentColor"

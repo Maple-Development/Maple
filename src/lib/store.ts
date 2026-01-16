@@ -37,6 +37,9 @@ export const queueState = writable<QueueSnapshot>({
 	currentIndex: -1,
 	source: { type: 'none' }
 });
+export const loopEnabled = writable(true);
+export const shuffleEnabled = writable(false);
+export const originalQueue = writable<Song[]>([]);
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
 export const collapsed = writable(false);
 // let currentTime = $derived($audioPlayer.audio?.currentTime ?? 0);
