@@ -110,7 +110,11 @@ class StatsManager {
 		});
 	}
 
-	recordListeningSeconds(song: Song | null, source: QueueSnapshot['source'] | undefined, seconds: number) {
+	recordListeningSeconds(
+		song: Song | null,
+		source: QueueSnapshot['source'] | undefined,
+		seconds: number
+	) {
 		if (!Number.isFinite(seconds) || seconds <= 0) return;
 		const sourceType = source?.type ?? 'unknown';
 		this.apply((state) => {
