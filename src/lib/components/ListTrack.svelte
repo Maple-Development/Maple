@@ -5,6 +5,8 @@
 	import { refreshLibrary } from '$lib/global.svelte';
 	import { goto } from '$app/navigation';
 	import Lazy from 'svelte-lazy';
+	import { startPlayback } from '$lib/player';
+	import type { QueueSource } from '$lib/store';
 
 	const CONTEXT_MENU_EVENT = 'track-context-menu-open';
 
@@ -19,7 +21,9 @@
 		onDragOver,
 		onDrop,
 		onDragEnd,
-		showDropIndicator = false
+		showDropIndicator = false,
+		playbackContext = [],
+		playbackSource
 	}: {
 		track: Song;
 		index: number;
@@ -32,6 +36,8 @@
 		onDrop?: (e: DragEvent) => void;
 		onDragEnd?: (e: DragEvent) => void;
 		showDropIndicator?: boolean;
+		playbackContext?: Song[];
+		playbackSource?: { type?: QueueSource; id?: string; label?: string };
 	} = $props();
 
 	let showMenu = $state(false);
@@ -54,7 +60,11 @@
 		};
 	}
 
-	function onRowClick() {}
+	function onRowClick() {
+		if (!track) return;
+		const queue = playbackContext.length ? playbackContext : [track];
+		startPlayback(queue.slice(), track.id, playbackSource);
+	}
 
 	function openMenuFromTarget(target: HTMLElement) {
 		const rect = target.getBoundingClientRect();

@@ -136,7 +136,17 @@
 			<ul class="divide-outline-variant divide-y">
 				{#each sortedTracks as track, i (track.id)}
 					<li animate:flip={{ duration: 300, easing: cubicOut }}>
-						<ListTrack {track} index={i + 1} trackNo={track.trackNumber} />
+						<ListTrack
+							{track}
+							index={i + 1}
+							trackNo={track.trackNumber}
+							playbackContext={sortedTracks}
+							playbackSource={{
+								type: 'artist',
+								id: artist?.id,
+								label: artist?.name ?? 'Artist'
+							}}
+						/>
 					</li>
 				{/each}
 			</ul>

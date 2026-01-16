@@ -38,7 +38,11 @@
 >
 	{#each sortedTracks as track (track.id)}
 		<div class="will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
-			<Track track={track as Song} />
+			<Track
+				track={track as Song}
+				queue={sortedTracks}
+				queueSource={{ type: 'tracks', label: 'Tracks' }}
+			/>
 		</div>
 	{/each}
 </div>

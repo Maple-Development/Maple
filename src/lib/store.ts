@@ -4,10 +4,12 @@ import { Socket } from 'socket.io-client';
 import { derived, writable } from 'svelte/store';
 import type { AddedFriend, PendingRequest, Song, User } from '$lib/types';
 
+export type QueueSource = 'none' | 'album' | 'playlist' | 'artist' | 'tracks' | 'recent' | 'custom';
+
 export const pendingRequests = writable([] as PendingRequest[]);
 export const friends = writable([] as AddedFriend[]);
 export const isLoggedIn = writable(false);
-export const friendNowPlaying = writable({} as any);
+export const friendNowPlaying = writable({} as Record<string, unknown>);
 export const socket = writable(null as Socket | null);
 //export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
@@ -22,11 +24,21 @@ UserInfo.subscribe((value) => {
 export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
+export type QueueSnapshot = {
+	items: Song[];
+	currentIndex: number;
+	source: { type: QueueSource; id?: string; label?: string };
+};
+export const queueState = writable<QueueSnapshot>({
+	items: [],
+	currentIndex: -1,
+	source: { type: 'none' }
+});
 let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
 export const collapsed = writable(false);
 // let currentTime = $derived($audioPlayer.audio?.currentTime ?? 0);
-export const curTime = writable([0] as number[]);
-export const setCurTime = writable([0] as number[]);
+export const curTime = writable(0);
+export const setCurTime = writable(0);
 export const hideTips = writable(false);
 hideTips.subscribe((value) => {
 	if (value) {
@@ -69,8 +81,8 @@ export const recentlyPlayedManager = writable({
 	}
 });
 
-let endedHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
-let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
+let endedHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
+let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
 
 export const currentDuration = derived(audioPlayer, ($audioPlayer) => {
 	return $audioPlayer.audio?.duration ?? 0;
@@ -97,8 +109,8 @@ audioPlayer.subscribe((value) => {
 				value.audio.ontimeupdate = () => {
 					currentTime = value.audio?.currentTime ?? 0;
 					if (value.playing) {
-						curTime.set([value.audio?.currentTime ?? currentTime]);
-						setCurTime.set([value.audio?.currentTime ?? currentTime]);
+						curTime.set(value.audio?.currentTime ?? currentTime);
+						setCurTime.set(value.audio?.currentTime ?? currentTime);
 					}
 				};
 
@@ -134,7 +146,7 @@ function createTitle() {
 
 	return {
 		subscribe,
-		set: (value: any) => {
+		set: (value: string) => {
 			set(`${value} • Maple`);
 		},
 		clear: () => {

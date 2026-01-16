@@ -279,6 +279,12 @@
 									showDropIndicator={dropIndex === t.playlistIndex}
 									onRemove={() => removeTrackAt(t.playlistIndex - 1)}
 									draggable={canReorder}
+									playbackContext={displayedTracks}
+									playbackSource={{
+										type: 'playlist',
+										id: playlist?.id,
+										label: playlist?.name ?? 'Playlist'
+									}}
 									onDragStart={(e) => {
 										if (!canReorder) return;
 										dragIndex = t.playlistIndex - 1;

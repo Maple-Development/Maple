@@ -92,13 +92,48 @@ const applyTheme = (settings: ThemeSettings) => {
 	const scheme = settings.isDarkMode ? theme.schemes.dark : theme.schemes.light;
 	const schemeValues = scheme as unknown as Record<string, number>;
 	const neutralPalette = theme.palettes?.neutral;
+	const palettes = theme.palettes;
 	const target = document.documentElement;
-
-	Object.entries(schemeVars).forEach(([cssVar, schemeKey]) => {
-		const value = schemeValues[schemeKey];
+	const setCssVar = (cssVar: string, value?: number) => {
 		if (value !== undefined) {
 			target.style.setProperty(`--m3-scheme-${cssVar}`, toRgb(value));
 		}
+	};
+
+	Object.entries(schemeVars).forEach(([cssVar, schemeKey]) => {
+		setCssVar(cssVar, schemeValues[schemeKey]);
+	});
+
+	const fixedTones: Record<'primary' | 'secondary' | 'tertiary', [string, number][]> = {
+		primary: [
+			['primary-fixed', 90],
+			['on-primary-fixed', 10],
+			['primary-fixed-dim', 80],
+			['on-primary-fixed-variant', 30]
+		],
+		secondary: [
+			['secondary-fixed', 90],
+			['on-secondary-fixed', 10],
+			['secondary-fixed-dim', 80],
+			['on-secondary-fixed-variant', 30]
+		],
+		tertiary: [
+			['tertiary-fixed', 90],
+			['on-tertiary-fixed', 10],
+			['tertiary-fixed-dim', 80],
+			['on-tertiary-fixed-variant', 30]
+		]
+	};
+
+	(['primary', 'secondary', 'tertiary'] as const).forEach((paletteKey) => {
+		const palette = palettes?.[paletteKey];
+		if (!palette?.tone) return;
+		fixedTones[paletteKey].forEach(([cssVar, tone]) => {
+			const schemeKey = schemeVars[cssVar];
+			if (schemeValues[schemeKey] === undefined) {
+				setCssVar(cssVar, palette.tone(tone));
+			}
+		});
 	});
 
 	const surfaceFallbacks = settings.isDarkMode
@@ -125,7 +160,7 @@ const applyTheme = (settings: ThemeSettings) => {
 		Object.entries(surfaceFallbacks).forEach(([cssVar, tone]) => {
 			const schemeKey = schemeVars[cssVar];
 			if (schemeValues[schemeKey] === undefined) {
-				target.style.setProperty(`--m3-scheme-${cssVar}`, toRgb(neutralPalette.tone(tone)));
+				setCssVar(cssVar, neutralPalette.tone(tone));
 			}
 		});
 	}

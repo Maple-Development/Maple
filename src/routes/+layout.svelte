@@ -4,7 +4,7 @@
 	import SideBar from '$lib/components/SideBar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
-	import { isLoggedIn, title } from '$lib/store';
+	import { isLoggedIn, title, loadPreferencesStore } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
 	import { Snackbar } from 'm3-svelte';
@@ -14,6 +14,7 @@
 
 	onMount(async () => {
 		initTheme();
+		loadPreferencesStore.load();
 		const user = await UserManager.checkSession();
 		if (user) {
 			isLoggedIn.set(true);

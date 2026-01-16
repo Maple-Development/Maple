@@ -156,7 +156,7 @@ export class OPFS {
 		}
 	}
 
-	public static async addFile(id: string, file: File, track: Song) {
+	public static async addFile(id: string, file: File) {
 		const fileContent = await file.arrayBuffer();
 		const extension = file.name.split('.').pop();
 		await write(`/tracks/${id}.${extension}`, fileContent);

@@ -133,6 +133,26 @@
 		return sortedTracks.map((t) => ({ kind: 'track', track: t }));
 	});
 
+	let playbackOrder: Song[] = $derived.by(() => {
+		if (groupByDisk) {
+			return renderItems
+				.filter((r) => r.kind === 'track')
+				.map((r) => (r as { kind: 'track'; track: Song }).track);
+		}
+		if (sortKey === 'trackNumber') {
+			return tracks
+				.slice()
+				.sort(
+					(a, b) =>
+						a.disk - b.disk ||
+						a.trackNumber - b.trackNumber ||
+						a.title.localeCompare(b.title) ||
+						a.id.localeCompare(b.id)
+				);
+		}
+		return sortedTracks;
+	});
+
 	$effect(() => {
 		OPFS.get()
 			.album(data.albumId)
@@ -223,6 +243,12 @@
 									? (perDiscIndexById.get(item.track.id) ?? 0)
 									: (globalIndexById.get(item.track.id) ?? 0)}
 								trackNo={item.track.trackNumber}
+								playbackContext={playbackOrder}
+								playbackSource={{
+									type: 'album',
+									id: album?.id,
+									label: album?.name ?? 'Album'
+								}}
 							/>
 						{/if}
 					</li>

@@ -73,7 +73,7 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 						await OPFS.addAlbum(album, track.id);
 						await OPFS.addArtist(artist, track.id, track.album);
 						await OPFS.addTrack(track);
-						await OPFS.addFile(track.id, file, track);
+						await OPFS.addFile(track.id, file);
 					} catch (error) {
 						console.error(`Error processing file ${file.name}:`, error);
 					}

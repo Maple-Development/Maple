@@ -7,6 +7,8 @@
 	import { goto } from '$app/navigation';
 	import { refreshLibrary } from '$lib/global.svelte';
 	import { v4 as uuidv4 } from 'uuid';
+	import { startPlayback } from '$lib/player';
+	import type { QueueSource } from '$lib/store';
 
 	const DEFAULT_PLACEHOLDER =
 		'https://raw.githubusercontent.com/Cattn/Maple/8c1ab06960d3cec36714bf99cd6cee4ebb53913a/static/temp/MapleD.svg';
@@ -26,13 +28,17 @@
 		playlist,
 		album,
 		artist,
-		type = 'track'
+		type = 'track',
+		queue = [],
+		queueSource
 	}: {
 		track?: Song;
 		playlist?: Playlist;
 		album?: Album;
 		artist?: Artist;
 		type?: string;
+		queue?: Song[];
+		queueSource?: { type?: QueueSource; id?: string; label?: string };
 	} = $props();
 
 	const USE_ARTIST_SVG = true;
@@ -256,7 +262,9 @@
 
 	function handleTrackClick() {
 		if (type === 'track') {
-			// play later
+			if (!track) return;
+			const queueItems = queue.length ? queue : [track];
+			startPlayback(queueItems.slice(), track.id, queueSource);
 		} else if (type === 'playlist') {
 			goto(`/playlists/playlist/${playlist?.id}`);
 		} else if (type === 'album') {
