@@ -146,10 +146,10 @@ Maple was inspired by various experiences, such as being on a plane without inte
 
 ## Credits
 
-### Lead & Only Developer
+### Lead Developer
 
 - Cattn
 
-### Logos & Branding
+### Logos & Various Help
 
-- Nailington
+- Nailington ([@Nailington](https://github.com/Nailington))
