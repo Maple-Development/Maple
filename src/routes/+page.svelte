@@ -3,6 +3,7 @@
 	import Track from '$lib/components/Track.svelte';
 	import { onMount } from 'svelte';
 	import { title, recentlyPlayed } from '$lib/store';
+	import { createLibrary } from '$lib/library';
 
 	let recent = $derived($recentlyPlayed.filter(Boolean));
 
@@ -20,7 +21,7 @@
 					Maple is a music library and organization tool. It allows you to upload your music library
 					and watch it be organized into albums, artists, playlists, and more! Start by uploading
 					your music library
-					<a href="/upload" class="text-class text-primary">here!</a>
+					<a href="/" class="text-class text-primary" onclick={() => createLibrary()}>here!</a>
 				</p>
 			</div>
 		</Card>
