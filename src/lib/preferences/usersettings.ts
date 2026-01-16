@@ -28,6 +28,14 @@ socket = preferences.get('socket') !== null ? preferences.get('socket') : socket
 jellyfinMode =
 	preferences.get('jellyfinMode') !== null ? preferences.get('jellyfinMode') : jellyfinMode;
 
+let sourceColor = '#8f4a4c';
+let isDarkMode = false;
+let themeSettings = new Settings('theme');
+sourceColor =
+	themeSettings.get('sourceColor') !== null ? themeSettings.get('sourceColor') : sourceColor;
+isDarkMode =
+	themeSettings.get('isDarkMode') !== null ? themeSettings.get('isDarkMode') : isDarkMode;
+
 const UserSettings = {
 	webhook: {
 		enabled: webhookEnabled,
@@ -39,6 +47,10 @@ const UserSettings = {
 		showLogging,
 		socket,
 		jellyfinMode
+	},
+	theme: {
+		sourceColor,
+		isDarkMode
 	},
 	discord: {
 		enabled: discord

@@ -18,7 +18,7 @@ export class Settings {
 		}
 	}
 
-	set(key: string, value: any) {
+	set(key: string, value: unknown) {
 		if (browser) {
 			localStorage.setItem(`${this.type}.${key}`, JSON.stringify(value));
 		}

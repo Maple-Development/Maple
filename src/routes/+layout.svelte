@@ -8,10 +8,12 @@
 	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
 	import { Snackbar } from 'm3-svelte';
+	import { initTheme } from '$lib/theme/theme';
 
 	let { children, data } = $props();
 
 	onMount(async () => {
+		initTheme();
 		const user = await UserManager.checkSession();
 		if (user) {
 			isLoggedIn.set(true);

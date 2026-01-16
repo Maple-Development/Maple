@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { Card, Button } from 'm3-svelte';
+	import ColorPicker from 'svelte-awesome-color-picker';
 	import { isLoggedIn, UserInfo, SavedUser } from '$lib/store';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	import { title } from '$lib/store';
+	import { themeSettings, setThemeSettings, persistThemeSettings } from '$lib/theme/theme';
 
 	let name = $state('');
 	let initialName = $state('');
@@ -22,9 +25,38 @@
 	let initialLoggingEnabled = $state(false);
 	let developerModeEnabled = $state(false);
 	let initialDeveloperModeEnabled = $state(false);
+	const initialTheme = get(themeSettings);
+	let themeSourceColor = $state<string | null>(initialTheme.sourceColor);
+	let initialThemeSourceColor = $state(initialTheme.sourceColor);
+	let themeDarkMode = $state(initialTheme.isDarkMode);
+	let initialThemeDarkMode = $state(initialTheme.isDarkMode);
+	let themePreviewColor = $derived(themeSourceColor ?? initialThemeSourceColor);
+	let themeInitialized = false;
 	$effect(() => {
 		name = $UserInfo?.name ?? '';
 		initialName = $UserInfo?.name ?? '';
+	});
+
+	$effect(() => {
+		const { sourceColor, isDarkMode } = $themeSettings;
+		if (!themeInitialized) {
+			themeSourceColor = sourceColor;
+			themeDarkMode = isDarkMode;
+			initialThemeSourceColor = sourceColor;
+			initialThemeDarkMode = isDarkMode;
+			themeInitialized = true;
+			return;
+		}
+		themeSourceColor = sourceColor;
+		themeDarkMode = isDarkMode;
+	});
+
+	$effect(() => {
+		if (themeSourceColor) {
+			setThemeSettings({ sourceColor: themeSourceColor, isDarkMode: themeDarkMode });
+		} else {
+			setThemeSettings({ isDarkMode: themeDarkMode });
+		}
 	});
 
 	let hasChanges = $derived(
@@ -36,8 +68,17 @@
 			socketCommunicationEnabled !== initialSocketCommunicationEnabled ||
 			jellyfinModeEnabled !== initialJellyfinModeEnabled ||
 			loggingEnabled !== initialLoggingEnabled ||
-			developerModeEnabled !== initialDeveloperModeEnabled
+			developerModeEnabled !== initialDeveloperModeEnabled ||
+			themePreviewColor !== initialThemeSourceColor ||
+			themeDarkMode !== initialThemeDarkMode
 	);
+
+	const saveChanges = () => {
+		const sourceColor = themePreviewColor;
+		persistThemeSettings({ sourceColor, isDarkMode: themeDarkMode });
+		initialThemeSourceColor = sourceColor;
+		initialThemeDarkMode = themeDarkMode;
+	};
 
 	onMount(async () => {
 		title.set('Settings');
@@ -52,7 +93,7 @@
 				<h1 class="text-4xl font-black">Account</h1>
 				<p class="text-on-surface-variant text-sm">Manage your Maple account.</p>
 			</div>
-			<Button variant="filled" disabled={!hasChanges}>Save changes</Button>
+			<Button variant="filled" disabled={!hasChanges} onclick={saveChanges}>Save changes</Button>
 		</div>
 
 		<div class="grid grid-cols-1 gap-6">
@@ -160,6 +201,54 @@
 
 				<Card variant="outlined" class="flex flex-col gap-6 p-6">
 					<div class="flex flex-col gap-5">
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">Theme</p>
+							</div>
+							<div class="flex flex-col gap-4">
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">Use dark mode</p>
+										<p class="text-on-surface-variant text-xs">Save your eyes.</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input type="checkbox" class="peer sr-only" bind:checked={themeDarkMode} />
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+								<div class="flex flex-col gap-3">
+									<div class="flex items-start justify-between gap-4">
+										<div class="flex flex-col gap-1">
+											<p class="text-on-surface-variant text-sm font-semibold">Theme color</p>
+											<p class="text-on-surface-variant text-xs">
+												Select the color that drives the system theme.
+											</p>
+										</div>
+										<div
+											class="ring-outline/50 h-8 w-8 rounded-full ring-1"
+											style={`background-color: ${themePreviewColor};`}
+										></div>
+									</div>
+									<div class="bg-surface ring-outline/50 rounded-xl p-2 ring-1">
+										<ColorPicker
+											hex={themeSourceColor}
+											onInput={(event) => {
+												themeSourceColor = event.hex;
+											}}
+											isAlpha={false}
+											isDialog={false}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div
 							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
 						>
