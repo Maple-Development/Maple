@@ -8,6 +8,7 @@
 	let artwork = $state(null as string | null);
 	let progress = $state(0);
 	let volume = $state(100);
+	let lastVolume = $state(100);
 	let duration = $state(0);
 	let paused = $state(true);
 	let fillPercent = $state(0);
@@ -47,6 +48,13 @@
 
 	$effect(() => {
 		volume = $audioPlayer.volume ?? volume;
+	});
+
+	$effect(() => {
+		if (!browser) return;
+		if (volume === lastVolume) return;
+		lastVolume = volume;
+		setVolumeLevel(volume);
 	});
 
 	function formatTime(seconds: number) {

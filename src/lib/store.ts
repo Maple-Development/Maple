@@ -1,8 +1,11 @@
 import { browser } from '$app/environment';
 //import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import type { AddedFriend, PendingRequest, Song, User } from '$lib/types';
+import { stats, statsManager } from './stats';
+export { stats, statsManager };
+import { OPFS } from '$lib/opfs';
 
 export type QueueSource = 'none' | 'album' | 'playlist' | 'artist' | 'tracks' | 'recent' | 'custom';
 
@@ -89,6 +92,8 @@ export const currentDuration = derived(audioPlayer, ($audioPlayer) => {
 });
 
 let currentTime = 0;
+let lastListenTime = 0;
+let lastListenSongId = '';
 
 audioPlayer.subscribe((value) => {
 	if (browser) {
@@ -111,6 +116,21 @@ audioPlayer.subscribe((value) => {
 					if (value.playing) {
 						curTime.set(value.audio?.currentTime ?? currentTime);
 						setCurTime.set(value.audio?.currentTime ?? currentTime);
+					}
+					const song = get(activeSong);
+					const state = get(queueState);
+					if (value.playing && song?.id) {
+						if (song.id !== lastListenSongId) {
+							lastListenSongId = song.id;
+							lastListenTime = value.audio?.currentTime ?? 0;
+						} else {
+							const nextTime = value.audio?.currentTime ?? 0;
+							const delta = nextTime - lastListenTime;
+							lastListenTime = nextTime;
+							if (delta > 0 && delta <= 2.5) {
+								statsManager.recordListeningSeconds(song, state.source, delta);
+							}
+						}
 					}
 				};
 
@@ -186,3 +206,24 @@ if (browser) {
 		UserInfo.set(JSON.parse(storedUserInfo));
 	}
 }
+
+let statsReady = false;
+const loadStats = async () => {
+	if (!browser) return;
+	const stored = await OPFS.getStats();
+	if (stored) {
+		stats.set(stored);
+	}
+	statsReady = true;
+};
+loadStats();
+
+stats.subscribe((value) => {
+	if (browser && statsReady) {
+		OPFS.saveStats(value);
+	}
+});
+
+friends.subscribe((value) => {
+	statsManager.setFriendsCount(value.length);
+});

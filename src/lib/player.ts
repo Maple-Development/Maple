@@ -13,6 +13,7 @@ import {
 	setCurTime,
 	socket
 } from '$lib/store';
+import { statsManager } from '$lib/stats';
 import type { QueueSnapshot } from '$lib/store';
 import UserSettings from '$lib/preferences/usersettings';
 
@@ -52,6 +53,7 @@ async function playAtIndex(index: number) {
 	const song = state.items[normalized];
 	updateQueue(state.items, normalized, state.source);
 	activeSong.set(song);
+	statsManager.recordPlay(song, state.source);
 	get(recentlyPlayedManager).add(song);
 	const buffer = await OPFS.getSong(song);
 	if (!buffer) return;
@@ -90,22 +92,31 @@ export async function startPlayback(
 		id: source?.id,
 		label: source?.label
 	});
+	statsManager.recordQueueStart(get(queueState).source, queue.length);
 	await playAtIndex(startIndex);
 }
 
 export async function next() {
 	const state = get(queueState);
 	if (!state.items.length) return;
+	statsManager.recordSkip();
 	await playAtIndex(state.currentIndex + 1);
 }
 
 export async function previous() {
 	const state = get(queueState);
 	if (!state.items.length) return;
+	statsManager.recordSkip();
 	await playAtIndex(state.currentIndex - 1);
 }
 
 export function togglePlay() {
+	const state = get(audioPlayer);
+	if (state.playing) {
+		statsManager.recordPause();
+	} else {
+		statsManager.recordResume();
+	}
 	audioPlayer.update((value) => {
 		if (value.audio instanceof HTMLAudioElement) {
 			if (value.playing) {

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Song, Album, Artist } from '$lib/types';
 import UserSettings from '$lib/preferences/usersettings';
 import { refreshLibrary } from '$lib/global.svelte';
+import { statsManager } from '$lib/stats';
 
 declare global {
 	//prob fixes annoying ts warnings
@@ -74,12 +75,15 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 						await OPFS.addArtist(artist, track.id, track.album);
 						await OPFS.addTrack(track);
 						await OPFS.addFile(track.id, file);
+						statsManager.recordLibraryAdd(track.id);
 					} catch (error) {
 						console.error(`Error processing file ${file.name}:`, error);
 					}
 				}
 			}
 			await refreshLibrary();
+			const tracks = await OPFS.get().tracks();
+			statsManager.setLibrarySize(tracks.length);
 			toast.success(`Library added successfully!`);
 		};
 

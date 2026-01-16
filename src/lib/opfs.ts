@@ -1,4 +1,5 @@
 import type { Album, Artist, Playlist, Song } from '$lib/types';
+import type { StatsSnapshot } from '$lib/stats';
 import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
 export class OPFS {
@@ -6,6 +7,7 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
+	private static statsCache: StatsSnapshot | null = null;
 	private static imageUrlCache: Map<string, string> = new Map();
 	private static SERVER = 'https://api.maple.music';
 
@@ -24,6 +26,13 @@ export class OPFS {
 		await write(path, JSON.stringify(cache));
 	}
 
+	private static async ensureConfigDir() {
+		const exists = await dir('/config').exists();
+		if (!exists) {
+			await dir('/config').create();
+		}
+	}
+
 	public static async initializeLibrary() {
 		const paths = ['albums', 'artists', 'tracks', 'playlists', 'config', 'images'].map(
 			(p) => `/${p}`
@@ -33,6 +42,7 @@ export class OPFS {
 			{ path: '/albums/albums.json', content: '' },
 			{ path: '/artists/artists.json', content: '' },
 			{ path: '/config/config.json', content: '' },
+			{ path: '/config/stats.json', content: '' },
 			{ path: '/tracks/tracks.json', content: '' }
 		];
 
@@ -90,6 +100,27 @@ export class OPFS {
 		const url = URL.createObjectURL(blob);
 		this.imageUrlCache.set(path, url);
 		return url;
+	}
+
+	public static async getStats() {
+		if (this.statsCache) return this.statsCache;
+		try {
+			const content = await file('/config/stats.json').text();
+			const parsed = JSON.parse(content || 'null');
+			if (parsed && typeof parsed === 'object') {
+				this.statsCache = parsed as StatsSnapshot;
+				return this.statsCache;
+			}
+		} catch {
+			return null;
+		}
+		return null;
+	}
+
+	public static async saveStats(snapshot: StatsSnapshot) {
+		await this.ensureConfigDir();
+		this.statsCache = snapshot;
+		await write('/config/stats.json', JSON.stringify(snapshot));
 	}
 
 	public static async addAlbum(album: Album, id: string) {
@@ -421,13 +452,13 @@ export class OPFS {
 				await file(`/tracks/${track.id}.${track.ext}`).remove();
 				await file(`/images/${track.id}.image`).remove();
 
-				async function removeTrackFromCollections(
+				async function removeTrackFromCollections<T extends Album | Artist | Playlist>(
 					trackId: string,
-					collections: any[],
-					editFn: (item: any) => Promise<void>
+					collections: T[],
+					editFn: (item: T) => Promise<void>
 				) {
 					for (const item of collections) {
-						const index = item.tracks?.findIndex((t: string) => t === trackId);
+						const index = item.tracks?.findIndex((t) => t === trackId);
 						if (index !== undefined && index !== -1) {
 							item.tracks?.splice(index, 1);
 							await editFn(item);
