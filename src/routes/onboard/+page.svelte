@@ -1,8 +1,17 @@
 <script lang="ts">
-	import { Button } from 'm3-svelte';
-	import { Card } from 'm3-svelte';
+	import { Button, Card } from 'm3-svelte';
 	import { goto } from '$app/navigation';
 	import { createLibrary } from '$lib/library';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { title } from '$lib/store';
+
+	onMount(() => {
+		title.set('Welcome');
+		if (browser) {
+			localStorage.setItem('hasOnboarded', 'true');
+		}
+	});
 </script>
 
 <div class="flex min-h-[70vh] flex-col items-center justify-center px-6 py-8">

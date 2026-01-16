@@ -9,12 +9,23 @@
 	import { onMount } from 'svelte';
 	import { Snackbar } from 'm3-svelte';
 	import { initTheme } from '$lib/theme/theme';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 
 	let { children, data } = $props();
 
 	onMount(async () => {
 		initTheme();
 		loadPreferencesStore.load();
+
+		const hasOnboarded = localStorage.getItem('hasOnboarded');
+		const currentPath = $page.url.pathname;
+		const excludedPaths = ['/onboard', '/login', '/register'];
+		if (!hasOnboarded && !excludedPaths.includes(currentPath)) {
+			goto('/onboard');
+		}
+
 		const user = await UserManager.checkSession();
 		if (user) {
 			isLoggedIn.set(true);
