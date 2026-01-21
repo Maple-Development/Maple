@@ -19,6 +19,8 @@
 	} from '$lib/player';
 	import { OPFS } from '$lib/opfs';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
+	import Queue from './Queue.svelte';
 
 	let artwork = $state(null as string | null);
 	let progress = $state(0);
@@ -29,6 +31,12 @@
 	let fillPercent = $state(0);
 	let trackEl: HTMLDivElement | null = null;
 	let dragging = $state(false);
+	let queueOpen = $state(false);
+
+	$effect(() => {
+		page.url.pathname;
+		queueOpen = false;
+	});
 
 	$effect(() => {
 		if (!browser) return;
@@ -112,7 +120,9 @@
 		dragging = false;
 	}
 
-	function openQueue() {}
+	function openQueue() {
+		queueOpen = !queueOpen;
+	}
 </script>
 
 <div
@@ -232,7 +242,7 @@
 			</div>
 			<div class="mr-6 flex items-center justify-end">
 				<div>
-					<Button iconType="full" square variant={'tonal'} onclick={openQueue}>
+					<Button iconType="full" square variant={queueOpen ? 'filled' : 'tonal'} onclick={openQueue}>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 							><path
 								fill="currentColor"
@@ -281,6 +291,10 @@
 		</div>
 	</div>
 </div>
+
+{#if queueOpen}
+	<Queue />
+{/if}
 
 <style>
 	.song-title {
