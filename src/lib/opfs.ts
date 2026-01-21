@@ -122,10 +122,12 @@ export class OPFS {
 	public static async saveStats(snapshot: StatsSnapshot) {
 		this.statsCache = snapshot;
 		const currentQueue = this.saveStatsQueue;
-		this.saveStatsQueue = currentQueue.then(async () => {
-			await this.ensureConfigDir();
-			await write('/config/stats.json', JSON.stringify(snapshot));
-		}).catch(() => {});
+		this.saveStatsQueue = currentQueue
+			.then(async () => {
+				await this.ensureConfigDir();
+				await write('/config/stats.json', JSON.stringify(snapshot));
+			})
+			.catch(() => {});
 		await this.saveStatsQueue;
 	}
 
