@@ -52,7 +52,7 @@ async function sendWebhook(song: Song) {
 		const imageBuffer = await image.arrayBuffer();
 		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
 		await UserManager.setAlbumArt(imageFile);
-		await new Promise(resolve => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, 100));
 
 		const user = get(SavedUser);
 		const formData = new FormData();
