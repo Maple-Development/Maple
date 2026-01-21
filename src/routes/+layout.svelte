@@ -17,8 +17,6 @@
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 	import { SERVER } from '$lib/api/server';
 
-
-
 	let { children, data } = $props();
 
 	onMount(async () => {

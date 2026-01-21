@@ -16,14 +16,10 @@
 			<button
 				type="button"
 				onclick={() => goto('/settings')}
-				class="bg-primary text-on-primary hover:bg-primary/90 flex h-12 w-12 items-center justify-center rounded-full transition-colors cursor-pointer"
+				class="bg-primary text-on-primary hover:bg-primary/90 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full transition-colors"
 			>
 				{#if $SavedUser?.pfp}
-					<img
-						src={$SavedUser.pfp}
-						alt="Profile"
-						class="h-12 w-12 rounded-full object-cover"
-					/>
+					<img src={$SavedUser.pfp} alt="Profile" class="h-12 w-12 rounded-full object-cover" />
 				{:else}
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 						<path

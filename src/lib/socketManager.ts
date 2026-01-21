@@ -16,16 +16,14 @@ export const socketManager = () => {
 		socket?.on('friendRequest', async (data) => {
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
-			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')',
-				{
-					action: {
-						label: 'Accept',
-						onClick: () => {
-							UserManager.acceptRequest(id);
-						}
-					},
+			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')', {
+				action: {
+					label: 'Accept',
+					onClick: () => {
+						UserManager.acceptRequest(id);
+					}
 				}
-			);
+			});
 			refreshRequests();
 		});
 
@@ -46,11 +44,11 @@ export const socketManager = () => {
 			refreshRequests();
 		});
 
-		socket?.on("acceptedRequest", async (data) => {
+		socket?.on('acceptedRequest', async (data) => {
 			console.log(data);
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
-			toast.success('You are now friends with '+ friend.name + ' (' + friend.username + ')!');
+			toast.success('You are now friends with ' + friend.name + ' (' + friend.username + ')!');
 			refreshFriends();
 			refreshRequests();
 		});
