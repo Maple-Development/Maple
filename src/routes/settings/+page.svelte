@@ -1,27 +1,41 @@
 <script lang="ts">
 	import { Card, Button } from 'm3-svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
-	import { isLoggedIn, UserInfo, SavedUser } from '$lib/store';
+	import { isLoggedIn, UserInfo, SavedUser, socket } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { title } from '$lib/store';
 	import { themeSettings, setThemeSettings, persistThemeSettings } from '$lib/theme/theme';
 	import { UserManager } from '$lib/api/UserManager';
+	import UserSettings from '$lib/preferences/usersettings';
+	import { Settings } from '$lib/preferences/fetch';
+	import { io } from 'socket.io-client';
+	import { SERVER } from '$lib/api/server';
+	import { socketManager } from '$lib/socketManager';
+	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 
 	let name = $state('');
 	let initialName = $state('');
-	let webhookEnabled = $state(false);
-	let initialWebhookEnabled = $state(false);
-	let webhookUrl = $state('');
-	let initialWebhookUrl = $state('');
-	let discordRpcEnabled = $state(false);
-	let initialDiscordRpcEnabled = $state(false);
+	const webhookSettings = new Settings('webhook');
+	const initialWebhookEnabledValue = webhookSettings.get('enabled') !== null ? webhookSettings.get('enabled') : false;
+	let webhookEnabled = $state(initialWebhookEnabledValue);
+	let initialWebhookEnabled = $state(initialWebhookEnabledValue);
+	const initialWebhookUrlValue = webhookSettings.get('url') !== null ? webhookSettings.get('url') : '';
+	let webhookUrl = $state(initialWebhookUrlValue);
+	let initialWebhookUrl = $state(initialWebhookUrlValue);
+	const discordSettings = new Settings('discord');
+	const initialDiscordRpcValue = discordSettings.get('enabled') !== null ? discordSettings.get('enabled') : false;
+	let discordRpcEnabled = $state(initialDiscordRpcValue);
+	let initialDiscordRpcEnabled = $state(initialDiscordRpcValue);
 	let p2pTransfersEnabled = $state(true);
 	let initialP2pTransfersEnabled = $state(true);
-	let socketCommunicationEnabled = $state(true);
-	let initialSocketCommunicationEnabled = $state(true);
-	let jellyfinModeEnabled = $state(false);
-	let initialJellyfinModeEnabled = $state(false);
+	const preferencesSettings = new Settings('preferences');
+	const initialSocketValue = preferencesSettings.get('socket') !== null ? preferencesSettings.get('socket') : true;
+	let socketCommunicationEnabled = $state(initialSocketValue);
+	let initialSocketCommunicationEnabled = $state(initialSocketValue);
+	const initialJellyfinValue = preferencesSettings.get('jellyfinMode') !== null ? preferencesSettings.get('jellyfinMode') : false;
+	let jellyfinModeEnabled = $state(initialJellyfinValue);
+	let initialJellyfinModeEnabled = $state(initialJellyfinValue);
 	let loggingEnabled = $state(false);
 	let initialLoggingEnabled = $state(false);
 	let developerModeEnabled = $state(false);
@@ -115,6 +129,62 @@
 				return;
 			}
 			initialName = name;
+		}
+
+		if (socketCommunicationEnabled !== initialSocketCommunicationEnabled) {
+			preferencesSettings.set('socket', socketCommunicationEnabled);
+			UserSettings.preferences.socket = socketCommunicationEnabled;
+			
+			const currentSocket = get(socket);
+			const isLoggedInValue = get(isLoggedIn);
+			
+			if (socketCommunicationEnabled) {
+				if (!isLoggedInValue) {
+					socketCommunicationEnabled = false;
+					initialSocketCommunicationEnabled = false;
+					return;
+				}
+				if (!currentSocket || !currentSocket.connected) {
+					const io2 = io(`${SERVER}`, {
+						withCredentials: true
+					});
+					socket.set(io2);
+					const newSocket = get(socket);
+					newSocket?.on('connect', () => {
+						console.log('Connected to server');
+					});
+					socketManager();
+					refreshFriends();
+					refreshRequests();
+				}
+			} else {
+				if (currentSocket) {
+					currentSocket.disconnect();
+					socket.set(null);
+				}
+			}
+			initialSocketCommunicationEnabled = socketCommunicationEnabled;
+		}
+
+		if (jellyfinModeEnabled !== initialJellyfinModeEnabled) {
+			preferencesSettings.set('jellyfinMode', jellyfinModeEnabled);
+			UserSettings.preferences.jellyfinMode = jellyfinModeEnabled;
+			initialJellyfinModeEnabled = jellyfinModeEnabled;
+		}
+
+		if (webhookEnabled !== initialWebhookEnabled || webhookUrl !== initialWebhookUrl) {
+			webhookSettings.set('enabled', webhookEnabled);
+			webhookSettings.set('url', webhookUrl);
+			UserSettings.webhook.enabled = webhookEnabled;
+			UserSettings.webhook.url = webhookUrl;
+			initialWebhookEnabled = webhookEnabled;
+			initialWebhookUrl = webhookUrl;
+		}
+
+		if (discordRpcEnabled !== initialDiscordRpcEnabled) {
+			discordSettings.set('enabled', discordRpcEnabled);
+			UserSettings.discord.enabled = discordRpcEnabled;
+			initialDiscordRpcEnabled = discordRpcEnabled;
 		}
 
 		const sourceColor = themePreviewColor;

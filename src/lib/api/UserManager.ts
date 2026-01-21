@@ -300,4 +300,34 @@ export class UserManager {
 			return console.error('Error:', error);
 		}
 	};
+
+	public static setAlbumArt = async (file: File) => {
+		try {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const formData = new FormData();
+			formData.append('albumArt', file);
+
+			const response = await fetch(`${SERVER}/user/manage/setAlbumArt/${userId}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: formData
+			});
+
+			if (response.ok) {
+				return { success: true };
+			}
+			const data = await response.json();
+			return { error: data.error || 'Failed to update album art' };
+		} catch (e) {
+			console.error('Error:', e);
+			return { error: 'Failed to update album art' };
+		}
+	};
+
+	public static isLoggedIn = async () => {
+		const userId = get(UserInfo)?.id;
+		return !!userId;
+	};
 }

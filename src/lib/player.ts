@@ -19,6 +19,7 @@ import {
 import { statsManager } from '$lib/stats';
 import type { QueueSnapshot } from '$lib/store';
 import UserSettings from '$lib/preferences/usersettings';
+import { UserManager } from './api/UserManager';
 
 type QueueSourceState = QueueSnapshot['source'];
 
@@ -29,6 +30,72 @@ function updateQueue(items: Song[], index: number, source?: QueueSourceState) {
 		source: source ?? { type: 'custom', id: undefined, label: undefined }
 	});
 	context.set(items);
+}
+
+async function getImageFile(imagePath: string): Promise<File> {
+	const response = await OPFS.get().image(imagePath);
+	const arrayBuffer = await response.arrayBuffer();
+	return new File([arrayBuffer], imagePath, { type: 'image/jpeg' });
+}
+
+async function sendWebhook(song: Song) {
+	if (!UserSettings.webhook.enabled || !UserSettings.webhook.url) return;
+
+	const isLoggedIn = await UserManager.isLoggedIn();
+	if (!isLoggedIn) return;
+
+	if (!song.image || typeof song.image !== 'string') return;
+	const imagePath: string = song.image;
+
+	try {
+		const image = await getImageFile(imagePath);
+		const imageBuffer = await image.arrayBuffer();
+		const imageFile = new File([imageBuffer], 'album.jpg', { type: 'image/jpeg' });
+		await UserManager.setAlbumArt(imageFile);
+		await new Promise(resolve => setTimeout(resolve, 100));
+
+		const user = get(SavedUser);
+		const formData = new FormData();
+		formData.append('file', image, 'album.jpg');
+		formData.append(
+			'payload_json',
+			JSON.stringify({
+				embeds: [
+					{
+						title: 'Now Playing',
+						description: `**${song.title}** by ${song.artist}`,
+						color: 0x8f4a4c,
+						fields: [
+							{
+								name: 'Album',
+								value: song.album
+							},
+							{
+								name: 'Year',
+								value: song.year ? song.year.toString() : 'N/A'
+							},
+							{
+								name: 'Track Number',
+								value: song.trackNumber ? song.trackNumber.toString() : 'N/A'
+							}
+						],
+						image: {
+							url: 'attachment://album.jpg'
+						}
+					}
+				],
+				username: user?.name || 'Maple User',
+				avatar_url: `https://api.maple.music/public/get/pfp/${user?.id}`
+			})
+		);
+
+		await fetch(UserSettings.webhook.url, {
+			method: 'POST',
+			body: formData
+		});
+	} catch (error) {
+		console.error('Error sending webhook:', error);
+	}
 }
 
 async function emitNowPlaying(song: Song) {
@@ -46,6 +113,7 @@ async function emitNowPlaying(song: Song) {
 		source: 'Web'
 	};
 	s.emit('nowPlaying', { nowPlaying: payload });
+	await sendWebhook(song);
 }
 
 async function playAtIndex(index: number) {
