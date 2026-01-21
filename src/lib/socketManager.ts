@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { socket as importedSocket } from '$lib/store';
+import { socket as importedSocket, friends } from '$lib/store';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 import { UserManager } from './api/UserManager';
@@ -56,8 +56,23 @@ export const socketManager = () => {
 		socket?.on('nowPlaying', async (data) => {
 			console.log('[CLIENT] Received nowPlaying event:', data);
 			console.log('[CLIENT] Current socket ID:', socket?.id);
-			refreshFriends();
-			refreshRequests();
+			if (data.id && data.nowPlaying) {
+				friends.update((currentFriends) => {
+					return currentFriends.map((friend) => {
+						if (friend.id === data.id) {
+							return {
+								...friend,
+								nowPlaying: {
+									title: data.nowPlaying.title,
+									artist: data.nowPlaying.artist,
+									album: data.nowPlaying.album
+								}
+							};
+						}
+						return friend;
+					});
+				});
+			}
 		});
 	}
 };

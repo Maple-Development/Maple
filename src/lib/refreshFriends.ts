@@ -30,12 +30,31 @@ async function sortFriends(unsorted: FriendRelation[]) {
 		const friendData = await UserManager.getUserbyId(friend.friend_id);
 		if (!friendData) continue;
 		seenIds.add(friendData.id);
+		let nowPlaying = friendData.nowPlaying;
+		if (nowPlaying && typeof nowPlaying === 'string') {
+			try {
+				nowPlaying = JSON.parse(nowPlaying);
+			} catch (error) {
+				console.error('Error parsing nowPlaying:', error);
+				nowPlaying = null;
+			}
+		}
+		let nowPlayingFormatted = undefined;
+		if (nowPlaying && typeof nowPlaying === 'object' && nowPlaying !== null) {
+			if (nowPlaying.title || nowPlaying.artist || nowPlaying.album) {
+				nowPlayingFormatted = {
+					title: nowPlaying.title || '',
+					artist: nowPlaying.artist || '',
+					album: nowPlaying.album || ''
+				};
+			}
+		}
 		const newFriend: AddedFriend = {
 			id: friendData.id,
 			name: friendData.name,
 			username: friendData.username,
 			pfp: friendData.pfp,
-			nowPlaying: friendData.nowPlaying
+			nowPlaying: nowPlayingFormatted
 		};
 		friendsList.push(newFriend);
 	}

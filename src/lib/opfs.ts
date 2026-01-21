@@ -102,6 +102,8 @@ export class OPFS {
 		return url;
 	}
 
+	private static saveStatsQueue: Promise<void> = Promise.resolve();
+
 	public static async getStats() {
 		if (this.statsCache) return this.statsCache;
 		try {
@@ -118,9 +120,13 @@ export class OPFS {
 	}
 
 	public static async saveStats(snapshot: StatsSnapshot) {
-		await this.ensureConfigDir();
 		this.statsCache = snapshot;
-		await write('/config/stats.json', JSON.stringify(snapshot));
+		const currentQueue = this.saveStatsQueue;
+		this.saveStatsQueue = currentQueue.then(async () => {
+			await this.ensureConfigDir();
+			await write('/config/stats.json', JSON.stringify(snapshot));
+		}).catch(() => {});
+		await this.saveStatsQueue;
 	}
 
 	public static async addAlbum(album: Album, id: string) {
