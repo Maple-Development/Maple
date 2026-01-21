@@ -17,23 +17,30 @@
 	let name = $state('');
 	let initialName = $state('');
 	const webhookSettings = new Settings('webhook');
-	const initialWebhookEnabledValue = webhookSettings.get('enabled') !== null ? webhookSettings.get('enabled') : false;
+	const initialWebhookEnabledValue =
+		webhookSettings.get('enabled') !== null ? webhookSettings.get('enabled') : false;
 	let webhookEnabled = $state(initialWebhookEnabledValue);
 	let initialWebhookEnabled = $state(initialWebhookEnabledValue);
-	const initialWebhookUrlValue = webhookSettings.get('url') !== null ? webhookSettings.get('url') : '';
+	const initialWebhookUrlValue =
+		webhookSettings.get('url') !== null ? webhookSettings.get('url') : '';
 	let webhookUrl = $state(initialWebhookUrlValue);
 	let initialWebhookUrl = $state(initialWebhookUrlValue);
 	const discordSettings = new Settings('discord');
-	const initialDiscordRpcValue = discordSettings.get('enabled') !== null ? discordSettings.get('enabled') : false;
+	const initialDiscordRpcValue =
+		discordSettings.get('enabled') !== null ? discordSettings.get('enabled') : false;
 	let discordRpcEnabled = $state(initialDiscordRpcValue);
 	let initialDiscordRpcEnabled = $state(initialDiscordRpcValue);
 	let p2pTransfersEnabled = $state(true);
 	let initialP2pTransfersEnabled = $state(true);
 	const preferencesSettings = new Settings('preferences');
-	const initialSocketValue = preferencesSettings.get('socket') !== null ? preferencesSettings.get('socket') : true;
+	const initialSocketValue =
+		preferencesSettings.get('socket') !== null ? preferencesSettings.get('socket') : true;
 	let socketCommunicationEnabled = $state(initialSocketValue);
 	let initialSocketCommunicationEnabled = $state(initialSocketValue);
-	const initialJellyfinValue = preferencesSettings.get('jellyfinMode') !== null ? preferencesSettings.get('jellyfinMode') : false;
+	const initialJellyfinValue =
+		preferencesSettings.get('jellyfinMode') !== null
+			? preferencesSettings.get('jellyfinMode')
+			: false;
 	let jellyfinModeEnabled = $state(initialJellyfinValue);
 	let initialJellyfinModeEnabled = $state(initialJellyfinValue);
 	let loggingEnabled = $state(false);
@@ -134,10 +141,10 @@
 		if (socketCommunicationEnabled !== initialSocketCommunicationEnabled) {
 			preferencesSettings.set('socket', socketCommunicationEnabled);
 			UserSettings.preferences.socket = socketCommunicationEnabled;
-			
+
 			const currentSocket = get(socket);
 			const isLoggedInValue = get(isLoggedIn);
-			
+
 			if (socketCommunicationEnabled) {
 				if (!isLoggedInValue) {
 					socketCommunicationEnabled = false;
