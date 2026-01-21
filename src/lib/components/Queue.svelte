@@ -13,9 +13,10 @@
 
 	$effect(() => {
 		const currentItems = $queueState.items;
-		const itemsChanged = itemsCache.length !== currentItems.length ||
+		const itemsChanged =
+			itemsCache.length !== currentItems.length ||
 			itemsCache.some((item, i) => item.id !== currentItems[i]?.id);
-		
+
 		if (itemsChanged) {
 			itemsCache = [...currentItems];
 		}
@@ -24,7 +25,12 @@
 	function moveQueueItem(fromIndex: number, toIndex: number) {
 		const state = get(queueState);
 		if (fromIndex === toIndex) return;
-		if (fromIndex < 0 || toIndex < 0 || fromIndex >= state.items.length || toIndex >= state.items.length)
+		if (
+			fromIndex < 0 ||
+			toIndex < 0 ||
+			fromIndex >= state.items.length ||
+			toIndex >= state.items.length
+		)
 			return;
 
 		const next = [...state.items];
@@ -76,7 +82,7 @@
 	}
 </script>
 
-<div class="fixed inset-0 bottom-30 left-23 bg-secondary-container overflow-y-auto p-6">
+<div class="bg-secondary-container fixed inset-0 bottom-30 left-23 overflow-y-auto p-6">
 	<div class="flex flex-col gap-6">
 		<h1 class="text-on-surface text-2xl font-bold">Queue</h1>
 		<div class="bg-surface-container rounded-xl">

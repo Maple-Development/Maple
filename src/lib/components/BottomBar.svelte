@@ -242,7 +242,12 @@
 			</div>
 			<div class="mr-6 flex items-center justify-end">
 				<div>
-					<Button iconType="full" square variant={queueOpen ? 'filled' : 'tonal'} onclick={openQueue}>
+					<Button
+						iconType="full"
+						square
+						variant={queueOpen ? 'filled' : 'tonal'}
+						onclick={openQueue}
+					>
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 							><path
 								fill="currentColor"
