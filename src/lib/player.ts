@@ -20,6 +20,7 @@ import { statsManager } from '$lib/stats';
 import type { QueueSnapshot } from '$lib/store';
 import UserSettings from '$lib/preferences/usersettings';
 import { UserManager } from './api/UserManager';
+import { SERVER } from '$lib/api/server';
 
 type QueueSourceState = QueueSnapshot['source'];
 
@@ -84,8 +85,8 @@ async function sendWebhook(song: Song) {
 						}
 					}
 				],
-				username: user?.name || 'Maple User',
-				avatar_url: `https://api.maple.music/public/get/pfp/${user?.id}`
+				username: user?.name || 'User',
+				avatar_url: `${SERVER}/public/get/pfp/${user?.id}`
 			})
 		);
 

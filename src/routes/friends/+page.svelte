@@ -8,6 +8,7 @@
 
 	let selectedFriend = $state('');
 	let addingFriend = $state(false);
+	const pfpErrors = $state(new Set<string>());
 
 	onMount(async () => {
 		title.set('Friends');
@@ -141,11 +142,12 @@
 											class="bg-surface-container-high flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between"
 										>
 											<div class="flex items-center gap-4">
-												{#if user.pfp}
+												{#if user.pfp && !pfpErrors.has(user.id)}
 													<img
 														src={user.pfp}
 														alt="Profile"
 														class="h-12 w-12 rounded-full object-cover"
+														onerror={() => pfpErrors.add(user.id)}
 													/>
 												{:else}
 													<div
@@ -226,11 +228,12 @@
 									class="bg-surface-container-high flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between"
 								>
 									<div class="flex min-w-0 items-center gap-4">
-										{#if friend.pfp}
+										{#if friend.pfp && !pfpErrors.has(friend.id)}
 											<img
 												src={friend.pfp}
 												alt="Profile"
 												class="h-12 w-12 flex-shrink-0 rounded-full object-cover"
+												onerror={() => pfpErrors.add(friend.id)}
 											/>
 										{:else}
 											<div

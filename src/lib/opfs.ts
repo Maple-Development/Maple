@@ -1,5 +1,6 @@
 import type { Album, Artist, Playlist, Song } from '$lib/types';
 import type { StatsSnapshot } from '$lib/stats';
+import { SERVER } from '$lib/api/server';
 import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
 export class OPFS {
@@ -9,7 +10,7 @@ export class OPFS {
 	private static playlistsCache: Playlist[] | null = null;
 	private static statsCache: StatsSnapshot | null = null;
 	private static imageUrlCache: Map<string, string> = new Map();
-	private static SERVER = 'https://api.maple.music';
+	private static SERVER = SERVER;
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;

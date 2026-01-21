@@ -2,6 +2,7 @@ import { friends, pendingRequests, SavedUser } from '$lib/store';
 import { get } from 'svelte/store';
 import { UserManager } from './api/UserManager';
 import type { AddedFriend } from './types';
+import { SERVER } from './api/server';
 
 type FriendRelation = { user_id: string; friend_id: string };
 
@@ -49,11 +50,12 @@ async function sortFriends(unsorted: FriendRelation[]) {
 				};
 			}
 		}
+		const pfpUrl = `${SERVER}/public/get/pfp/${friendData.id}`;
 		const newFriend: AddedFriend = {
 			id: friendData.id,
 			name: friendData.name,
 			username: friendData.username,
-			pfp: friendData.pfp,
+			pfp: pfpUrl,
 			nowPlaying: nowPlayingFormatted
 		};
 		friendsList.push(newFriend);
