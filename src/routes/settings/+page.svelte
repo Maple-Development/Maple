@@ -6,6 +6,7 @@
 	import { get } from 'svelte/store';
 	import { title } from '$lib/store';
 	import { themeSettings, setThemeSettings, persistThemeSettings } from '$lib/theme/theme';
+	import { UserManager } from '$lib/api/UserManager';
 
 	let name = $state('');
 	let initialName = $state('');
@@ -32,9 +33,15 @@
 	let initialThemeDarkMode = $state(initialTheme.isDarkMode);
 	let themePreviewColor = $derived(themeSourceColor ?? initialThemeSourceColor);
 	let themeInitialized = false;
+
+	let pfpFile = $state<File | null>(null);
+	let pfpPreview = $state<string | null>(null);
+	let pfpUploading = $state(false);
+	let fileInput: HTMLInputElement;
+
 	$effect(() => {
-		name = $UserInfo?.name ?? '';
-		initialName = $UserInfo?.name ?? '';
+		name = $SavedUser?.name ?? '';
+		initialName = $SavedUser?.name ?? '';
 	});
 
 	$effect(() => {
@@ -59,6 +66,22 @@
 		}
 	});
 
+	const handleFileSelect = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file) {
+			if (file.size > 3 * 1024 * 1024) {
+				return;
+			}
+			pfpFile = file;
+			const reader = new FileReader();
+			reader.onload = () => {
+				pfpPreview = reader.result as string;
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
 	let hasChanges = $derived(
 		name !== initialName ||
 			webhookEnabled !== initialWebhookEnabled ||
@@ -70,10 +93,30 @@
 			loggingEnabled !== initialLoggingEnabled ||
 			developerModeEnabled !== initialDeveloperModeEnabled ||
 			themePreviewColor !== initialThemeSourceColor ||
-			themeDarkMode !== initialThemeDarkMode
+			themeDarkMode !== initialThemeDarkMode ||
+			pfpFile !== null
 	);
 
-	const saveChanges = () => {
+	const saveChanges = async () => {
+		if (pfpFile) {
+			pfpUploading = true;
+			const result = await UserManager.updateProfilePicture(pfpFile);
+			pfpUploading = false;
+			if (result.error) {
+				return;
+			}
+			pfpFile = null;
+			pfpPreview = null;
+		}
+
+		if (name !== initialName) {
+			const result = await UserManager.updateDisplayName(name);
+			if (result.error) {
+				return;
+			}
+			initialName = name;
+		}
+
 		const sourceColor = themePreviewColor;
 		persistThemeSettings({ sourceColor, isDarkMode: themeDarkMode });
 		initialThemeSourceColor = sourceColor;
@@ -108,7 +151,20 @@
 				<Card variant="outlined" class="flex flex-col gap-6 p-6">
 					<div class="flex flex-col gap-6 sm:flex-row sm:items-center">
 						<div class="relative flex items-center justify-center">
-							{#if $SavedUser?.pfp}
+							<input
+								type="file"
+								accept="image/jpeg,image/png,image/gif"
+								class="hidden"
+								bind:this={fileInput}
+								onchange={handleFileSelect}
+							/>
+							{#if pfpPreview}
+								<img
+									src={pfpPreview}
+									alt="Profile Preview"
+									class="ring-primary/20 h-28 w-28 rounded-full object-cover ring-2"
+								/>
+							{:else if $SavedUser?.pfp}
 								<img
 									src={$SavedUser?.pfp}
 									alt="Profile"
@@ -128,14 +184,17 @@
 							{/if}
 							<button
 								type="button"
-								class="bg-surface text-primary ring-outline hover:bg-surface-container-high absolute -bottom-3 flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-md ring-1"
+								onclick={() => fileInput.click()}
+								disabled={pfpUploading}
+								class="bg-surface text-primary ring-outline hover:bg-surface-container-high absolute -bottom-3 flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-md ring-1 disabled:opacity-50"
 							>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 									><path
 										fill="currentColor"
 										d="M8 17h8v-.55q0-1.125-1.1-1.787T12 14t-2.9.663T8 16.45zm4-4q.825 0 1.413-.587T14 11t-.587-1.412T12 9t-1.412.588T10 11t.588 1.413T12 13m-8 8q-.825 0-1.412-.587T2 19V7q0-.825.588-1.412T4 5h3.15L9 3h6l1.85 2H20q.825 0 1.413.588T22 7v12q0 .825-.587 1.413T20 21zm0-2h16V7h-4.05l-1.825-2h-4.25L8.05 7H4zm8-6"
 									/></svg
-								> Change photo
+								>
+								{#if pfpUploading}Uploading...{:else}Change photo{/if}
 							</button>
 						</div>
 
