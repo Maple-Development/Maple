@@ -263,9 +263,9 @@
 					</Lazy>
 				{/if}
 			{/if}
-			<div class="min-w-0 flex-1">
-				<p class="text-on-surface truncate">{track.title}</p>
-				<p class="text-on-surface-variant truncate text-sm">{track.artist}</p>
+			<div class="min-w-0 flex-1 max-w-[40px]">
+				<p class="text-on-surface truncate" title={track.title}>{track.title}</p>
+				<p class="text-on-surface-variant truncate text-sm" title={track.artist}>{track.artist}</p>
 			</div>
 		</div>
 		<div class="flex items-center gap-2">
@@ -386,3 +386,14 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.text-on-surface.truncate,
+	.text-on-surface-variant.truncate {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-width: 100%;
+		display: block;
+	}
+</style>
