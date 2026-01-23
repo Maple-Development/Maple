@@ -122,11 +122,11 @@
 		</ConnectedButtons>
 	</div>
 	<div
-		class={`flex mr-10 items-center justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}
+		class={`mr-10 flex items-center justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}
 	>
 		<div class="flex items-center">
 			<div
-				class="overflow-hidden transition-all duration-300 ease-out mr-2"
+				class="mr-2 overflow-hidden transition-all duration-300 ease-out"
 				class:w-0={!searchOpen}
 				class:w-48={searchOpen}
 				class:opacity-0={!searchOpen}
@@ -137,7 +137,7 @@
 					type="text"
 					placeholder="Search..."
 					bind:value={searchQuery}
-					class="mr-2 h-10 w-full rounded-full border border-outline/50 bg-surface-container px-4 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/60"
+					class="border-outline/50 bg-surface-container text-on-surface placeholder:text-on-surface-variant/60 mr-2 h-10 w-full rounded-full border px-4 text-sm outline-none"
 				/>
 			</div>
 			<Button
