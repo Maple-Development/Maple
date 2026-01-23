@@ -103,7 +103,7 @@
 			</p>
 		</div>
 		<div class="flex shrink-0 items-center gap-1">
-			<div class="queue-btn">
+			<div class="queue-btn" onpointerdown={(e) => e.stopPropagation()}>
 				<Button
 					iconType="full"
 					square
@@ -118,7 +118,7 @@
 					</svg>
 				</Button>
 			</div>
-			<div class="play-btn">
+			<div class="play-btn" onpointerdown={(e) => e.stopPropagation()}>
 				<Button iconType="full" square variant="filled" onclick={togglePlay}>
 					{#if paused}
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
