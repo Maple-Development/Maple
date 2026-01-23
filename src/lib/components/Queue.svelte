@@ -82,7 +82,9 @@
 	}
 </script>
 
-<div class="bg-secondary-container fixed inset-0 bottom-30 left-23 overflow-y-auto p-6">
+<div
+	class="bg-secondary-container fixed inset-0 bottom-24 left-0 overflow-y-auto p-4 md:bottom-30 md:left-23 md:p-6"
+>
 	<div class="flex flex-col gap-6">
 		<h1 class="text-on-surface text-2xl font-bold">Queue</h1>
 		<div class="bg-surface-container rounded-xl">

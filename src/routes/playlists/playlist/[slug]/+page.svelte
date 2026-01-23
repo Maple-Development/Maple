@@ -199,20 +199,24 @@
 	});
 </script>
 
-<div class="flex flex-col gap-8 pt-10 pr-5 pl-6 md:flex-row md:pt-14 md:pr-20 md:pl-14 lg:pl-28">
-	<div class="md:w-1/2 lg:w-2/5">
+<div class="flex flex-col gap-8 pt-4 pr-3 pl-3 md:flex-row md:pt-14 md:pr-20 md:pl-14 lg:pl-28">
+	<div class="w-full md:w-1/2 lg:w-2/5">
 		{#if playlist?.image}
 			{#await OPFS.getImageUrl(playlist.image as string) then imageUrl}
 				<img
 					src={imageUrl}
 					alt={playlist?.name}
-					class="aspect-square w-full max-w-sm rounded-lg object-cover shadow-md"
+					class="mx-auto aspect-square w-full max-w-sm rounded-lg object-cover shadow-md md:mx-0"
 				/>
 			{:catch}
-				<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
+				<div
+					class="bg-surface-container mx-auto aspect-square w-full max-w-sm rounded-lg md:mx-0"
+				></div>
 			{/await}
 		{:else}
-			<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
+			<div
+				class="bg-surface-container mx-auto aspect-square w-full max-w-sm rounded-lg md:mx-0"
+			></div>
 		{/if}
 		{#if editModeOn}
 			<div class="mt-4 space-y-2">

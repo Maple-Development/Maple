@@ -77,12 +77,12 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div
-	class={`mt-5 grid w-full items-center ${align === 'left' ? 'grid-cols-[auto_1fr_auto]' : 'grid-cols-[1fr_auto_1fr]'}`}
+	class={`mt-5 flex w-full flex-col-reverse items-center gap-4 md:grid md:gap-0 ${align === 'left' ? 'md:grid-cols-[auto_1fr_auto]' : 'md:grid-cols-[1fr_auto_1fr]'}`}
 >
 	<div
-		class={`flex items-center ${align === 'left' ? 'col-start-1 justify-start' : 'col-start-2 justify-center'}`}
+		class={`flex w-full items-center overflow-hidden ${align === 'left' ? 'md:col-start-1 md:justify-start' : 'md:col-start-2 md:justify-center'}`}
 	>
-		<div class="mr-2">
+		<div class="mr-2 shrink-0 pl-4 md:pl-0">
 			<input
 				class="hidden"
 				id={`flip-order-${idPrefix}`}
@@ -104,31 +104,34 @@
 				>
 			</Button>
 		</div>
-		<ConnectedButtons>
-			{#each sortOptions as option}
-				<input
-					id={`sort-${idPrefix}-${option.key}`}
-					type="radio"
-					name={`sortKey-${idPrefix}`}
-					value={option.key}
-					bind:group={sortKey}
-				/>
-				<Button for={`sort-${idPrefix}-${option.key}`} variant="tonal">
-					<div class="flex flex-row">
-						<p>{option.label}</p>
-					</div>
-				</Button>
-			{/each}
-		</ConnectedButtons>
+		<div class="no-scrollbar w-full overflow-x-auto pr-4 pb-1 md:pr-0">
+			<ConnectedButtons>
+				{#each sortOptions as option}
+					<input
+						id={`sort-${idPrefix}-${option.key}`}
+						type="radio"
+						name={`sortKey-${idPrefix}`}
+						value={option.key}
+						bind:group={sortKey}
+					/>
+					<Button for={`sort-${idPrefix}-${option.key}`} variant="tonal">
+						<div class="flex flex-row whitespace-nowrap">
+							<p>{option.label}</p>
+						</div>
+					</Button>
+				{/each}
+			</ConnectedButtons>
+		</div>
 	</div>
 	<div
-		class={`mr-10 flex items-center justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}
+		class={`mr-4 flex w-full items-center justify-end md:mr-10 md:w-auto ${align === 'left' ? 'md:col-start-3' : 'md:col-start-3'}`}
 	>
 		<div class="flex items-center">
 			<div
 				class="mr-2 overflow-hidden transition-all duration-300 ease-out"
 				class:w-0={!searchOpen}
-				class:w-48={searchOpen}
+				class:w-full={searchOpen}
+				class:md:w-48={searchOpen}
 				class:opacity-0={!searchOpen}
 				class:opacity-100={searchOpen}
 			>

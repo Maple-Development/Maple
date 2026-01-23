@@ -3,6 +3,8 @@
 	import '../main.css';
 	import SideBar from '$lib/components/SideBar.svelte';
 	import BottomBar from '$lib/components/BottomBar.svelte';
+	import MobileNowPlaying from '$lib/components/MobileNowPlaying.svelte';
+	import MobileBottomNav from '$lib/components/MobileBottomNav.svelte';
 	import { isLoggedIn, title, loadPreferencesStore, SavedUser, socket, UserInfo } from '$lib/store';
 	import { UserManager } from '$lib/api/UserManager';
 	import { onMount } from 'svelte';
@@ -66,10 +68,20 @@
 </svelte:head>
 
 <SideBar />
-<div class="fixed inset-0 bottom-30 left-23 overflow-x-hidden overflow-y-auto">
+<div
+	class="fixed inset-0 bottom-36 left-0 overflow-x-hidden overflow-y-auto md:bottom-30 md:left-23"
+>
 	<div>
 		{@render children()}
 	</div>
 </div>
-<BottomBar />
+
+<div class="hidden md:block">
+	<BottomBar />
+</div>
+
+<div class="block md:hidden">
+	<MobileNowPlaying />
+	<MobileBottomNav />
+</div>
 <Snackbar />

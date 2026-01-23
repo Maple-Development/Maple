@@ -43,9 +43,9 @@
 />
 
 <div
-	class="mx-24 grid grid-cols-1 gap-x-2 gap-y-2 sm:grid-cols-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2"
+	class="ml-2 mr-5 mb-10 grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2"
 >
-	<div class="mt-5 ml-10 flex w-full flex-col">
+	<div class="mt-4 ml-4 flex w-full flex-col md:mt-5 md:ml-10">
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div

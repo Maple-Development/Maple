@@ -394,7 +394,7 @@
 <svelte:window on:click={onPageClick} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="mt-5 ml-10 flex w-full flex-col" oncontextmenu={rightClickContextMenu}>
+<div class="mt-4 ml-4 flex w-full flex-col md:mt-5 md:ml-10" oncontextmenu={rightClickContextMenu}>
 	{#if track?.image || playlist?.image || album?.image || artist?.image}
 		{#await OPFS.getImageUrl((track?.image || playlist?.image || album?.image || artist?.image) as string)}
 			<Lazy height={200} keep={true}>
@@ -497,7 +497,7 @@
 			draggable="false"
 		/>
 	{/if}
-	<div class="flex flex-col select-none">
+	<div class="flex max-w-[90%] flex-col select-none md:max-w-full">
 		<p class="song-titles mt-2">{track?.title || playlist?.name || album?.name || artist?.name}</p>
 		<p class="song-artists">{track?.artist || '' || album?.artist || ''}</p>
 	</div>
@@ -506,7 +506,7 @@
 <style>
 	.song-titles {
 		color: var(--color-secondary);
-		font-size: 20px;
+		font-size: 16px;
 		font-family: 'Roboto Flex', sans-serif;
 		font-weight: 800;
 		font-style: normal;
@@ -527,7 +527,7 @@
 
 	.song-artists {
 		color: var(--color-secondary-fixed);
-		font-size: 16px;
+		font-size: 14px;
 		font-family: 'Roboto Flex', sans-serif;
 		font-weight: 300;
 		font-style: normal;
@@ -544,5 +544,14 @@
 			'YTFI' 728,
 			'YTLC' 514,
 			'YTUC' 712;
+	}
+
+	@media (min-width: 768px) {
+		.song-titles {
+			font-size: 20px;
+		}
+		.song-artists {
+			font-size: 16px;
+		}
 	}
 </style>

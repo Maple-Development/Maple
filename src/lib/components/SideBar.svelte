@@ -8,7 +8,7 @@
 	const isActive = (path: string) => page.url.pathname === path;
 </script>
 
-<div class="flex items-center justify-center">
+<div class="items-center justify-center hidden md:flex">
 	<div
 		class="bg-surface-container-high fixed top-0 left-0 flex h-[100%] flex-col items-center justify-between rounded-br-4xl p-4"
 	>
