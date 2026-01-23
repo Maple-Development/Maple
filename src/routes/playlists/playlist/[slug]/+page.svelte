@@ -210,12 +210,12 @@
 				/>
 			{:catch}
 				<div
-					class="bg-surface-container mx-auto aspect-square w-full max-w-sm rounded-lg md:mx-0"
+					class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"
 				></div>
 			{/await}
 		{:else}
 			<div
-				class="bg-surface-container mx-auto aspect-square w-full max-w-sm rounded-lg md:mx-0"
+				class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"
 			></div>
 		{/if}
 		{#if editModeOn}
