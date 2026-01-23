@@ -22,6 +22,7 @@
 					and watch it be organized into albums, artists, playlists, and more! Start by uploading
 					your music library
 					<a href="/" class="text-class text-primary" onclick={() => createLibrary()}>here!</a>
+					(if you're on mobile you may need to upload from settings)
 				</p>
 			</div>
 		</Card>
