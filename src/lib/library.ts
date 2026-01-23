@@ -27,13 +27,13 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 				toast.error('No files selected. Please select audio files to upload.');
 				return;
 			}
-			
-			const audioFiles = Array.from(files).filter(file => file.type.startsWith('audio/'));
+
+			const audioFiles = Array.from(files).filter((file) => file.type.startsWith('audio/'));
 			if (audioFiles.length === 0) {
 				toast.error('No audio files found. Please select audio files (MP3, FLAC, etc.).');
 				return;
 			}
-			
+
 			let i = 0;
 			for (const file of Array.from(files)) {
 				if (file.type.startsWith('audio/')) {
@@ -142,7 +142,9 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 			} else if (input && input.files && input.files.length > 0) {
 				await handleFiles(input.files);
 			} else if (!window.showDirectoryPicker) {
-				toast.error('Directory picker is not supported on mobile. Please use the Upload button in Settings.');
+				toast.error(
+					'Directory picker is not supported on mobile. Please use the Upload button in Settings.'
+				);
 				return;
 			} else {
 				toast.error('No files selected. Please try again.');

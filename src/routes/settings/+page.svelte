@@ -599,54 +599,79 @@
 									></div>
 									<span
 										class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
-															></span>
-					</label>
-				</div>
-				<div class="ring-outline/30 mt-3 border-t border-outline/30 pt-4">
-					<input
-						type="file"
-						accept="audio/*"
-						multiple
-						class="hidden"
-						bind:this={mobileFileInput}
-						onchange={handleMobileFileSelect}
-					/>
-					<div class="flex items-center justify-between gap-4">
-						<div class="flex flex-col gap-1">
-							<p class="text-on-surface-variant text-sm font-semibold">
-								Upload Music (Mobile)
-							</p>
-							<p class="text-on-surface-variant text-xs">
-								Upload audio files directly to your library.
-							</p>
-							<p class="text-primary text-sm font-semibold mt-1">
-								{trackCount} {trackCount === 1 ? 'track' : 'tracks'} in library
-							</p>
+									></span>
+								</label>
+							</div>
+							<div class="ring-outline/30 border-outline/30 mt-3 border-t pt-4">
+								<input
+									type="file"
+									accept="audio/*"
+									multiple
+									class="hidden"
+									bind:this={mobileFileInput}
+									onchange={handleMobileFileSelect}
+								/>
+								<div class="flex items-center justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">
+											Upload Music (Mobile)
+										</p>
+										<p class="text-on-surface-variant text-xs">
+											Upload audio files directly to your library.
+										</p>
+										<p class="text-primary mt-1 text-sm font-semibold">
+											{trackCount}
+											{trackCount === 1 ? 'track' : 'tracks'} in library
+										</p>
+									</div>
+									<button
+										type="button"
+										onclick={() => mobileFileInput.click()}
+										disabled={mobileUploading}
+										class="bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition disabled:opacity-50"
+									>
+										{#if mobileUploading}
+											<svg
+												class="h-4 w-4 animate-spin"
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+											>
+												<circle
+													class="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													stroke-width="4"
+												></circle>
+												<path
+													class="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												></path>
+											</svg>
+											Uploading...
+										{:else}
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="18"
+												height="18"
+												viewBox="0 0 24 24"
+											>
+												<path
+													fill="currentColor"
+													d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"
+												/>
+											</svg>
+											Upload
+										{/if}
+									</button>
+								</div>
+							</div>
 						</div>
-						<button
-							type="button"
-							onclick={() => mobileFileInput.click()}
-							disabled={mobileUploading}
-							class="bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition disabled:opacity-50"
-						>
-							{#if mobileUploading}
-								<svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-								</svg>
-								Uploading...
-							{:else}
-								<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-									<path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/>
-								</svg>
-								Upload
-							{/if}
-						</button>
 					</div>
-				</div>
-			</div>
-		</div>
-	</Card>
+				</Card>
 			</section>
 
 			<section class="flex flex-col gap-3">
