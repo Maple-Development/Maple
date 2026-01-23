@@ -18,6 +18,7 @@
 	import UserSettings from '$lib/preferences/usersettings';
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 	import { SERVER } from '$lib/api/server';
+	import { Toaster } from 'svelte-sonner';
 
 	let { children, data } = $props();
 
@@ -62,6 +63,8 @@
 		}
 	});
 </script>
+
+<Toaster position="bottom-right" />
 
 <svelte:head>
 	<title>{$title}</title>
