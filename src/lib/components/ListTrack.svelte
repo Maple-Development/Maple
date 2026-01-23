@@ -237,8 +237,10 @@
 		ondrop={onDrop}
 		ondragend={onDragEnd}
 	>
-		<div class="flex min-w-0 items-center gap-3">
-			<span class="text-on-surface-variant w-4 shrink-0 text-right">{index}</span>
+		<div class="flex min-w-0 items-center gap-4">
+			<span class="text-on-surface-variant w-8 shrink-0 text-right text-sm tabular-nums"
+				>{index}</span
+			>
 			{#if showThumbnail}
 				{#if track.image}
 					{#await OPFS.getImageUrl(track.image as string) then imageUrl}
