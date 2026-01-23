@@ -263,7 +263,7 @@
 					</Lazy>
 				{/if}
 			{/if}
-			<div class="min-w-0 flex-1 max-w-[40px]">
+			<div class="max-w-[40px] min-w-0 flex-1">
 				<p class="text-on-surface truncate" title={track.title}>{track.title}</p>
 				<p class="text-on-surface-variant truncate text-sm" title={track.artist}>{track.artist}</p>
 			</div>

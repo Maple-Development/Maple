@@ -498,8 +498,15 @@
 		/>
 	{/if}
 	<div class="flex w-44 flex-col select-none md:w-60 lg:w-64">
-		<p class="song-titles mt-2" title={track?.title || playlist?.name || album?.name || artist?.name || ''}>{track?.title || playlist?.name || album?.name || artist?.name}</p>
-		<p class="song-artists" title={track?.artist || '' || album?.artist || ''}>{track?.artist || '' || album?.artist || ''}</p>
+		<p
+			class="song-titles mt-2"
+			title={track?.title || playlist?.name || album?.name || artist?.name || ''}
+		>
+			{track?.title || playlist?.name || album?.name || artist?.name}
+		</p>
+		<p class="song-artists" title={track?.artist || '' || album?.artist || ''}>
+			{track?.artist || '' || album?.artist || ''}
+		</p>
 	</div>
 </div>
 
