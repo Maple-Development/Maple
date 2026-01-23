@@ -209,14 +209,10 @@
 					class="aspect-square w-full max-w-sm rounded-lg object-cover shadow-md"
 				/>
 			{:catch}
-				<div
-					class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"
-				></div>
+				<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
 			{/await}
 		{:else}
-			<div
-				class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"
-			></div>
+			<div class="bg-surface-container aspect-square w-full max-w-sm rounded-lg"></div>
 		{/if}
 		{#if editModeOn}
 			<div class="mt-4 space-y-2">
