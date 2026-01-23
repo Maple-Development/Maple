@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { ConnectedButtons, Button } from 'm3-svelte';
-	import SettingsGear from './Search.svelte';
 
 	let {
 		items = [],
@@ -24,9 +23,26 @@
 
 	let sortKey = $state(initialSortKey);
 	let descending = $state(initialDescending);
+	let searchQuery = $state('');
+	let searchOpen = $state(false);
+	let searchInput: HTMLInputElement;
+
+	let searchableKeys = $derived(sortOptions.map((o: { key: string; label: string }) => o.key));
+
+	let filtered = $derived.by(() => {
+		if (!searchQuery.trim()) return items;
+		const query = searchQuery.toLowerCase();
+		return items.filter((item: Record<string, unknown>) =>
+			searchableKeys.some((key: string) => {
+				const val = item[key];
+				if (val == null) return false;
+				return String(val).toLowerCase().includes(query);
+			})
+		);
+	});
 
 	let sorted = $derived.by(() => {
-		const list = [...items];
+		const list = [...filtered];
 		list.sort((a, b) => {
 			const aVal = a[sortKey] as unknown as string | number | undefined;
 			const bVal = b[sortKey] as unknown as string | number | undefined;
@@ -44,7 +60,21 @@
 	$effect(() => {
 		onChange?.({ sorted, sortKey, descending });
 	});
+
+	function handleKeydown(e: KeyboardEvent) {
+		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+			e.preventDefault();
+			searchOpen = !searchOpen;
+			if (searchOpen) {
+				setTimeout(() => searchInput?.focus(), 50);
+			} else {
+				searchQuery = '';
+			}
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <div
 	class={`mt-5 grid w-full items-center ${align === 'left' ? 'grid-cols-[auto_1fr_auto]' : 'grid-cols-[1fr_auto_1fr]'}`}
@@ -91,7 +121,52 @@
 			{/each}
 		</ConnectedButtons>
 	</div>
-	<div class={`mr-2 flex justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}>
-		<SettingsGear />
+	<div
+		class={`flex mr-10 items-center justify-end ${align === 'left' ? 'col-start-3' : 'col-start-3'}`}
+	>
+		<div class="flex items-center">
+			<div
+				class="overflow-hidden transition-all duration-300 ease-out mr-2"
+				class:w-0={!searchOpen}
+				class:w-48={searchOpen}
+				class:opacity-0={!searchOpen}
+				class:opacity-100={searchOpen}
+			>
+				<input
+					bind:this={searchInput}
+					type="text"
+					placeholder="Search..."
+					bind:value={searchQuery}
+					class="mr-2 h-10 w-full rounded-full border border-outline/50 bg-surface-container px-4 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/60"
+				/>
+			</div>
+			<Button
+				iconType="full"
+				square
+				variant={searchOpen ? 'filled' : 'outlined'}
+				onclick={() => {
+					searchOpen = !searchOpen;
+					if (searchOpen) {
+						setTimeout(() => searchInput?.focus(), 50);
+					} else {
+						searchQuery = '';
+					}
+				}}
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					class="transition-transform duration-200"
+					class:scale-90={searchOpen}
+				>
+					<path
+						fill="currentColor"
+						d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"
+					/>
+				</svg>
+			</Button>
+		</div>
 	</div>
 </div>
