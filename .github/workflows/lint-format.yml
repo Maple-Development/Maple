@@ -25,7 +25,10 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add -A
-          git diff --staged --quiet || git commit -m "style: auto-format code"
-          git push
+          if ! git diff --staged --quiet; then
+            ORIGINAL_MSG=$(git log -1 --pretty=%B)
+            git commit --amend -m "$ORIGINAL_MSG [skip ci]"
+            git push --force-with-lease
+          fi
       - run: npm run lint
         continue-on-error: true
