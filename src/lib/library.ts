@@ -15,7 +15,9 @@ declare global {
 }
 
 function isMobileBrowser(): boolean {
-	return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(navigator.userAgent);
+	return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(
+		navigator.userAgent
+	);
 }
 
 function isDirectoryPickerSupported(): boolean {
@@ -26,12 +28,15 @@ function isDirectoryPickerSupported(): boolean {
 }
 
 function yieldToUI(): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, 0));
+	return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-async function parseMetadataWithTimeout(file: File, timeoutMs: number = 30000): Promise<Awaited<ReturnType<typeof parseBlob>> | null> {
+async function parseMetadataWithTimeout(
+	file: File,
+	timeoutMs: number = 30000
+): Promise<Awaited<ReturnType<typeof parseBlob>> | null> {
 	try {
-		const timeoutPromise = new Promise<null>((_, reject) => 
+		const timeoutPromise = new Promise<null>((_, reject) =>
 			setTimeout(() => reject(new Error('Metadata parsing timeout')), timeoutMs)
 		);
 		const parsePromise = parseBlob(file);
@@ -67,7 +72,7 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 				i++;
 				toast(`${i} of ${audioFiles.length} | Processing ${file.name}`);
 				await yieldToUI();
-				
+
 				try {
 					const metadata = await parseMetadataWithTimeout(file);
 					const track: Song = {
@@ -76,8 +81,10 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 						artist: metadata?.common.artist || 'Unknown Artist',
 						album: metadata?.common.album || 'Unknown Album',
 						year: metadata?.common.year || 0,
-						genre: metadata?.common.genre 
-							? (Array.isArray(metadata.common.genre) ? metadata.common.genre[0] : metadata.common.genre)
+						genre: metadata?.common.genre
+							? Array.isArray(metadata.common.genre)
+								? metadata.common.genre[0]
+								: metadata.common.genre
 							: 'Unknown Genre',
 						duration: metadata?.format.duration || 0,
 						image: metadata?.common.picture
@@ -97,7 +104,9 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 						artist: metadata?.common.artist || 'Unknown Artist',
 						year: metadata?.common.year || 0,
 						genre: metadata?.common.genre
-							? (Array.isArray(metadata.common.genre) ? metadata.common.genre[0] : metadata.common.genre)
+							? Array.isArray(metadata.common.genre)
+								? metadata.common.genre[0]
+								: metadata.common.genre
 							: 'Unknown Genre',
 						image: metadata?.common.picture
 							? new Blob([metadata.common.picture[0].data.slice()], {
