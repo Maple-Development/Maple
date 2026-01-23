@@ -245,12 +245,14 @@
 				{#if track.image}
 					{#await OPFS.getImageUrl(track.image as string) then imageUrl}
 						<Lazy height={40} keep={true}>
-							<img
-								src={imageUrl}
-								alt="{track.title} - {track.artist}"
-								class="h-10 w-10 shrink-0 rounded-md object-cover"
-								draggable="false"
-							/>
+							<div class="h-10 w-10 shrink-0">
+								<img
+									src={imageUrl}
+									alt="{track.title} - {track.artist}"
+									class="h-full w-full rounded-md object-cover"
+									draggable="false"
+								/>
+							</div>
 						</Lazy>
 					{:catch}
 						<Lazy height={40} keep={true}>
