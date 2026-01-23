@@ -23,11 +23,22 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 		const input = document.getElementById('files') as HTMLInputElement;
 
 		const handleFiles = async (files: FileList | File[]) => {
+			if (!files || files.length === 0) {
+				toast.error('No files selected. Please select audio files to upload.');
+				return;
+			}
+			
+			const audioFiles = Array.from(files).filter(file => file.type.startsWith('audio/'));
+			if (audioFiles.length === 0) {
+				toast.error('No audio files found. Please select audio files (MP3, FLAC, etc.).');
+				return;
+			}
+			
 			let i = 0;
 			for (const file of Array.from(files)) {
 				if (file.type.startsWith('audio/')) {
 					i++;
-					toast(`${i} of ${files.length} | Processing ${file.name}`);
+					toast(`${i} of ${audioFiles.length} | Processing ${file.name}`);
 					try {
 						const metadata = await parseBlob(file);
 						const track: Song = {
@@ -128,13 +139,26 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 		} else {
 			if (mobileFiles) {
 				await handleFiles(mobileFiles);
-			} else if (input.files) {
+			} else if (input && input.files && input.files.length > 0) {
 				await handleFiles(input.files);
+			} else if (!window.showDirectoryPicker) {
+				toast.error('Directory picker is not supported on mobile. Please use the Upload button in Settings.');
+				return;
+			} else {
+				toast.error('No files selected. Please try again.');
+				return;
 			}
 		}
 	} catch (error) {
 		console.error('Error in createLibrary:', error);
-		toast.error('Failed to create library');
+		if (error instanceof Error) {
+			if (error.name === 'AbortError') {
+				return;
+			}
+			toast.error(`Failed to create library: ${error.message}`);
+		} else {
+			toast.error('Failed to create library. Please try again.');
+		}
 	}
 }
 
