@@ -39,11 +39,6 @@
 	</div>
 </div>
 
-<div class="mt-10 ml-10 flex w-full flex-col">
-	<h1 class="text-2xl font-bold">Friend Activity</h1>
-	<div class="mt-5 flex w-full flex-row"></div>
-</div>
-
 <style>
 	.text-class {
 		text-decoration: underline !important;
