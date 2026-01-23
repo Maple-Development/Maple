@@ -206,7 +206,7 @@
 				<img
 					src={imageUrl}
 					alt={playlist?.name}
-					class="mx-auto aspect-square w-full max-w-sm rounded-lg object-cover shadow-md md:mx-0"
+					class="aspect-square w-full max-w-sm rounded-lg object-cover shadow-md"
 				/>
 			{:catch}
 				<div
