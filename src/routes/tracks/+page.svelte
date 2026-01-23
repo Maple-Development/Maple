@@ -34,7 +34,7 @@
 />
 
 <div
-	class="mx-4 grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2"
+	class="ml-2 mr-8 grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-2 xl:grid-cols-5 xl:gap-x-2"
 >
 	{#each sortedTracks as track (track.id)}
 		<div class="will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
