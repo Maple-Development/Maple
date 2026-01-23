@@ -1,4 +1,6 @@
 import type { Album, Artist, Playlist, Song } from '$lib/types';
+import type { StatsSnapshot } from '$lib/stats';
+import { SERVER } from '$lib/api/server';
 import { dir, file, write } from 'opfs-tools';
 import { toast } from 'svelte-sonner';
 export class OPFS {
@@ -6,7 +8,9 @@ export class OPFS {
 	private static artistsCache: Artist[] | null = null;
 	private static tracksCache: Song[] | null = null;
 	private static playlistsCache: Playlist[] | null = null;
-	private static SERVER = 'https://api.maple.music';
+	private static statsCache: StatsSnapshot | null = null;
+	private static imageUrlCache: Map<string, string> = new Map();
+	private static SERVER = SERVER;
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
 		if (cache) return cache;
@@ -23,6 +27,13 @@ export class OPFS {
 		await write(path, JSON.stringify(cache));
 	}
 
+	private static async ensureConfigDir() {
+		const exists = await dir('/config').exists();
+		if (!exists) {
+			await dir('/config').create();
+		}
+	}
+
 	public static async initializeLibrary() {
 		const paths = ['albums', 'artists', 'tracks', 'playlists', 'config', 'images'].map(
 			(p) => `/${p}`
@@ -32,6 +43,7 @@ export class OPFS {
 			{ path: '/albums/albums.json', content: '' },
 			{ path: '/artists/artists.json', content: '' },
 			{ path: '/config/config.json', content: '' },
+			{ path: '/config/stats.json', content: '' },
 			{ path: '/tracks/tracks.json', content: '' }
 		];
 
@@ -78,6 +90,46 @@ export class OPFS {
 			)
 		);
 		toast('Library cleared');
+	}
+
+	public static async getImageUrl(path: string) {
+		const cached = this.imageUrlCache.get(path);
+		if (cached) return cached;
+		const response = await OPFS.get().image(path);
+		const arrayBuffer = await response.arrayBuffer();
+		const blob = new Blob([arrayBuffer]);
+		const url = URL.createObjectURL(blob);
+		this.imageUrlCache.set(path, url);
+		return url;
+	}
+
+	private static saveStatsQueue: Promise<void> = Promise.resolve();
+
+	public static async getStats() {
+		if (this.statsCache) return this.statsCache;
+		try {
+			const content = await file('/config/stats.json').text();
+			const parsed = JSON.parse(content || 'null');
+			if (parsed && typeof parsed === 'object') {
+				this.statsCache = parsed as StatsSnapshot;
+				return this.statsCache;
+			}
+		} catch {
+			return null;
+		}
+		return null;
+	}
+
+	public static async saveStats(snapshot: StatsSnapshot) {
+		this.statsCache = snapshot;
+		const currentQueue = this.saveStatsQueue;
+		this.saveStatsQueue = currentQueue
+			.then(async () => {
+				await this.ensureConfigDir();
+				await write('/config/stats.json', JSON.stringify(snapshot));
+			})
+			.catch(() => {});
+		await this.saveStatsQueue;
 	}
 
 	public static async addAlbum(album: Album, id: string) {
@@ -144,7 +196,7 @@ export class OPFS {
 		}
 	}
 
-	public static async addFile(id: string, file: File, track: Song) {
+	public static async addFile(id: string, file: File) {
 		const fileContent = await file.arrayBuffer();
 		const extension = file.name.split('.').pop();
 		await write(`/tracks/${id}.${extension}`, fileContent);
@@ -175,6 +227,10 @@ export class OPFS {
 		if (!this.playlistsCache) {
 			this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 		}
+
+		const now = Date.now();
+		playlist.createdAt ??= now;
+		playlist.modifiedAt ??= playlist.createdAt;
 
 		const imageFileName = `${playlist.id}.image`;
 		const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
@@ -237,6 +293,21 @@ export class OPFS {
 			if (!this.playlistsCache) {
 				this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 			}
+			let changed = false;
+			const now = Date.now();
+			for (const p of this.playlistsCache) {
+				if (p.createdAt == null) {
+					p.createdAt = now;
+					changed = true;
+				}
+				if (p.modifiedAt == null) {
+					p.modifiedAt = p.createdAt;
+					changed = true;
+				}
+			}
+			if (changed) {
+				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+			}
 			return this.playlistsCache;
 		},
 
@@ -244,7 +315,23 @@ export class OPFS {
 			if (!this.playlistsCache) {
 				this.playlistsCache = await this.getCache('/playlists/playlists.json', this.playlistsCache);
 			}
-			return this.playlistsCache.find((p) => p.id === id);
+			const found = this.playlistsCache.find((p) => p.id === id);
+			if (found) {
+				const now = Date.now();
+				let changed = false;
+				if (found.createdAt == null) {
+					found.createdAt = now;
+					changed = true;
+				}
+				if (found.modifiedAt == null) {
+					found.modifiedAt = found.createdAt;
+					changed = true;
+				}
+				if (changed) {
+					await this.writeCache('/playlists/playlists.json', this.playlistsCache);
+				}
+			}
+			return found;
 		}
 	});
 
@@ -322,6 +409,9 @@ export class OPFS {
 			}
 			const index = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 			if (index !== -1) {
+				const now = Date.now();
+				playlist.createdAt ??= now;
+				playlist.modifiedAt = now;
 				if (playlist.image instanceof Blob) {
 					const imageFileName = `${playlist.id}.image`;
 					const imageArrayBuffer = await new Response(playlist.image).arrayBuffer();
@@ -351,6 +441,9 @@ export class OPFS {
 			const playlistIndex = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 			if (playlistIndex !== -1) {
 				this.playlistsCache[playlistIndex].tracks?.splice(trackIndex, 1);
+				const now = Date.now();
+				this.playlistsCache[playlistIndex].createdAt ??= now;
+				this.playlistsCache[playlistIndex].modifiedAt = now;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}
 		}
@@ -368,13 +461,13 @@ export class OPFS {
 				await file(`/tracks/${track.id}.${track.ext}`).remove();
 				await file(`/images/${track.id}.image`).remove();
 
-				async function removeTrackFromCollections(
+				async function removeTrackFromCollections<T extends Album | Artist | Playlist>(
 					trackId: string,
-					collections: any[],
-					editFn: (item: any) => Promise<void>
+					collections: T[],
+					editFn: (item: T) => Promise<void>
 				) {
 					for (const item of collections) {
-						const index = item.tracks?.findIndex((t: string) => t === trackId);
+						const index = item.tracks?.findIndex((t) => t === trackId);
 						if (index !== undefined && index !== -1) {
 							item.tracks?.splice(index, 1);
 							await editFn(item);
@@ -402,7 +495,13 @@ export class OPFS {
 			const playlistIndex = this.playlistsCache.findIndex((p) => p.id === playlist.id);
 
 			if (playlistIndex !== -1) {
+				if (!this.playlistsCache[playlistIndex].tracks) {
+					this.playlistsCache[playlistIndex].tracks = [];
+				}
 				this.playlistsCache[playlistIndex].tracks?.push(track.id);
+				const now = Date.now();
+				this.playlistsCache[playlistIndex].createdAt ??= now;
+				this.playlistsCache[playlistIndex].modifiedAt = now;
 				await this.writeCache('/playlists/playlists.json', this.playlistsCache);
 			}
 		}

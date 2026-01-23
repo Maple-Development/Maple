@@ -1,20 +1,22 @@
 import { browser } from '$app/environment';
-import { Peer } from 'peerjs';
+//import { Peer } from 'peerjs';
 import { Socket } from 'socket.io-client';
-import { derived, writable } from 'svelte/store';
-import type { AddedFriend } from './types/addedfriends';
-import type { PendingRequest } from './types/preq';
-import type { Song } from './types/song';
-import type { User } from './types/user';
+import { derived, get, writable } from 'svelte/store';
+import type { AddedFriend, PendingRequest, Song, User } from '$lib/types';
+import { stats, statsManager } from './stats';
+export { stats, statsManager };
+import { OPFS } from '$lib/opfs';
+
+export type QueueSource = 'none' | 'album' | 'playlist' | 'artist' | 'tracks' | 'recent' | 'custom';
 
 export const pendingRequests = writable([] as PendingRequest[]);
 export const friends = writable([] as AddedFriend[]);
 export const isLoggedIn = writable(false);
-export const friendNowPlaying = writable({} as any);
+export const friendNowPlaying = writable({} as Record<string, unknown>);
 export const socket = writable(null as Socket | null);
-export const UserPeer = writable(null as Peer | null);
+//export const UserPeer = writable(null as Peer | null);
 export const searchType = writable('tracks');
-export const UserInfo = writable(null as any);
+export const UserInfo = writable(null as User | null);
 UserInfo.subscribe((value) => {
 	if (browser) {
 		if (!value) return;
@@ -25,10 +27,24 @@ UserInfo.subscribe((value) => {
 export const SavedUser = writable({} as User);
 export const activeSong = writable({} as Song);
 export const context = writable([] as Song[]);
-let recentlyPlayed: [Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?, Song?] = [];
+export type QueueSnapshot = {
+	items: Song[];
+	currentIndex: number;
+	source: { type: QueueSource; id?: string; label?: string };
+};
+export const queueState = writable<QueueSnapshot>({
+	items: [],
+	currentIndex: -1,
+	source: { type: 'none' }
+});
+export const loopEnabled = writable(true);
+export const shuffleEnabled = writable(false);
+export const originalQueue = writable<Song[]>([]);
+export const recentlyPlayed = writable<Song[]>([]);
 export const collapsed = writable(false);
-export const curTime = writable([0] as number[]);
-export const setCurTime = writable([0] as number[]);
+// let currentTime = $derived($audioPlayer.audio?.currentTime ?? 0);
+export const curTime = writable(0);
+export const setCurTime = writable(0);
 export const hideTips = writable(false);
 hideTips.subscribe((value) => {
 	if (value) {
@@ -46,39 +62,40 @@ export const audioPlayer = writable({
 	currentTime: 0,
 	changeVolume: false
 });
-export const recentlyPlayedManager = writable({
+export const recentlyPlayedManager = {
 	add: (value: Song) => {
-		if (!recentlyPlayed.some((song) => song?.id === value.id)) {
-			recentlyPlayed = [value, ...recentlyPlayed].slice(0, 10) as [
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?,
-				Song?
-			];
-			localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
-		}
+		recentlyPlayed.update((current) => {
+			if (current.some((song) => song?.id === value.id)) {
+				return current;
+			}
+			const updated = [value, ...current].slice(0, 10);
+			if (browser) {
+				localStorage.setItem('recentlyPlayed', JSON.stringify(updated));
+			}
+			return updated;
+		});
+	},
+	load: () => {
+		if (!browser) return;
+		const stored = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+		recentlyPlayed.set(stored);
 	},
 	get: () => {
 		if (!browser) return [];
-		recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-		return recentlyPlayed;
+		return get(recentlyPlayed);
 	}
-});
+};
 
-let endedHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
-let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => any) | null = null;
+let endedHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
+let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
 
 export const currentDuration = derived(audioPlayer, ($audioPlayer) => {
 	return $audioPlayer.audio?.duration ?? 0;
 });
 
 let currentTime = 0;
+let lastListenTime = 0;
+let lastListenSongId = '';
 
 audioPlayer.subscribe((value) => {
 	if (browser) {
@@ -99,8 +116,23 @@ audioPlayer.subscribe((value) => {
 				value.audio.ontimeupdate = () => {
 					currentTime = value.audio?.currentTime ?? 0;
 					if (value.playing) {
-						curTime.set([value.audio?.currentTime ?? currentTime]);
-						setCurTime.set([value.audio?.currentTime ?? currentTime]);
+						curTime.set(value.audio?.currentTime ?? currentTime);
+						setCurTime.set(value.audio?.currentTime ?? currentTime);
+					}
+					const song = get(activeSong);
+					const state = get(queueState);
+					if (value.playing && song?.id) {
+						if (song.id !== lastListenSongId) {
+							lastListenSongId = song.id;
+							lastListenTime = value.audio?.currentTime ?? 0;
+						} else {
+							const nextTime = value.audio?.currentTime ?? 0;
+							const delta = nextTime - lastListenTime;
+							lastListenTime = nextTime;
+							if (delta > 0 && delta <= 2.5) {
+								statsManager.recordListeningSeconds(song, state.source, delta);
+							}
+						}
 					}
 				};
 
@@ -136,7 +168,7 @@ function createTitle() {
 
 	return {
 		subscribe,
-		set: (value: any) => {
+		set: (value: string) => {
 			set(`${value} • Maple`);
 		},
 		clear: () => {
@@ -175,4 +207,27 @@ if (browser) {
 	if (storedUserInfo) {
 		UserInfo.set(JSON.parse(storedUserInfo));
 	}
+
+	recentlyPlayedManager.load();
 }
+
+let statsReady = false;
+const loadStats = async () => {
+	if (!browser) return;
+	const stored = await OPFS.getStats();
+	if (stored) {
+		stats.set(stored);
+	}
+	statsReady = true;
+};
+loadStats();
+
+stats.subscribe((value) => {
+	if (browser && statsReady) {
+		OPFS.saveStats(value);
+	}
+});
+
+friends.subscribe((value) => {
+	statsManager.setFriendsCount(value.length);
+});

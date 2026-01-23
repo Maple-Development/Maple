@@ -1,205 +1,204 @@
+import { SERVER } from '$lib/api/server';
 import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
-import { SavedUser, UserInfo, friendNowPlaying } from '$lib/store';
+import { friendNowPlaying, SavedUser, UserInfo } from '$lib/store';
 import type { User } from '$lib/types';
-import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 
 export class UserManager {
-	private static DevServer = 'http://localhost:3000';
-	private static PRODServer = 'https://api.maple.music';
-	private static SERVER = this.PRODServer;
-
 	public static register = async (username: string, password: string) => {
 		try {
-			const response: any = await fetch(`${this.SERVER}/login/create`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
+			const response = await fetch(`${SERVER}/login/create`, {
 				credentials: 'include',
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, password })
 			});
 			const data = await response.json();
-			toast.success('Account created successfully!');
 			return data;
 		} catch (error) {
-			toast.error('Error creating account: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};
 
 	public static login = async (username: string, password: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/login`, {
+			const response = await fetch(`${SERVER}/login`, {
 				credentials: 'include',
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username, password })
 			});
 			const data = await response.json();
 			const returnName = data.user.username;
 			const id = data.user.id;
 			UserInfo.set({ username: returnName, id: id });
-			toast.success('Welcome back, ' + returnName + '!');
-			this.getUser();
+			await this.getUser();
 			return data;
 		} catch (error) {
-			toast.error('Error logging in: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};
 
 	public static getUser = async () => {
 		try {
-			const response = await fetch(`${this.SERVER}/get/user/${get(UserInfo)?.id}`, {
+			const response = await fetch(`${SERVER}/get/user/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'GET'
 			});
 			const data = await response.json();
-
 			const returnUser: User = {
 				id: data.id,
 				username: data.username,
 				name: data.name,
-				pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : null
+				pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : undefined
 			};
-
 			if (response.ok) {
 				SavedUser.set(returnUser);
 			}
 			return returnUser;
-		} catch (error) {
-			return {
-				id: '',
-				username: '',
-				name: '',
-				pfp: null
-			};
+		} catch (e) {
+			console.error('Error:', e);
+			return { id: '', username: '', name: '', pfp: undefined };
 		}
 	};
 
-	public static updateUser = async (user: User): Promise<User | void> => {
+	public static checkSession = async () => {
 		try {
-			let returnUser: User = {
-				id: user.id,
-				username: user.username,
-				name: user.name,
-				pfp: user.pfp
-			};
-
-			if (user.pfp) {
-				const formData = new FormData();
-				formData.append('pfp', user.pfp);
-				formData.append('id', user.id);
-
-				const pfpResponse = await fetch(`${this.SERVER}/user/manage/setProfile/${user.id}`, {
-					credentials: 'include',
-					method: 'POST',
-					body: formData
-				});
-
-				const pfpData = await pfpResponse.json();
-				if (pfpData.ok) {
-					returnUser.pfp = pfpData.pfp;
-				}
-			}
-
-			if (user.name) {
-				const nameResponse = await fetch(`${this.SERVER}/user/manage/setDisplayName/${user.id}`, {
-					credentials: 'include',
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ displayName: user.name })
-				});
-
-				const nameData = await nameResponse.json();
-				if (nameData.ok) {
-					returnUser.name = nameData.name;
-				}
-			}
-			const newUser = this.getUser();
-			toast.success('Profile updated successfully!');
-			return newUser;
-		} catch (error) {
-			toast.error('Error updating profile: "' + error + '"');
-			console.error('Error:', error);
-			return console.error('Error:', error);
-		}
-	};
-
-	public static isLoggedIn = async () => {
-		if (!get(UserInfo)?.id) {
-			return false;
-		}
-		try {
-			const response = await fetch(`${this.SERVER}/get/isAuthenticated/${get(UserInfo)?.id}`, {
-				credentials: 'include',
-				method: 'GET'
-			}).then(async (res) => {
-				const response2 = res.clone();
-				return res;
-			});
-			let data;
-			try {
-				data = await response.json();
-			} catch (error) {
-				console.error('Error parsing response:', error);
-			}
-			return data;
-		} catch (error) {
-			return { isAuthenticated: false };
-		}
-	};
-
-	public static logOut = async () => {
-		try {
-			const response = await fetch(`${this.SERVER}/get/logout/${get(UserInfo)?.id}`, {
+			const response = await fetch(`${SERVER}/get/user/${get(UserInfo)?.id}`, {
 				credentials: 'include',
 				method: 'GET'
 			});
-			const data = await response.json();
 			if (response.ok) {
-				UserInfo.set({});
-			} else {
-				return data;
+				const data = await response.json();
+				const returnUser: User = {
+					id: data.id,
+					username: data.username,
+					name: data.name,
+					pfp: data.pfp ? `data:image/png;base64,${data.pfp}` : undefined
+				};
+				UserInfo.set({ username: returnUser.username, id: returnUser.id });
+				SavedUser.set(returnUser);
+				return returnUser;
 			}
-			UserInfo.set({});
-			SavedUser.set({} as User);
-			toast.success('Logout successful!');
-			location.reload();
-			return data;
-		} catch (error) {
-			toast.error('Error logging out: "' + error + '"');
-			return console.error('Error:', error);
+			return null;
+		} catch (e) {
+			console.error('Error:', e);
+			return null;
 		}
 	};
 
-	public static getUserName = async (username: string) => {
+	public static updateProfilePicture = async (file: File) => {
 		try {
-			const response = await fetch(`${this.SERVER}/public/get/user/${username}`, {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const formData = new FormData();
+			formData.append('pfp', file);
+
+			const response = await fetch(`${SERVER}/user/manage/setProfile/${userId}`, {
+				credentials: 'include',
+				method: 'POST',
+				body: formData
+			});
+
+			if (response.ok) {
+				await this.getUser();
+				return { success: true };
+			}
+			const data = await response.json();
+			return { error: data.error || 'Failed to update profile picture' };
+		} catch (e) {
+			console.error('Error:', e);
+			return { error: 'Failed to update profile picture' };
+		}
+	};
+
+	public static updateDisplayName = async (displayName: string) => {
+		try {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/manage/setDisplayName/${userId}`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ displayName })
+			});
+
+			if (response.ok) {
+				await this.getUser();
+				return { success: true };
+			}
+			const data = await response.json();
+			return { error: data.error || 'Failed to update display name' };
+		} catch (e) {
+			console.error('Error:', e);
+			return { error: 'Failed to update display name' };
+		}
+	};
+
+	public static getRequests = async () => {
+		try {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/get/requests/${userId}`, {
 				credentials: 'include',
 				method: 'GET'
 			});
 			const data = await response.json();
 			if (response.ok) {
 				return data;
-			} else {
-				toast.error('Error fetching username: "' + data.error + '"');
-				return;
 			}
 		} catch (error) {
-			toast.error('Error fetching username: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static getFriends = async () => {
+		try {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/get/friends/${userId}`, {
+				credentials: 'include',
+				method: 'GET'
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			}
+		} catch (error) {
+			return console.error('Error:', error);
+		}
+	};
+
+	public static removeFriend = async (id: string) => {
+		try {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/remove/${userId}`, {
+				credentials: 'include',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ friendId: id })
+			});
+			const data = await response.json();
+			if (response.ok) {
+				refreshFriends();
+				return data;
+			}
+		} catch (error) {
 			return console.error('Error:', error);
 		}
 	};
 
 	public static getUserbyId = async (id: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/public/get/user/id/${id}`, {
+			const response = await fetch(`${SERVER}/public/get/user/id/${id}`, {
 				credentials: 'include',
 				method: 'GET'
 			});
@@ -210,18 +209,36 @@ export class UserManager {
 				}
 				return data;
 			} else {
-				toast.error('Error fetching user: "' + data.error + '"');
 				return;
 			}
 		} catch (error) {
-			toast.error('Error fetching user: "' + error + '"');
+			return console.error('Error:', error);
+		}
+	};
+
+	public static getUserName = async (username: string) => {
+		try {
+			const response = await fetch(`${SERVER}/public/get/user/${username}`, {
+				credentials: 'include',
+				method: 'GET'
+			});
+			const data = await response.json();
+			if (response.ok) {
+				return data;
+			} else {
+				return;
+			}
+		} catch (error) {
 			return console.error('Error:', error);
 		}
 	};
 
 	public static acceptRequest = async (id: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/user/friends/accept/${get(UserInfo)?.id}`, {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/accept/${userId}`, {
 				credentials: 'include',
 				method: 'POST',
 				headers: {
@@ -234,14 +251,16 @@ export class UserManager {
 				return data;
 			}
 		} catch (error) {
-			toast.error('Error accepting request: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};
 
 	public static rejectRequest = async (id: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/user/friends/decline/${get(UserInfo)?.id}`, {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/decline/${userId}`, {
 				credentials: 'include',
 				method: 'POST',
 				headers: {
@@ -251,20 +270,21 @@ export class UserManager {
 			});
 			const data = await response.json();
 			if (response.ok) {
-				toast.success('Request declined successfully!');
 				refreshRequests();
 				refreshFriends();
 				return data;
 			}
 		} catch (error) {
-			toast.error('Error rejecting request: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};
 
 	public static addFriend = async (id: string) => {
 		try {
-			const response = await fetch(`${this.SERVER}/user/friends/add/${get(UserInfo)?.id}`, {
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
+
+			const response = await fetch(`${SERVER}/user/friends/add/${userId}`, {
 				credentials: 'include',
 				method: 'POST',
 				headers: {
@@ -277,83 +297,37 @@ export class UserManager {
 				return data;
 			}
 		} catch (error) {
-			toast.error('Error adding friend: "' + error + '"');
 			return console.error('Error:', error);
 		}
 	};
 
-	public static getRequests = async () => {
+	public static setAlbumArt = async (file: File) => {
 		try {
-			const response = await fetch(`${this.SERVER}/user/friends/get/requests/${get(UserInfo)?.id}`, {
-				credentials: 'include',
-				method: 'GET'
-			});
-			const data = await response.json();
-			if (response.ok) {
-				return data;
-			}
-		} catch (error) {
-			toast.error('Error getting requests: "' + error + '"');
-			return console.error('Error:', error);
-		}
-	};
+			const userId = get(UserInfo)?.id;
+			if (!userId) return { error: 'Not logged in' };
 
-	public static getFriends = async () => {
-		try {
-			const response = await fetch(`${this.SERVER}/user/friends/get/friends/${get(UserInfo)?.id}`, {
-				credentials: 'include',
-				method: 'GET'
-			});
-			const data = await response.json();
-			if (response.ok) {
-				return data;
-			}
-		} catch (error) {
-			toast.error('Error getting friends: "' + error + '"');
-			return console.error('Error:', error);
-		}
-	};
-
-	public static removeFriend = async (id: string) => {
-		try {
-			const response = await fetch(`${this.SERVER}/user/friends/remove/${get(UserInfo)?.id}`, {
-				credentials: 'include',
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ friendId: id })
-			});
-			const data = await response.json();
-			if (response.ok) {
-				toast.success('Friend removed successfully!');
-				refreshFriends();
-				return data;
-			}
-		} catch (error) {
-			toast.error('Error removing friend: "' + error + '"');
-			return console.error('Error:', error);
-		}
-	};
-
-	public static setAlbumArt = async (albumArt: File) => {
-		try {
 			const formData = new FormData();
-			formData.append('albumArt', albumArt);
-			formData.append('id', get(UserInfo)?.id);
-			const response = await fetch(`${this.SERVER}/user/manage/setAlbumArt/${get(UserInfo)?.id}`, {
+			formData.append('albumArt', file);
+
+			const response = await fetch(`${SERVER}/user/manage/setAlbumArt/${userId}`, {
 				credentials: 'include',
 				method: 'POST',
 				body: formData
 			});
-			const data = await response.json();
+
 			if (response.ok) {
-				return data;
+				return { success: true };
 			}
-		} catch (error) {
-			toast.error('Error setting album art: "' + error + '"');
-			console.error('Error:', error);
-			return null;
+			const data = await response.json();
+			return { error: data.error || 'Failed to update album art' };
+		} catch (e) {
+			console.error('Error:', e);
+			return { error: 'Failed to update album art' };
 		}
+	};
+
+	public static isLoggedIn = async () => {
+		const userId = get(UserInfo)?.id;
+		return !!userId;
 	};
 }

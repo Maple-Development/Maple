@@ -1,57 +1,59 @@
 export type AddedFriend = {
-    id: string;
-    name: string;
-    username: string;
-    pfp?: string;
-    nowPlaying?: {
-        title: string;
-        artist: string;
-        album: string;
-    };
-}
+	id: string;
+	name: string;
+	username: string;
+	pfp?: string;
+	nowPlaying?: {
+		title: string;
+		artist: string;
+		album: string;
+	};
+};
 
 export type Album = {
 	id: string;
 	name: string;
 	artist: string;
-	image: any;
+	image: string | Blob;
 	year: number;
 	genre?: string;
-	tracks?: String[];
+	tracks?: string[];
 };
 
 export type Artist = {
 	id: string;
 	name: string;
-	image?: any;
-	tracks?: String[];
-	albums?: String[];
+	image?: string | Blob;
+	tracks?: string[];
+	albums?: string[];
 };
 
 export enum DataType {
-    FILE = 'FILE',
-    OTHER = 'OTHER'
+	FILE = 'FILE',
+	OTHER = 'OTHER'
 }
 
 export interface PeerData {
-    dataType: DataType;
-    file?: Blob;
-    fileName?: string;
-    fileType?: string;
-    message?: string;
-} 
+	dataType: DataType;
+	file?: Blob;
+	fileName?: string;
+	fileType?: string;
+	message?: string;
+}
 
 export type Playlist = {
 	id: string;
 	name: string;
 	description: string;
-	tracks?: String[];
-	image?: any;
+	tracks?: string[];
+	image?: string | Blob;
+	createdAt?: number;
+	modifiedAt?: number;
 };
 
 export type PendingRequest = {
-    user_id: string,
-    friend_id: string
+	user_id: string;
+	friend_id: string;
 };
 
 export type Song = {
@@ -63,7 +65,7 @@ export type Song = {
 	genre?: string;
 	fileName: string;
 	duration: number;
-	image?: any;
+	image?: string | Blob;
 	trackNumber: number;
 	disk: number;
 	ext: string;
@@ -73,5 +75,5 @@ export type User = {
 	id: string;
 	username: string;
 	name?: string;
-	pfp?: any;
+	pfp?: string;
 };

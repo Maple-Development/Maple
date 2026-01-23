@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { socket as importedSocket } from '$lib/store';
+import { socket as importedSocket, friends } from '$lib/store';
 import { toast } from 'svelte-sonner';
 import { get } from 'svelte/store';
 import { UserManager } from './api/UserManager';
@@ -13,25 +13,21 @@ export const socketManager = () => {
 			console.log('[CLIENT] Socket connected');
 		});
 
-		
-
 		socket?.on('friendRequest', async (data) => {
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
-			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')',
-				{
-					action: {
-						label: 'Accept',
-						onClick: () => {
-							UserManager.acceptRequest(id);
-						}
-					},
+			toast.success('Friend request from: ' + friend.name + ' (' + friend.username + ')', {
+				action: {
+					label: 'Accept',
+					onClick: () => {
+						UserManager.acceptRequest(id);
+					}
 				}
-			);
+			});
 			refreshRequests();
 		});
 
-		socket?.on('notFound', async (data) => {
+		socket?.on('notFound', async () => {
 			toast.error('Friend request failed: User not found');
 		});
 
@@ -48,11 +44,11 @@ export const socketManager = () => {
 			refreshRequests();
 		});
 
-		socket?.on("acceptedRequest", async (data) => {
+		socket?.on('acceptedRequest', async (data) => {
 			console.log(data);
 			const id = data.id;
 			const friend = await UserManager.getUserbyId(id);
-			toast.success('You are now friends with '+ friend.name + ' (' + friend.username + ')!');
+			toast.success('You are now friends with ' + friend.name + ' (' + friend.username + ')!');
 			refreshFriends();
 			refreshRequests();
 		});
@@ -60,8 +56,23 @@ export const socketManager = () => {
 		socket?.on('nowPlaying', async (data) => {
 			console.log('[CLIENT] Received nowPlaying event:', data);
 			console.log('[CLIENT] Current socket ID:', socket?.id);
-			refreshFriends();
-			refreshRequests();
+			if (data.id && data.nowPlaying) {
+				friends.update((currentFriends) => {
+					return currentFriends.map((friend) => {
+						if (friend.id === data.id) {
+							return {
+								...friend,
+								nowPlaying: {
+									title: data.nowPlaying.title,
+									artist: data.nowPlaying.artist,
+									album: data.nowPlaying.album
+								}
+							};
+						}
+						return friend;
+					});
+				});
+			}
 		});
 	}
 };

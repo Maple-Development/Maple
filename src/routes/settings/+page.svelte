@@ -1,345 +1,743 @@
 <script lang="ts">
-	//@ts-nocheck
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { Textarea } from '$lib/components/ui/textarea';
-	import { OPFS } from '$lib/opfs';
-	import { Settings } from '$lib/preferences/fetch';
-	import UserSettings from '$lib/preferences/usersettings';
-	import { title } from '$lib/store';
-	import { createLibrary } from '$lib/library';
-	import { Users } from 'lucide-svelte';
+	import { Card, Button } from 'm3-svelte';
+	import ColorPicker from 'svelte-awesome-color-picker';
+	import { isLoggedIn, UserInfo, SavedUser, socket } from '$lib/store';
 	import { onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { get } from 'svelte/store';
+	import { title } from '$lib/store';
+	import { themeSettings, setThemeSettings, persistThemeSettings } from '$lib/theme/theme';
+	import { UserManager } from '$lib/api/UserManager';
+	import UserSettings from '$lib/preferences/usersettings';
+	import { Settings } from '$lib/preferences/fetch';
+	import { io } from 'socket.io-client';
+	import { SERVER } from '$lib/api/server';
+	import { socketManager } from '$lib/socketManager';
+	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
+	import { OPFS } from '$lib/opfs';
+	import { createLibrary } from '$lib/library';
 
-	let preferences = new Settings('preferences');
+	let name = $state('');
+	let initialName = $state('');
+	const webhookSettings = new Settings('webhook');
+	const initialWebhookEnabledValue =
+		webhookSettings.get('enabled') !== null ? webhookSettings.get('enabled') : false;
+	let webhookEnabled = $state(initialWebhookEnabledValue);
+	let initialWebhookEnabled = $state(initialWebhookEnabledValue);
+	const initialWebhookUrlValue =
+		webhookSettings.get('url') !== null ? webhookSettings.get('url') : '';
+	let webhookUrl = $state(initialWebhookUrlValue);
+	let initialWebhookUrl = $state(initialWebhookUrlValue);
+	const discordSettings = new Settings('discord');
+	const initialDiscordRpcValue =
+		discordSettings.get('enabled') !== null ? discordSettings.get('enabled') : false;
+	let discordRpcEnabled = $state(initialDiscordRpcValue);
+	let initialDiscordRpcEnabled = $state(initialDiscordRpcValue);
+	let p2pTransfersEnabled = $state(true);
+	let initialP2pTransfersEnabled = $state(true);
+	const preferencesSettings = new Settings('preferences');
+	const initialSocketValue =
+		preferencesSettings.get('socket') !== null ? preferencesSettings.get('socket') : true;
+	let socketCommunicationEnabled = $state(initialSocketValue);
+	let initialSocketCommunicationEnabled = $state(initialSocketValue);
+	const initialJellyfinValue =
+		preferencesSettings.get('jellyfinMode') !== null
+			? preferencesSettings.get('jellyfinMode')
+			: false;
+	let jellyfinModeEnabled = $state(initialJellyfinValue);
+	let initialJellyfinModeEnabled = $state(initialJellyfinValue);
+	let loggingEnabled = $state(false);
+	let initialLoggingEnabled = $state(false);
+	let developerModeEnabled = $state(false);
+	let initialDeveloperModeEnabled = $state(false);
+	const initialTheme = get(themeSettings);
+	let themeSourceColor = $state<string | null>(initialTheme.sourceColor);
+	let initialThemeSourceColor = $state(initialTheme.sourceColor);
+	let themeDarkMode = $state(initialTheme.isDarkMode);
+	let initialThemeDarkMode = $state(initialTheme.isDarkMode);
+	let themePreviewColor = $derived(themeSourceColor ?? initialThemeSourceColor);
+	let themeInitialized = false;
 
-	let errorText = 'LOG will appear here';
-	let devMode = false;
-	let showLogging = false;
-	let p2p = true;
-	let socket = true;
-	let jellyfinMode = false;
+	let pfpFile = $state<File | null>(null);
+	let pfpPreview = $state<string | null>(null);
+	let pfpUploading = $state(false);
+	let fileInput: HTMLInputElement;
 
-	let deferredPrompt;
+	let mobileFileInput: HTMLInputElement;
+	let mobileUploading = $state(false);
+	let trackCount = $state(0);
 
-	let length = 0;
-	async function getLength() {
-		length = (await OPFS.ls('/tracks')).length - 1;
-		if (length < 0) {
-			length = 0;
-		}
-	}
-
-	onMount(() => {
-		getLength();
-		findDevice();
-		title.set('Settings');
-		p2p = UserSettings.preferences.p2p;
-		devMode = UserSettings.preferences.devMode;
-		showLogging = UserSettings.preferences.showLogging;
-		socket = UserSettings.preferences.socket;
-		jellyfinMode = UserSettings.preferences.jellyfinMode;
+	$effect(() => {
+		name = $SavedUser?.name ?? '';
+		initialName = $SavedUser?.name ?? '';
 	});
 
-	let device = 'chrome';
-	function findDevice() {
-		if (!window.showDirectoryPicker) {
-			device = 'ew';
+	$effect(() => {
+		const { sourceColor, isDarkMode } = $themeSettings;
+		if (!themeInitialized) {
+			themeSourceColor = sourceColor;
+			themeDarkMode = isDarkMode;
+			initialThemeSourceColor = sourceColor;
+			initialThemeDarkMode = isDarkMode;
+			themeInitialized = true;
+			return;
 		}
-	}
-	let dir = '';
-	let text = '> ';
-	async function send() {
-		const lines = text.split('\n');
-		const newText = lines[lines.length - 1].substring(dir.length + 2);
-		if (newText.startsWith('ls')) {
-			let selectedDir = '';
-			let subdir = newText.split(' ')[1] || '';
-			if (subdir.startsWith('/')) {
-				subdir = subdir.substring(1);
-			}
-			if (!subdir.endsWith('/') && subdir !== '') {
-				subdir = subdir + '/';
-			}
-			if (dir === '' && subdir === '') {
-				selectedDir = '/';
-			} else if (dir === '') {
-				selectedDir = subdir;
-			} else {
-				selectedDir = dir + subdir;
-			}
+		themeSourceColor = sourceColor;
+		themeDarkMode = isDarkMode;
+	});
 
-			const ls = await OPFS.ls(selectedDir);
-			let names = [];
-			ls.forEach((file) => {
-				names.push(file.name);
-			});
-
-			if (names.length === 0) {
-				text += `No files found in ${selectedDir}\n${dir}> `;
-			} else {
-				text += `${names.join('\n')}\n${dir}> `;
-			}
-		} else if (newText == 'clear') {
-			await clearLibrary();
-			text += 'Library cleared\n' + dir + '> ';
-			getLength();
-		} else if (newText == 'exit') {
-			text = dir + '> ';
-		} else if (newText.startsWith('help')) {
-			let helpCmd = newText.split(' ')[1] || '';
-			text += '\n';
-			if (helpCmd == 'ls') {
-				text +=
-					"This command lists the files in the selected directory, or if left blank, the current directory: 'ls (directory)'\n" +
-					dir +
-					'> ';
-			} else if (helpCmd == 'clear') {
-				text += "This command clears the library. Use with caution: 'clear'\n" + dir + '> ';
-			} else if (helpCmd == 'exit') {
-				text += "This command clears the terminal: 'exit'\n" + dir + '> ';
-			} else if (helpCmd == 'import') {
-				text += "This command imports a library from your computer: 'import'\n" + dir + '> ';
-			} else if (helpCmd == 'cd') {
-				text +=
-					"This command changes the current directory to the specified directory: 'cd [directory]'\n" +
-					dir +
-					'> ';
-			} else if (helpCmd == 'download') {
-				text +=
-					"This command downloads a file from the library: 'download [filePath]'\n" + dir + '> ';
-			} else if (helpCmd == 'help') {
-				text +=
-					"This command lists the available commands, and information about them: 'help [command]'\n" +
-					dir +
-					'> ';
-			} else {
-				text += 'Welcome to the OPFS CLI!\n';
-				text +=
-					"Commands: ls, clear, exit, import, cd, download, help\n For more information, type 'help [command]'\n" +
-					dir +
-					'> ';
-			}
-		} else if (newText == 'import') {
-			await createLibrary();
-			text += 'Library imported\n' + dir + '> ';
-		} else if (newText.startsWith('cd')) {
-			dir = newText.split(' ')[1];
-			if (!dir.startsWith('/')) {
-				dir = '/' + dir;
-			}
-			if (!dir.endsWith('/')) {
-				dir = dir + '/';
-			}
-			text += '\n' + dir + '> ';
-		} else if (newText.startsWith('download')) {
-			let selectedDir = '';
-			let subdir = newText.split(' ')[1] || '';
-			if (!subdir.startsWith('/')) {
-				subdir = '/' + subdir;
-			}
-			if (dir === '' && subdir === '') {
-				selectedDir = '/';
-			} else if (dir === '') {
-				selectedDir = subdir;
-			} else {
-				selectedDir = dir + subdir;
-			}
-
-			const fileObj = await OPFS.downloadFile(selectedDir);
-			const file = fileObj[1];
-			const fileName = fileObj[0];
-			let type = file.type;
-			file.text().then((text) => {
-				const blob = new Blob([text], { type });
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = fileName;
-				a.click();
-				URL.revokeObjectURL(url);
-			});
-			text += 'Downloading ' + selectedDir + '...\n' + dir + '> ';
+	$effect(() => {
+		if (themeSourceColor) {
+			setThemeSettings({ sourceColor: themeSourceColor, isDarkMode: themeDarkMode });
 		} else {
-			text += 'Command not found\n' + dir + '> ';
+			setThemeSettings({ isDarkMode: themeDarkMode });
 		}
-	}
-	function handleKeydown(event) {
-		if (event.key === 'Backspace') {
-			if (text.length <= dir.length + 2) {
-				event.preventDefault();
+	});
+
+	const handleFileSelect = (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file) {
+			if (file.size > 3 * 1024 * 1024) {
+				return;
 			}
+			pfpFile = file;
+			const reader = new FileReader();
+			reader.onload = () => {
+				pfpPreview = reader.result as string;
+			};
+			reader.readAsDataURL(file);
 		}
-		if (event.key === 'Enter') {
-			if (text.length > 2) {
-				send();
+	};
+
+	let hasChanges = $derived(
+		name !== initialName ||
+			webhookEnabled !== initialWebhookEnabled ||
+			webhookUrl !== initialWebhookUrl ||
+			discordRpcEnabled !== initialDiscordRpcEnabled ||
+			p2pTransfersEnabled !== initialP2pTransfersEnabled ||
+			socketCommunicationEnabled !== initialSocketCommunicationEnabled ||
+			jellyfinModeEnabled !== initialJellyfinModeEnabled ||
+			loggingEnabled !== initialLoggingEnabled ||
+			developerModeEnabled !== initialDeveloperModeEnabled ||
+			themePreviewColor !== initialThemeSourceColor ||
+			themeDarkMode !== initialThemeDarkMode ||
+			pfpFile !== null
+	);
+
+	const saveChanges = async () => {
+		if (pfpFile) {
+			pfpUploading = true;
+			const result = await UserManager.updateProfilePicture(pfpFile);
+			pfpUploading = false;
+			if (result.error) {
+				return;
+			}
+			pfpFile = null;
+			pfpPreview = null;
+		}
+
+		if (name !== initialName) {
+			const result = await UserManager.updateDisplayName(name);
+			if (result.error) {
+				return;
+			}
+			initialName = name;
+		}
+
+		if (socketCommunicationEnabled !== initialSocketCommunicationEnabled) {
+			preferencesSettings.set('socket', socketCommunicationEnabled);
+			UserSettings.preferences.socket = socketCommunicationEnabled;
+
+			const currentSocket = get(socket);
+			const isLoggedInValue = get(isLoggedIn);
+
+			if (socketCommunicationEnabled) {
+				if (!isLoggedInValue) {
+					socketCommunicationEnabled = false;
+					initialSocketCommunicationEnabled = false;
+					return;
+				}
+				if (!currentSocket || !currentSocket.connected) {
+					const io2 = io(`${SERVER}`, {
+						withCredentials: true
+					});
+					socket.set(io2);
+					const newSocket = get(socket);
+					newSocket?.on('connect', () => {
+						console.log('Connected to server');
+					});
+					socketManager();
+					refreshFriends();
+					refreshRequests();
+				}
 			} else {
-				event.preventDefault();
+				if (currentSocket) {
+					currentSocket.disconnect();
+					socket.set(null);
+				}
+			}
+			initialSocketCommunicationEnabled = socketCommunicationEnabled;
+		}
+
+		if (jellyfinModeEnabled !== initialJellyfinModeEnabled) {
+			preferencesSettings.set('jellyfinMode', jellyfinModeEnabled);
+			UserSettings.preferences.jellyfinMode = jellyfinModeEnabled;
+			initialJellyfinModeEnabled = jellyfinModeEnabled;
+		}
+
+		if (webhookEnabled !== initialWebhookEnabled || webhookUrl !== initialWebhookUrl) {
+			webhookSettings.set('enabled', webhookEnabled);
+			webhookSettings.set('url', webhookUrl);
+			UserSettings.webhook.enabled = webhookEnabled;
+			UserSettings.webhook.url = webhookUrl;
+			initialWebhookEnabled = webhookEnabled;
+			initialWebhookUrl = webhookUrl;
+		}
+
+		if (discordRpcEnabled !== initialDiscordRpcEnabled) {
+			discordSettings.set('enabled', discordRpcEnabled);
+			UserSettings.discord.enabled = discordRpcEnabled;
+			initialDiscordRpcEnabled = discordRpcEnabled;
+		}
+
+		const sourceColor = themePreviewColor;
+		persistThemeSettings({ sourceColor, isDarkMode: themeDarkMode });
+		initialThemeSourceColor = sourceColor;
+		initialThemeDarkMode = themeDarkMode;
+	};
+
+	const handleMobileFileSelect = async (e: Event) => {
+		const target = e.target as HTMLInputElement;
+		const files = target.files;
+		if (files && files.length > 0) {
+			mobileUploading = true;
+			try {
+				await createLibrary(files);
+				const tracks = await OPFS.get().tracks();
+				trackCount = tracks.length;
+			} finally {
+				mobileUploading = false;
+				if (mobileFileInput) {
+					mobileFileInput.value = '';
+				}
 			}
 		}
-	}
+	};
 
-	function clearLibrary() {
-		OPFS.clearLibrary();
-		getLength();
-	}
+	const refreshTrackCount = async () => {
+		try {
+			const tracks = await OPFS.get().tracks();
+			trackCount = tracks.length;
+		} catch {
+			trackCount = 0;
+		}
+	};
 
-	function updatePrefs() {
-		preferences.set('p2p', p2p);
-		preferences.set('devMode', devMode);
-		preferences.set('showLogging', showLogging);
-		preferences.set('socket', socket);
-		preferences.set('jellyfinMode', jellyfinMode);
-		toast.success('Settings updated',
-			{
-				action: {
-					label: 'Refresh now?',
-					onClick: () => {
-						window.location.reload();
-					}
-				},
-			}
-		);
-	}
+	onMount(async () => {
+		title.set('Settings');
+		await refreshTrackCount();
+	});
 </script>
 
-<div class=" mx-auto max-w-4xl px-4 py-8">
-	<div class="mb-8 text-center">
-		<h1 class="mb-2 text-2xl font-semibold">Settings</h1>
-		<p class="text-muted-foreground">Manage your library and application preferences</p>
+<div class="flex w-full justify-center px-4 py-12">
+	<div class="flex w-full max-w-6xl flex-col gap-8">
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+			<div class="flex flex-col gap-1">
+				<p class="text-on-surface-variant text-xs tracking-[0.16em] uppercase">Settings</p>
+				<h1 class="text-4xl font-black">Account</h1>
+				<p class="text-on-surface-variant text-sm">Manage your Maple account.</p>
+			</div>
+			<Button variant="filled" disabled={!hasChanges} onclick={saveChanges}>Save changes</Button>
+		</div>
+
+		<div class="grid grid-cols-1 gap-6">
+			<section class="flex flex-col gap-3">
+				<div class="flex items-center justify-between">
+					<div class="flex flex-col gap-1">
+						<p class="text-on-surface-variant text-xs tracking-[0.16em] uppercase">Profile</p>
+						<p class="text-on-surface-variant text-sm">Update how your account appears.</p>
+					</div>
+				</div>
+
+				<Card variant="outlined" class="flex flex-col gap-6 p-6">
+					<div class="flex flex-col gap-6 sm:flex-row sm:items-center">
+						<div class="relative flex items-center justify-center">
+							<input
+								type="file"
+								accept="image/jpeg,image/png,image/gif"
+								class="hidden"
+								bind:this={fileInput}
+								onchange={handleFileSelect}
+							/>
+							{#if pfpPreview}
+								<img
+									src={pfpPreview}
+									alt="Profile Preview"
+									class="ring-primary/20 h-28 w-28 rounded-full object-cover ring-2"
+								/>
+							{:else if $SavedUser?.pfp}
+								<img
+									src={$SavedUser?.pfp}
+									alt="Profile"
+									class="ring-primary/20 h-28 w-28 rounded-full object-cover ring-2"
+								/>
+							{:else}
+								<div
+									class="bg-surface-container-high ring-surface-container-high flex h-28 w-28 items-center justify-center rounded-full ring-2"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24"
+										><path
+											fill="currentColor"
+											d="M9.775 12q-.9 0-1.5-.675T7.8 9.75l.325-2.45q.2-1.425 1.3-2.363T12 4t2.575.938t1.3 2.362l.325 2.45q.125.9-.475 1.575t-1.5.675zM4 18v-.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2v.8q0 .825-.587 1.413T18 20H6q-.825 0-1.412-.587T4 18"
+										/></svg
+									>
+								</div>
+							{/if}
+							<button
+								type="button"
+								onclick={() => fileInput.click()}
+								disabled={pfpUploading}
+								class="bg-surface text-primary ring-outline hover:bg-surface-container-high absolute -bottom-3 flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-md ring-1 disabled:opacity-50"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+									><path
+										fill="currentColor"
+										d="M8 17h8v-.55q0-1.125-1.1-1.787T12 14t-2.9.663T8 16.45zm4-4q.825 0 1.413-.587T14 11t-.587-1.412T12 9t-1.412.588T10 11t.588 1.413T12 13m-8 8q-.825 0-1.412-.587T2 19V7q0-.825.588-1.412T4 5h3.15L9 3h6l1.85 2H20q.825 0 1.413.588T22 7v12q0 .825-.587 1.413T20 21zm0-2h16V7h-4.05l-1.825-2h-4.25L8.05 7H4zm8-6"
+									/></svg
+								>
+								{#if pfpUploading}Uploading...{:else}Change photo{/if}
+							</button>
+						</div>
+
+						<div class="flex flex-1 flex-col gap-4">
+							<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+								<div class="flex items-center gap-3">
+									<h2 class="text-2xl font-bold">{$UserInfo?.username ?? 'Guest'}</h2>
+									<span
+										class={`rounded-full px-3 py-1 text-xs font-semibold ${$isLoggedIn ? 'bg-primary/15 text-primary' : 'bg-surface-container-high text-on-surface-variant'}`}
+									>
+										{$isLoggedIn ? 'Signed in' : 'Not signed in'}
+									</span>
+								</div>
+							</div>
+
+							<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								<div
+									class="bg-surface-container-high flex h-full flex-col justify-center gap-2 rounded-xl p-4"
+								>
+									<p class="text-on-surface-variant text-xs font-semibold tracking-wide uppercase">
+										Display name (optional)
+									</p>
+									<input
+										type="text"
+										bind:value={name}
+										placeholder="Add a display name"
+										class="bg-surface text-on-surface placeholder:text-on-surface-variant/70 ring-outline focus:ring-primary w-full rounded-lg px-3 py-2 ring-1 focus:ring-2 focus:outline-none"
+									/>
+								</div>
+								<div
+									class="bg-surface-container-high flex h-full flex-col justify-center gap-1 rounded-xl p-4"
+								>
+									<p class="text-on-surface-variant text-xs font-semibold tracking-wide uppercase">
+										Username
+									</p>
+									<p class="text-on-surface text-lg font-semibold">
+										{$UserInfo?.username ?? 'Not set'}
+									</p>
+								</div>
+								<div
+									class="bg-surface-container-high flex h-full flex-col justify-center gap-1 rounded-xl p-4 sm:col-span-2"
+								>
+									<p class="text-on-surface-variant text-xs font-semibold tracking-wide uppercase">
+										Account ID
+									</p>
+									<p class="text-on-surface text-lg font-semibold">
+										{$UserInfo?.id ?? 'Not available'}
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</Card>
+			</section>
+
+			<section class="flex flex-col gap-3">
+				<div class="flex items-center justify-between">
+					<div class="flex flex-col gap-1">
+						<p class="text-on-surface-variant text-xs tracking-[0.16em] uppercase">Preferences</p>
+						<p class="text-on-surface-variant text-sm">Manage your account preferences.</p>
+					</div>
+				</div>
+
+				<Card variant="outlined" class="flex flex-col gap-6 p-6">
+					<div class="flex flex-col gap-5">
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">Theme</p>
+							</div>
+							<div class="flex flex-col gap-4">
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">Use dark mode</p>
+										<p class="text-on-surface-variant text-xs">Save your eyes.</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input type="checkbox" class="peer sr-only" bind:checked={themeDarkMode} />
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+								<div class="flex flex-col gap-3">
+									<div class="flex items-start justify-between gap-4">
+										<div class="flex flex-col gap-1">
+											<p class="text-on-surface-variant text-sm font-semibold">Theme color</p>
+											<p class="text-on-surface-variant text-xs">
+												Select the color that drives the system theme.
+											</p>
+										</div>
+										<div
+											class="ring-outline/50 h-8 w-8 rounded-full ring-1"
+											style={`background-color: ${themePreviewColor};`}
+										></div>
+									</div>
+									<div class="bg-surface ring-outline/50 rounded-xl p-2 ring-1">
+										<ColorPicker
+											hex={themeSourceColor}
+											onInput={(event) => {
+												themeSourceColor = event.hex;
+											}}
+											isAlpha={false}
+											isDialog={false}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">
+									Webhook Settings
+								</p>
+							</div>
+							<div class="flex flex-col gap-4">
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">Enable Webhooks</p>
+										<p class="text-on-surface-variant text-xs">
+											Send data to a chosen webhook service
+										</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input type="checkbox" class="peer sr-only" bind:checked={webhookEnabled} />
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+								<div class="flex flex-col gap-2">
+									<div class="flex flex-col gap-2">
+										<div class="flex flex-col gap-1">
+											<p class="text-on-surface-variant text-sm font-semibold">Webhook URL</p>
+											<p class="text-on-surface-variant text-xs">
+												Webhook URL to automatically send to. Currently supports Discord webhooks.
+												If left blank, nothing will be sent.
+											</p>
+										</div>
+										<input
+											type="url"
+											bind:value={webhookUrl}
+											placeholder="https://discord.com/api/webhooks/..."
+											class="bg-surface text-on-surface placeholder:text-on-surface-variant/70 ring-outline focus:ring-primary w-full rounded-lg px-3 py-2 ring-1 focus:ring-2 focus:outline-none"
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">
+									Discord Settings
+								</p>
+							</div>
+							<div class="flex items-start justify-between gap-4">
+								<div class="flex flex-col gap-1">
+									<p class="text-on-surface-variant text-sm font-semibold">Enable Discord RPC</p>
+									<p class="text-on-surface-variant text-xs">
+										Show what you're listening to in Discord
+									</p>
+								</div>
+								<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+									<input type="checkbox" class="peer sr-only" bind:checked={discordRpcEnabled} />
+									<div
+										class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+									></div>
+									<span
+										class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+									></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</Card>
+			</section>
+		</div>
+
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+			<div class="flex flex-col gap-1">
+				<h1 class="text-4xl font-black">App Settings</h1>
+				<p class="text-on-surface-variant text-sm">
+					Additional options that change the way the app works.
+				</p>
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 gap-6">
+			<section class="flex flex-col gap-3">
+				<div class="flex items-center justify-between">
+					<div class="flex flex-col gap-1">
+						<p class="text-on-surface-variant text-xs tracking-[0.16em] uppercase">Preferences</p>
+						<p class="text-on-surface-variant text-sm">Manage your app preferences.</p>
+					</div>
+				</div>
+
+				<Card variant="outlined" class="flex flex-col gap-6 p-6">
+					<div class="flex flex-col gap-5">
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">
+									Network Settings
+								</p>
+							</div>
+							<div class="flex flex-col gap-4">
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">
+											Enable P2P Transfers
+										</p>
+										<p class="text-on-surface-variant text-xs">
+											Allow you to transfer your library to other devices via peer-to-peer
+											connections.
+										</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input
+											type="checkbox"
+											class="peer sr-only"
+											bind:checked={p2pTransfersEnabled}
+										/>
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">
+											Enable Socket.io Communication
+										</p>
+										<p class="text-on-surface-variant text-xs">
+											Allow you to communicate with the server in real-time via socket.io.
+										</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input
+											type="checkbox"
+											class="peer sr-only"
+											bind:checked={socketCommunicationEnabled}
+										/>
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">
+									Library Settings
+								</p>
+							</div>
+							<div class="flex items-start justify-between gap-4">
+								<div class="flex flex-col gap-1">
+									<p class="text-on-surface-variant text-sm font-semibold">
+										Enable Jellyfin Support
+									</p>
+									<p class="text-on-surface-variant text-xs">
+										Allows for importing libraries in the jellyfin format.
+									</p>
+								</div>
+								<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+									<input type="checkbox" class="peer sr-only" bind:checked={jellyfinModeEnabled} />
+									<div
+										class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+									></div>
+									<span
+										class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+									></span>
+								</label>
+							</div>
+							<div class="ring-outline/30 border-outline/30 mt-3 border-t pt-4">
+								<input
+									type="file"
+									accept="audio/*"
+									multiple
+									class="hidden"
+									bind:this={mobileFileInput}
+									onchange={handleMobileFileSelect}
+								/>
+								<div class="flex items-center justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">
+											Upload Music (Mobile)
+										</p>
+										<p class="text-on-surface-variant text-xs">
+											Upload audio files directly to your library.
+										</p>
+										<p class="text-primary mt-1 text-sm font-semibold">
+											{trackCount}
+											{trackCount === 1 ? 'track' : 'tracks'} in library
+										</p>
+									</div>
+									<button
+										type="button"
+										onclick={() => mobileFileInput.click()}
+										disabled={mobileUploading}
+										class="bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition disabled:opacity-50"
+									>
+										{#if mobileUploading}
+											<svg
+												class="h-4 w-4 animate-spin"
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+											>
+												<circle
+													class="opacity-25"
+													cx="12"
+													cy="12"
+													r="10"
+													stroke="currentColor"
+													stroke-width="4"
+												></circle>
+												<path
+													class="opacity-75"
+													fill="currentColor"
+													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+												></path>
+											</svg>
+											Uploading...
+										{:else}
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												width="18"
+												height="18"
+												viewBox="0 0 24 24"
+											>
+												<path
+													fill="currentColor"
+													d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"
+												/>
+											</svg>
+											Upload
+										{/if}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</Card>
+			</section>
+
+			<section class="flex flex-col gap-3">
+				<div class="flex items-center justify-between">
+					<div class="flex flex-col gap-1">
+						<p class="text-on-surface-variant text-xs tracking-[0.16em] uppercase">Developer</p>
+						<p class="text-on-surface-variant text-sm">Developer options for advanced users.</p>
+					</div>
+				</div>
+
+				<Card variant="outlined" class="flex flex-col gap-6 p-6">
+					<div class="flex flex-col gap-5">
+						<div
+							class="bg-surface-container-high ring-outline/50 flex flex-col gap-3 rounded-xl p-4 ring-1"
+						>
+							<div class="flex flex-col gap-1">
+								<p class="text-on-surface text-xs font-semibold tracking-wide uppercase">
+									Advanced Settings
+								</p>
+							</div>
+							<div class="flex flex-col gap-4">
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">Enable Logging</p>
+										<p class="text-on-surface-variant text-xs">
+											Save logs to a file for debugging purposes.
+										</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input type="checkbox" class="peer sr-only" bind:checked={loggingEnabled} />
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+								<div class="flex items-start justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">
+											Enable Developer Mode
+										</p>
+										<p class="text-on-surface-variant text-xs">
+											Enable developer mode for advanced users.
+										</p>
+									</div>
+									<label class="relative inline-flex h-6 w-11 cursor-pointer items-center">
+										<input
+											type="checkbox"
+											class="peer sr-only"
+											bind:checked={developerModeEnabled}
+										/>
+										<div
+											class="bg-outline-variant peer-checked:bg-primary/90 h-6 w-11 rounded-full transition"
+										></div>
+										<span
+											class="bg-surface absolute top-0.5 left-0.5 h-5 w-5 rounded-full shadow-sm transition peer-checked:translate-x-5"
+										></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</Card>
+			</section>
+		</div>
 	</div>
-
-	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
-		<div class="mb-6 text-center">
-			<h2 class="mb-1 text-lg font-medium">Library Management</h2>
-			<p class="text-sm text-muted-foreground">You currently have {length} tracks imported</p>
-		</div>
-
-		<div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-			{#if device == 'ew'}
-				<div class="w-full max-w-md">
-					<input
-						type="file"
-						id="files"
-						class="block w-full rounded-md border bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-						accept="audio/*"
-						multiple
-						on:change={(e) => createLibrary(e)}
-					/>
-				</div>
-			{:else}
-				<Button
-					class="w-full sm:w-auto"
-					variant="secondary"
-					on:click={() => createLibrary()}
-				>
-					<Users class="mr-2 h-4 w-4" />
-					Import Music
-				</Button>
-			{/if}
-			<Button
-				class="w-full sm:w-auto"
-				variant="destructive"
-				on:click={() => clearLibrary()}
-			>
-				Clear Library
-			</Button>
-		</div>
-	</div>
-
-	<div class="mb-8 rounded-lg border bg-card p-6 shadow-sm">
-		<h2 class="mb-4 text-center text-lg font-medium">Developer Options</h2>
-		<div class="space-y-4">
-			<div class="flex items-center justify-between rounded-lg bg-background p-2">
-				<div class="space-y-0.5">
-					<Label for="devMode" class="text-base">Developer Mode</Label>
-					<p class="text-sm text-muted-foreground">Enable developer tools and features</p>
-				</div>
-				<Switch id="devMode" bind:checked={devMode} />
-			</div>
-
-			<div class="flex items-center justify-between rounded-lg bg-background p-2">
-				<div class="space-y-0.5">
-					<Label for="logging" class="text-base">Show Logging</Label>
-					<p class="text-sm text-muted-foreground">Display debug logs and system information</p>
-				</div>
-				<Switch id="logging" bind:checked={showLogging} />
-			</div>
-
-			<Separator class="my-4" />
-
-			<div class="flex items-center justify-between rounded-lg bg-background p-2">
-				<div class="space-y-0.5">
-					<Label for="p2p" class="text-base">P2P Transfer</Label>
-					<p class="text-sm text-muted-foreground">Enable peer-to-peer file sharing</p>
-				</div>
-				<Switch id="p2p" bind:checked={p2p} />
-			</div>
-
-			<div class="flex items-center justify-between rounded-lg bg-background p-2">
-				<div class="space-y-0.5">
-					<Label for="socket" class="text-base">Socket.io Communication</Label>
-					<p class="text-sm text-muted-foreground">Enable real-time communication features</p>
-				</div>
-				<Switch id="socket" bind:checked={socket} />
-			</div>
-
-			<div class="flex items-center justify-between rounded-lg bg-background p-2">
-				<div class="space-y-0.5">
-					<Label for="jellyfinMode" class="text-base">Jellyfin Library Mode</Label>
-					<p class="text-sm text-muted-foreground">Use Jellyfin-style folder structure for importing music</p>
-				</div>
-				<Switch id="jellyfinMode" bind:checked={jellyfinMode} />
-			</div>
-		</div>
-
-		<div class="mt-6 flex justify-center">
-			<Button
-				on:click={updatePrefs}
-				class="w-full sm:w-auto"
-				variant="secondary"
-			>
-				Save Settings
-			</Button>
-		</div>
-	</div>
-
-	<p class="text-center text-sm text-muted-foreground">
-		Tip: You can upload as many different folders/files as you'd like.
-	</p>
 </div>
-
-{#if UserSettings.preferences.devMode}
-	<div class=" mx-auto max-w-4xl px-4">
-		<div class="rounded-lg border bg-card p-6 shadow-sm">
-			<h2 class="mb-4 text-center text-lg font-medium">Developer Console</h2>
-			<Textarea
-				on:keydown={handleKeydown}
-				class="h-48 w-full rounded-md border bg-background p-3 font-mono text-sm"
-				bind:value={text}
-				placeholder="Type your message here..."
-			/>
-		</div>
-	</div>
-{/if}
-
-{#if UserSettings.preferences.showLogging}
-	<div class="px-12 max-w-4xl py-8">
-		<div class="rounded-lg border bg-card p-6 shadow-sm">
-			<h2 class="mb-4 text-center text-lg font-medium">System Logs</h2>
-			<Textarea
-				class="h-48 w-full rounded-md border bg-background p-3 font-mono text-sm"
-				bind:value={errorText}
-				placeholder="Logs will appear here..."
-				disabled
-			/>
-		</div>
-	</div>
-{/if}
-
-<style>
-	@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-</style>
