@@ -237,7 +237,7 @@
 		ondrop={onDrop}
 		ondragend={onDragEnd}
 	>
-		<div class="flex min-w-0 items-center gap-4">
+		<div class="flex min-w-0 flex-1 items-center gap-4 overflow-hidden">
 			<span class="text-on-surface-variant w-8 shrink-0 text-right text-sm tabular-nums"
 				>{index}</span
 			>
@@ -265,7 +265,7 @@
 					</Lazy>
 				{/if}
 			{/if}
-			<div class="min-w-0 flex-1">
+			<div class="min-w-0 flex-1 overflow-hidden">
 				<p class="text-on-surface truncate" title={track.title}>{track.title}</p>
 				<p class="text-on-surface-variant truncate text-sm" title={track.artist}>{track.artist}</p>
 			</div>
