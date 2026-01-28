@@ -338,7 +338,7 @@ export function togglePlay() {
 		return value;
 	});
 	updateMediaSessionPlaybackState(newPlayingState);
-}
+} 
 
 export function setVolumeLevel(volume: number) {
 	audioPlayer.update((value) => ({ ...value, volume, changeVolume: true }));
