@@ -298,7 +298,7 @@
 </div>
 
 {#if queueOpen}
-	<Queue />
+	<Queue onClose={() => (queueOpen = false)} />
 {/if}
 
 <style>

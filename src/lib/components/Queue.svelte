@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { Button } from 'm3-svelte';
 	import { queueState } from '$lib/store';
 	import { get } from 'svelte/store';
 	import ListTrack from '$lib/components/ListTrack.svelte';
 	import { flip } from 'svelte/animate';
 	import { cubicOut } from 'svelte/easing';
 	import type { Song } from '$lib/types';
+
+	let { onClose }: { onClose?: () => void } = $props();
 
 	let dragIndex = $state<number | null>(null);
 	let dropIndex = $state<number | null>(null);
@@ -82,7 +85,7 @@
 	}
 </script>
 
-<div class="bg-surface fixed inset-0 bottom-24 left-0 overflow-y-auto md:bottom-30 md:left-23">
+<div class="bg-surface fixed inset-0 bottom-24 left-0 z-40 overflow-y-auto md:bottom-30 md:left-23">
 	<div class="flex h-full flex-col">
 		<div class="bg-surface-container-high/80 sticky top-0 z-10 backdrop-blur-md">
 			<div class="flex items-center gap-4 p-4 md:p-6">
@@ -100,13 +103,23 @@
 						/>
 					</svg>
 				</div>
-				<div class="flex flex-col">
+				<div class="flex min-w-0 flex-1 flex-col">
 					<h1 class="queue-title">Queue</h1>
 					<p class="text-on-surface-variant text-sm">
 						{itemsCache.length}
 						{itemsCache.length === 1 ? 'track' : 'tracks'}
 					</p>
 				</div>
+				{#if onClose}
+					<Button iconType="full" square variant="tonal" onclick={onClose} aria-label="Close queue">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+							<path
+								fill="currentColor"
+								d="M6.4 19L5 17.6L10.6 12L5 6.4L6.4 5L12 10.6L17.6 5L19 6.4L13.4 12L19 17.6L17.6 19L12 13.4z"
+							/>
+						</svg>
+					</Button>
+				{/if}
 			</div>
 		</div>
 
