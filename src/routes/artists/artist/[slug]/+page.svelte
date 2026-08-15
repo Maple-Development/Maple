@@ -107,10 +107,10 @@
 			onChange={handleAlbumFiltersChange}
 		/>
 		<div
-			class="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:grid-cols-3 md:gap-x-1 lg:grid-cols-4 lg:gap-x-1 xl:grid-cols-5 xl:gap-x-1"
+			class="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:grid-cols-3 md:gap-x-4 lg:grid-cols-4 lg:gap-x-6 xl:grid-cols-5"
 		>
 			{#each sortedAlbums as album (album.id)}
-				<div class="will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
+				<div class="min-w-0 will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
 					<Track {album} type="album" />
 				</div>
 			{/each}

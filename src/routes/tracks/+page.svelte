@@ -34,10 +34,10 @@
 />
 
 <div
-	class="mr-8 ml-2 mb-10 md:mb-0 grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:mx-16 md:grid-cols-3 md:gap-x-1 lg:grid-cols-4 lg:gap-x-1 xl:grid-cols-5 xl:gap-x-1"
+	class="mr-8 ml-2 mb-10 grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-3 md:mx-8 md:mb-0 md:grid-cols-3 md:gap-x-4 lg:mx-16 lg:grid-cols-4 lg:gap-x-6 xl:grid-cols-5"
 >
 	{#each sortedTracks as track (track.id)}
-		<div class="will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
+		<div class="min-w-0 will-change-transform" animate:flip={{ duration: 300, easing: cubicOut }}>
 			<Track
 				track={track as Song}
 				queue={sortedTracks}
