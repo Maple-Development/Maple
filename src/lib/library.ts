@@ -1,4 +1,4 @@
-import { parseBlob } from 'music-metadata';
+import { parseBlob, parseBuffer } from 'music-metadata';
 import { OPFS } from '$lib/opfs';
 import { toast } from 'svelte-sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +38,10 @@ function yieldToUI(): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+const PARSE_HEAD_BYTES = 2 * 1024 * 1024;
+const IMPORT_FLUSH_EVERY = 20;
+const IMPORT_TOAST_ID = 'library-import';
+
 async function parseMetadataWithTimeout(
 	file: File,
 	timeoutMs: number = 30000
@@ -46,11 +50,27 @@ async function parseMetadataWithTimeout(
 		const timeoutPromise = new Promise<null>((_, reject) =>
 			setTimeout(() => reject(new Error('Metadata parsing timeout')), timeoutMs)
 		);
-		const parsePromise = parseBlob(file);
+		const parsePromise = parseBlob(file, { duration: false, skipPostHeaders: true });
 		return await Promise.race([parsePromise, timeoutPromise]);
 	} catch {
 		return null;
 	}
+}
+
+async function parseMetadataFast(file: File) {
+	try {
+		const headBytes = Math.min(file.size, PARSE_HEAD_BYTES);
+		const buf = new Uint8Array(await file.slice(0, headBytes).arrayBuffer());
+		const parsed = await parseBuffer(
+			buf,
+			{ mimeType: file.type || undefined, path: file.name, size: file.size },
+			{ duration: false, skipPostHeaders: true }
+		);
+		if (parsed?.common?.title || parsed?.common?.artist) return parsed;
+	} catch {
+		/* fall through to full parse */
+	}
+	return parseMetadataWithTimeout(file);
 }
 
 export async function createLibrary(mobileFiles?: FileList): Promise<void> {
@@ -76,72 +96,82 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 
 			let i = 0;
 			let successCount = 0;
-			for (const file of audioFiles) {
-				i++;
-				toast(`${i} of ${audioFiles.length} | Processing ${file.name}`);
-				await yieldToUI();
+			const addedIds: string[] = [];
+			await OPFS.beginImport();
+			try {
+				for (const file of audioFiles) {
+					i++;
+					if (i === 1 || i === audioFiles.length || i % 8 === 0) {
+						toast(`${i} of ${audioFiles.length} | Processing ${file.name}`, {
+							id: IMPORT_TOAST_ID
+						});
+						await yieldToUI();
+					}
 
-				try {
-					const metadata = await parseMetadataWithTimeout(file);
-					const track: Song = {
-						id: uuidv4(),
-						title: metadata?.common.title || file.name.split('.').slice(0, -1).join('.'),
-						artist: metadata?.common.artist || 'Unknown Artist',
-						album: metadata?.common.album || 'Unknown Album',
-						year: metadata?.common.year || 0,
-						genre: metadata?.common.genre
-							? Array.isArray(metadata.common.genre)
-								? metadata.common.genre[0]
-								: metadata.common.genre
-							: 'Unknown Genre',
-						duration: metadata?.format.duration || 0,
-						image: metadata?.common.picture
-							? new Blob([metadata.common.picture[0].data.slice()], {
-									type: metadata.common.picture[0].format
-								})
-							: blob,
-						trackNumber: metadata?.common.track?.no ?? 0,
-						disk: metadata?.common.disk?.no ?? 0,
-						ext: file.name.split('.').pop() || 'mp3',
-						fileName: file.name
-					};
+					try {
+						const metadata = await parseMetadataFast(file);
+						const picture = metadata?.common.picture?.[0];
+						const cover = picture
+							? new Blob([picture.data.slice()], { type: picture.format })
+							: blob;
+						const track: Song = {
+							id: uuidv4(),
+							title: metadata?.common.title || file.name.split('.').slice(0, -1).join('.'),
+							artist: metadata?.common.artist || 'Unknown Artist',
+							album: metadata?.common.album || 'Unknown Album',
+							year: metadata?.common.year || 0,
+							genre: metadata?.common.genre
+								? Array.isArray(metadata.common.genre)
+									? metadata.common.genre[0]
+									: metadata.common.genre
+								: 'Unknown Genre',
+							duration: metadata?.format.duration || 0,
+							image: cover,
+							trackNumber: metadata?.common.track?.no ?? 0,
+							disk: metadata?.common.disk?.no ?? 0,
+							ext: file.name.split('.').pop() || 'mp3',
+							fileName: file.name
+						};
 
-					const album: Album = {
-						id: uuidv4(),
-						name: metadata?.common.album || 'Unknown Album',
-						artist: metadata?.common.artist || 'Unknown Artist',
-						year: metadata?.common.year || 0,
-						genre: metadata?.common.genre
-							? Array.isArray(metadata.common.genre)
-								? metadata.common.genre[0]
-								: metadata.common.genre
-							: 'Unknown Genre',
-						image: metadata?.common.picture
-							? new Blob([metadata.common.picture[0].data.slice()], {
-									type: metadata.common.picture[0].format
-								})
-							: blob
-					};
+						const album: Album = {
+							id: uuidv4(),
+							name: metadata?.common.album || 'Unknown Album',
+							artist: metadata?.common.artist || 'Unknown Artist',
+							year: metadata?.common.year || 0,
+							genre: metadata?.common.genre
+								? Array.isArray(metadata.common.genre)
+									? metadata.common.genre[0]
+									: metadata.common.genre
+								: 'Unknown Genre',
+							image: cover
+						};
 
-					const artist: Artist = {
-						id: uuidv4(),
-						name: metadata?.common.artist || 'Unknown Artist'
-					};
+						const artist: Artist = {
+							id: uuidv4(),
+							name: metadata?.common.artist || 'Unknown Artist'
+						};
 
-					await OPFS.addAlbum(album, track.id);
-					await OPFS.addArtist(artist, track.id, track.album);
-					await OPFS.addTrack(track);
-					await OPFS.addFile(track.id, file);
-					statsManager.recordLibraryAdd(track.id);
-					successCount++;
-				} catch (error) {
-					console.error(`Error processing file ${file.name}:`, error);
-					if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-						toast.error('Storage is full. Free space on this device and try again.');
-						break;
+						await OPFS.addAlbum(album, track.id);
+						await OPFS.addArtist(artist, track.id, track.album);
+						await OPFS.addTrack(track);
+						await OPFS.addFile(track.id, file);
+						addedIds.push(track.id);
+						successCount++;
+						if (successCount % IMPORT_FLUSH_EVERY === 0) {
+							await OPFS.flushImport();
+						}
+					} catch (error) {
+						console.error(`Error processing file ${file.name}:`, error);
+						if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+							toast.error('Storage is full. Free space on this device and try again.');
+							break;
+						}
 					}
 				}
+			} finally {
+				await OPFS.endImport();
 			}
+			statsManager.recordLibraryAddMany(addedIds);
 			await refreshLibrary();
 			const tracks = await OPFS.get().tracks();
 			statsManager.setLibrarySize(tracks.length);

@@ -27,8 +27,32 @@ export class OPFS {
 		}
 	}
 
+	private static deferJsonWrites = false;
+
 	private static async writeCache<T>(path: string, cache: T[]): Promise<void> {
+		if (this.deferJsonWrites) return;
 		await write(path, JSON.stringify(cache));
+	}
+
+	public static async beginImport(): Promise<void> {
+		this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
+		this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
+		this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
+		this.deferJsonWrites = true;
+	}
+
+	public static async flushImport(): Promise<void> {
+		if (this.tracksCache) await write('/tracks/tracks.json', JSON.stringify(this.tracksCache));
+		if (this.albumsCache) await write('/albums/albums.json', JSON.stringify(this.albumsCache));
+		if (this.artistsCache) await write('/artists/artists.json', JSON.stringify(this.artistsCache));
+	}
+
+	public static async endImport(): Promise<void> {
+		try {
+			await this.flushImport();
+		} finally {
+			this.deferJsonWrites = false;
+		}
 	}
 
 	public static async requestPersistentStorage(): Promise<boolean> {
@@ -173,8 +197,21 @@ export class OPFS {
 	public static async addAlbum(album: Album, id: string) {
 		this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
 
+		const existingAlbum = this.albumsCache.find((a) => a.name === album.name);
+		if (existingAlbum) {
+			if (!existingAlbum.tracks) {
+				existingAlbum.tracks = [];
+			}
+			existingAlbum.tracks.push(id);
+			await this.writeCache('/albums/albums.json', this.albumsCache);
+			return;
+		}
+
 		const imageFileName = `${album.id}.image`;
-		const imageArrayBuffer = await new Response(album.image).arrayBuffer();
+		const imageArrayBuffer =
+			album.image instanceof Blob
+				? await album.image.arrayBuffer()
+				: await new Response(album.image).arrayBuffer();
 		await write(`/images/${imageFileName}`, imageArrayBuffer);
 		album.image = `/images/${imageFileName}`;
 
@@ -182,20 +219,8 @@ export class OPFS {
 			album.tracks = [];
 		}
 		album.tracks.push(id);
-
-		if (!this.albumsCache.some((a) => a.name === album.name)) {
-			this.albumsCache.push(album);
-			await this.writeCache('/albums/albums.json', this.albumsCache);
-		} else {
-			const existingAlbum = this.albumsCache.find((a) => a.name === album.name);
-			if (existingAlbum) {
-				if (!existingAlbum.tracks) {
-					existingAlbum.tracks = [];
-				}
-				existingAlbum.tracks.push(id);
-				await this.writeCache('/albums/albums.json', this.albumsCache);
-			}
-		}
+		this.albumsCache.push(album);
+		await this.writeCache('/albums/albums.json', this.albumsCache);
 	}
 
 	public static async addArtist(artist: Artist, id: string, album: string) {
@@ -230,17 +255,19 @@ export class OPFS {
 		}
 	}
 
-	public static async addFile(id: string, file: File) {
-		const fileContent = await file.arrayBuffer();
-		const extension = file.name.split('.').pop();
-		await write(`/tracks/${id}.${extension}`, fileContent);
+	public static async addFile(id: string, audio: File) {
+		const extension = audio.name.split('.').pop();
+		await write(`/tracks/${id}.${extension}`, audio);
 	}
 
 	public static async addTrack(track: Song) {
 		this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
 
 		const imageFileName = `${track.id}.image`;
-		const imageArrayBuffer = await new Response(track.image).arrayBuffer();
+		const imageArrayBuffer =
+			track.image instanceof Blob
+				? await track.image.arrayBuffer()
+				: await new Response(track.image).arrayBuffer();
 		await write(`/images/${imageFileName}`, imageArrayBuffer);
 		const trackWithImagePath = { ...track, image: `/images/${imageFileName}` };
 

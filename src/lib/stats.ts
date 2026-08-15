@@ -179,9 +179,18 @@ class StatsManager {
 	}
 
 	recordLibraryAdd(itemId: string, date?: string) {
+		this.recordLibraryAddMany([itemId], date);
+	}
+
+	recordLibraryAddMany(itemIds: string[], date?: string) {
+		if (itemIds.length === 0) return;
 		const now = date ?? new Date().toISOString();
 		this.apply((state) => {
-			state.dateAdded = { ...state.dateAdded, [itemId]: now };
+			const dateAdded = { ...state.dateAdded };
+			for (const itemId of itemIds) {
+				dateAdded[itemId] = now;
+			}
+			state.dateAdded = dateAdded;
 			return state;
 		});
 	}
