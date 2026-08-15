@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { isLoggedIn } from '$lib/store';
+	import { createLibrary } from '$lib/library';
 
 	let extraMenuOpen = $state(false);
 
@@ -46,6 +47,22 @@
 		<div
 			class="bg-surface-container-high flex max-w-[90vw] min-w-50 flex-col gap-1 rounded-2xl p-2 shadow-xl"
 		>
+			<button
+				type="button"
+				class="text-on-surface hover:bg-surface-container-highest flex cursor-pointer items-center gap-4 rounded-xl border-none bg-transparent px-5 py-4 text-left text-sm font-medium transition-colors"
+				onclick={() => {
+					extraMenuOpen = false;
+					createLibrary();
+				}}
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" viewBox="0 0 24 24">
+					<path
+						fill="currentColor"
+						d="M6 20q-.825 0-1.412-.587T4 18v-2q0-.425.288-.712T5 15t.713.288T6 16v2h12v-2q0-.425.288-.712T19 15t.713.288T20 16v2q0 .825-.587 1.413T18 20zm5-12.15L9.125 9.725q-.3.3-.712.288T7.7 9.7q-.275-.3-.288-.7t.288-.7l3.6-3.6q.15-.15.325-.212T12 4.425t.375.063t.325.212l3.6 3.6q.3.3.288.7t-.288.7q-.3.3-.712.313t-.713-.288L13 7.85V15q0 .425-.288.713T12 16t-.712-.288T11 15z"
+					/>
+				</svg>
+				<span>Upload music</span>
+			</button>
 			{#each extraRoutes as route}
 				<button
 					type="button"

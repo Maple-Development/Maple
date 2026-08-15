@@ -14,17 +14,24 @@ declare global {
 	}
 }
 
-function isMobileBrowser(): boolean {
-	return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(
-		navigator.userAgent
-	);
-}
+const AUDIO_EXT = /\.(mp3|flac|m4a|aac|ogg|opus|wav|wma|aiff|alac|webm)$/i;
 
 function isDirectoryPickerSupported(): boolean {
-	if (isMobileBrowser()) {
-		return false;
-	}
 	return typeof window.showDirectoryPicker === 'function';
+}
+
+function isAudioFile(file: File): boolean {
+	if (file.type.startsWith('audio/')) return true;
+	return AUDIO_EXT.test(file.name);
+}
+
+function openLibraryFilePicker(): void {
+	const input = document.getElementById('library-files') as HTMLInputElement | null;
+	if (input) {
+		input.click();
+		return;
+	}
+	toast.error('File picker is not available. Try uploading from Settings.');
 }
 
 function yieldToUI(): Promise<void> {
@@ -52,7 +59,8 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 		const blob = await sampleImage.blob();
 		await OPFS.initializeLibrary();
 
-		const input = document.getElementById('files') as HTMLInputElement;
+		const input = (document.getElementById('library-files') ??
+			document.getElementById('files')) as HTMLInputElement | null;
 
 		const handleFiles = async (files: FileList | File[]) => {
 			if (!files || files.length === 0) {
@@ -60,7 +68,7 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 				return;
 			}
 
-			const audioFiles = Array.from(files).filter((file) => file.type.startsWith('audio/'));
+			const audioFiles = Array.from(files).filter(isAudioFile);
 			if (audioFiles.length === 0) {
 				toast.error('No audio files found. Please select audio files (MP3, FLAC, etc.).');
 				return;
@@ -128,71 +136,88 @@ export async function createLibrary(mobileFiles?: FileList): Promise<void> {
 					successCount++;
 				} catch (error) {
 					console.error(`Error processing file ${file.name}:`, error);
+					if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+						toast.error('Storage is full. Free space on this device and try again.');
+						break;
+					}
 				}
 			}
 			await refreshLibrary();
 			const tracks = await OPFS.get().tracks();
 			statsManager.setLibrarySize(tracks.length);
+			OPFS.rememberLibrarySize(tracks.length);
 			if (successCount > 0) {
 				toast.success(`Library added successfully! (${successCount} tracks)`);
+				const persisted = await OPFS.requestPersistentStorage();
+				if (!persisted) {
+					toast.warning(
+						'Tracks saved, but this browser may clear them later if storage is low. Keep Maple installed as an app.'
+					);
+				}
 			} else {
 				toast.error('No tracks could be processed. Please try again.');
 			}
 		};
 
-		if (isDirectoryPickerSupported() && !mobileFiles) {
-			const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
-			const files: File[] = [];
+		if (mobileFiles) {
+			await handleFiles(mobileFiles);
+			return;
+		}
 
-			if (UserSettings.preferences.jellyfinMode) {
-				for await (const entry of dirHandle.values()) {
-					if (entry.kind === 'directory') {
-						const dir = await dirHandle.getDirectoryHandle(entry.name);
+		if (input && input.files && input.files.length > 0) {
+			await handleFiles(input.files);
+			return;
+		}
 
-						let isArtistDir = false;
-						for await (const subEntry of dir.values()) {
-							if (subEntry.kind === 'directory') {
-								isArtistDir = true;
-								break;
-							}
-						}
+		if (isDirectoryPickerSupported()) {
+			try {
+				const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
+				const files: File[] = [];
 
-						if (isArtistDir) {
-							for await (const albumEntry of dir.values()) {
-								if (albumEntry.kind === 'directory') {
-									await processAlbumDirectory(dir, albumEntry, files);
+				if (UserSettings.preferences.jellyfinMode) {
+					for await (const entry of dirHandle.values()) {
+						if (entry.kind === 'directory') {
+							const dir = await dirHandle.getDirectoryHandle(entry.name);
+
+							let isArtistDir = false;
+							for await (const subEntry of dir.values()) {
+								if (subEntry.kind === 'directory') {
+									isArtistDir = true;
+									break;
 								}
 							}
-						} else {
-							await processAlbumDirectory(dirHandle, entry, files);
+
+							if (isArtistDir) {
+								for await (const albumEntry of dir.values()) {
+									if (albumEntry.kind === 'directory') {
+										await processAlbumDirectory(dir, albumEntry, files);
+									}
+								}
+							} else {
+								await processAlbumDirectory(dirHandle, entry, files);
+							}
+						}
+					}
+				} else {
+					for await (const entry of dirHandle.values()) {
+						if (entry.kind === 'file') {
+							const file = await entry.getFile();
+							files.push(file);
 						}
 					}
 				}
-			} else {
-				for await (const entry of dirHandle.values()) {
-					if (entry.kind === 'file') {
-						const file = await entry.getFile();
-						files.push(file);
-					}
-				}
-			}
 
-			await handleFiles(files);
-		} else {
-			if (mobileFiles) {
-				await handleFiles(mobileFiles);
-			} else if (input && input.files && input.files.length > 0) {
-				await handleFiles(input.files);
-			} else if (!window.showDirectoryPicker) {
-				toast.error(
-					'Directory picker is not supported on mobile. Please use the Upload button in Settings.'
-				);
+				await handleFiles(files);
 				return;
-			} else {
-				toast.error('No files selected. Please try again.');
-				return;
+			} catch (error) {
+				if (error instanceof Error && error.name === 'AbortError') {
+					return;
+				}
+				console.error('Directory picker failed, falling back to file input:', error);
 			}
 		}
+
+		openLibraryFilePicker();
 	} catch (error) {
 		console.error('Error in createLibrary:', error);
 		if (error instanceof Error) {

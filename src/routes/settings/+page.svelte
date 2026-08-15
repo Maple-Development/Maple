@@ -62,8 +62,6 @@
 	let pfpUploading = $state(false);
 	let fileInput: HTMLInputElement;
 
-	let mobileFileInput: HTMLInputElement;
-	let mobileUploading = $state(false);
 	let trackCount = $state(0);
 
 	$effect(() => {
@@ -204,24 +202,6 @@
 		persistThemeSettings({ sourceColor, isDarkMode: themeDarkMode });
 		initialThemeSourceColor = sourceColor;
 		initialThemeDarkMode = themeDarkMode;
-	};
-
-	const handleMobileFileSelect = async (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		const files = target.files;
-		if (files && files.length > 0) {
-			mobileUploading = true;
-			try {
-				await createLibrary(files);
-				const tracks = await OPFS.get().tracks();
-				trackCount = tracks.length;
-			} finally {
-				mobileUploading = false;
-				if (mobileFileInput) {
-					mobileFileInput.value = '';
-				}
-			}
-		}
 	};
 
 	const refreshTrackCount = async () => {
@@ -603,19 +583,9 @@
 								</label>
 							</div>
 							<div class="ring-outline/30 border-outline/30 mt-3 border-t pt-4">
-								<input
-									type="file"
-									accept="audio/*"
-									multiple
-									class="hidden"
-									bind:this={mobileFileInput}
-									onchange={handleMobileFileSelect}
-								/>
 								<div class="flex items-center justify-between gap-4">
 									<div class="flex flex-col gap-1">
-										<p class="text-on-surface-variant text-sm font-semibold">
-											Upload Music (Mobile)
-										</p>
+										<p class="text-on-surface-variant text-sm font-semibold">Upload Music</p>
 										<p class="text-on-surface-variant text-xs">
 											Upload audio files directly to your library.
 										</p>
@@ -626,46 +596,21 @@
 									</div>
 									<button
 										type="button"
-										onclick={() => mobileFileInput.click()}
-										disabled={mobileUploading}
-										class="bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition disabled:opacity-50"
+										onclick={() => createLibrary()}
+										class="bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition"
 									>
-										{#if mobileUploading}
-											<svg
-												class="h-4 w-4 animate-spin"
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<circle
-													class="opacity-25"
-													cx="12"
-													cy="12"
-													r="10"
-													stroke="currentColor"
-													stroke-width="4"
-												></circle>
-												<path
-													class="opacity-75"
-													fill="currentColor"
-													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-												></path>
-											</svg>
-											Uploading...
-										{:else}
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												width="18"
-												height="18"
-												viewBox="0 0 24 24"
-											>
-												<path
-													fill="currentColor"
-													d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"
-												/>
-											</svg>
-											Upload
-										{/if}
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="18"
+											height="18"
+											viewBox="0 0 24 24"
+										>
+											<path
+												fill="currentColor"
+												d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"
+											/>
+										</svg>
+										Upload
 									</button>
 								</div>
 							</div>

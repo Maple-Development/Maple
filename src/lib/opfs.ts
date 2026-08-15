@@ -13,18 +13,49 @@ export class OPFS {
 	private static SERVER = SERVER;
 
 	private static async getCache<T>(path: string, cache: T[] | null): Promise<T[]> {
-		if (cache) return cache;
+		if (cache !== null && cache.length > 0) return cache;
 		try {
 			const content = await file(path).text();
+			if (!content?.trim()) return cache ?? [];
 			const json = JSON.parse(content);
-			return Array.isArray(json) ? json : [];
-		} catch {
-			return [];
+			const data = Array.isArray(json) ? json : [];
+			return data.length > 0 ? data : (cache ?? []);
+		} catch (error) {
+			console.error(`OPFS: failed to read ${path}`, error);
+			if (cache !== null) return cache;
+			throw error;
 		}
 	}
 
 	private static async writeCache<T>(path: string, cache: T[]): Promise<void> {
 		await write(path, JSON.stringify(cache));
+	}
+
+	public static async requestPersistentStorage(): Promise<boolean> {
+		if (typeof navigator === 'undefined' || !navigator.storage?.persist) return false;
+		try {
+			if (await navigator.storage.persisted?.()) return true;
+			return await navigator.storage.persist();
+		} catch (error) {
+			console.error('OPFS: persist() failed', error);
+			return false;
+		}
+	}
+
+	public static rememberLibrarySize(count: number) {
+		try {
+			localStorage.setItem('maple.libraryCount', String(count));
+		} catch {
+			/* ignore */
+		}
+	}
+
+	public static expectedLibrarySize(): number {
+		try {
+			return Number(localStorage.getItem('maple.libraryCount') || 0);
+		} catch {
+			return 0;
+		}
 	}
 
 	private static async ensureConfigDir() {
@@ -39,32 +70,34 @@ export class OPFS {
 			(p) => `/${p}`
 		);
 		const files = [
-			{ path: '/playlists/playlists.json', content: '' },
-			{ path: '/albums/albums.json', content: '' },
-			{ path: '/artists/artists.json', content: '' },
-			{ path: '/config/config.json', content: '' },
-			{ path: '/config/stats.json', content: '' },
-			{ path: '/tracks/tracks.json', content: '' }
+			{ path: '/playlists/playlists.json', content: '[]' },
+			{ path: '/albums/albums.json', content: '[]' },
+			{ path: '/artists/artists.json', content: '[]' },
+			{ path: '/config/config.json', content: '{}' },
+			{ path: '/config/stats.json', content: '{}' },
+			{ path: '/tracks/tracks.json', content: '[]' }
 		];
 
-		await Promise.all([
-			...paths.map((p) =>
+		await Promise.all(
+			paths.map((p) =>
 				dir(p)
 					.exists()
-					.then((exists) =>
-						exists
-							? Promise.resolve()
-							: dir(p)
-									.create()
-									.then(() => Promise.resolve())
-					)
-			),
-			...files.map((f) =>
-				file(f.path)
-					.exists()
-					.then((exists) => (exists ? Promise.resolve() : write(f.path, f.content)))
+					.then((exists) => (exists ? Promise.resolve() : dir(p).create()))
 			)
-		]);
+		);
+
+		for (const f of files) {
+			try {
+				const exists = await file(f.path).exists();
+				if (exists) {
+					const content = await file(f.path).text();
+					if (content?.trim()) continue;
+				}
+				await write(f.path, f.content);
+			} catch (error) {
+				console.error(`OPFS: skip init write for ${f.path}`, error);
+			}
+		}
 	}
 
 	public static async ifExists(path: string) {
@@ -89,6 +122,11 @@ export class OPFS {
 					.then(() => Promise.resolve())
 			)
 		);
+		this.tracksCache = null;
+		this.albumsCache = null;
+		this.artistsCache = null;
+		this.playlistsCache = null;
+		this.rememberLibrarySize(0);
 		toast('Library cleared');
 	}
 
@@ -133,9 +171,7 @@ export class OPFS {
 	}
 
 	public static async addAlbum(album: Album, id: string) {
-		if (!this.albumsCache) {
-			this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
-		}
+		this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
 
 		const imageFileName = `${album.id}.image`;
 		const imageArrayBuffer = await new Response(album.image).arrayBuffer();
@@ -163,9 +199,7 @@ export class OPFS {
 	}
 
 	public static async addArtist(artist: Artist, id: string, album: string) {
-		if (!this.artistsCache) {
-			this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
-		}
+		this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
 
 		if (!artist.tracks) {
 			artist.tracks = [];
@@ -203,9 +237,7 @@ export class OPFS {
 	}
 
 	public static async addTrack(track: Song) {
-		if (!this.tracksCache) {
-			this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
-		}
+		this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
 
 		const imageFileName = `${track.id}.image`;
 		const imageArrayBuffer = await new Response(track.image).arrayBuffer();
@@ -243,44 +275,32 @@ export class OPFS {
 
 	public static get = () => ({
 		tracks: async () => {
-			if (!this.tracksCache) {
-				this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
-			}
+			this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
 			return this.tracksCache;
 		},
 
 		track: async (id: string) => {
-			if (!this.tracksCache) {
-				this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
-			}
+			this.tracksCache = await this.getCache('/tracks/tracks.json', this.tracksCache);
 			return this.tracksCache.find((t) => t.id === id);
 		},
 
 		albums: async () => {
-			if (!this.albumsCache) {
-				this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
-			}
+			this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
 			return this.albumsCache;
 		},
 
 		album: async (id: string) => {
-			if (!this.albumsCache) {
-				this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
-			}
+			this.albumsCache = await this.getCache('/albums/albums.json', this.albumsCache);
 			return this.albumsCache.find((a) => a.id === id);
 		},
 
 		artists: async () => {
-			if (!this.artistsCache) {
-				this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
-			}
+			this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
 			return this.artistsCache;
 		},
 
 		artist: async (id: string) => {
-			if (!this.artistsCache) {
-				this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
-			}
+			this.artistsCache = await this.getCache('/artists/artists.json', this.artistsCache);
 			return this.artistsCache.find((a) => a.id === id);
 		},
 

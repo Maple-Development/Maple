@@ -19,6 +19,7 @@
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 	import { SERVER } from '$lib/api/server';
 	import { Toaster } from 'svelte-sonner';
+	import { createLibrary } from '$lib/library';
 
 	let { children, data } = $props();
 
@@ -63,6 +64,21 @@
 		}
 	});
 </script>
+
+<input
+	id="library-files"
+	type="file"
+	multiple
+	accept="audio/*,.mp3,.flac,.m4a,.aac,.ogg,.opus,.wav,.wma"
+	class="hidden"
+	onchange={async (e) => {
+		const files = (e.currentTarget as HTMLInputElement).files;
+		if (files && files.length > 0) {
+			await createLibrary(files);
+			e.currentTarget.value = '';
+		}
+	}}
+/>
 
 <Toaster position="bottom-right" />
 

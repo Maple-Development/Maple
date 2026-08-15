@@ -2,7 +2,7 @@
 	import type { Song } from '$lib/types';
 	import Track from '$lib/components/Track.svelte';
 	import Filters from '$lib/components/Filters.svelte';
-	import { tracks } from '$lib/global.svelte';
+	import { refreshLibrary, tracks } from '$lib/global.svelte';
 	import { flip } from 'svelte/animate';
 	import { cubicOut } from 'svelte/easing';
 	import { title } from '$lib/store';
@@ -16,6 +16,7 @@
 
 	onMount(async () => {
 		title.set('Tracks');
+		await refreshLibrary();
 	});
 </script>
 
