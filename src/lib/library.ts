@@ -2,6 +2,7 @@ import { parseBlob, parseBuffer } from 'music-metadata';
 import { OPFS } from '$lib/opfs';
 import { toast } from 'svelte-sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { writable } from 'svelte/store';
 import type { Song, Album, Artist } from '$lib/types';
 import UserSettings from '$lib/preferences/usersettings';
 import { refreshLibrary } from '$lib/global.svelte';
@@ -15,6 +16,19 @@ declare global {
 }
 
 const AUDIO_EXT = /\.(mp3|flac|m4a|aac|ogg|opus|wav|wma|aiff|alac|webm)$/i;
+
+export const iosImportOpen = writable(false);
+
+export const IOS_AUDIO_ACCEPT =
+	'audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/x-wav,audio/flac,audio/ogg,audio/opus,audio/webm,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus';
+
+export function isIOS(): boolean {
+	if (typeof window !== 'undefined' && (window as Window & { __mapleIOS?: boolean }).__mapleIOS)
+		return true;
+	if (typeof navigator === 'undefined') return false;
+	if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return true;
+	return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+}
 
 function isDirectoryPickerSupported(): boolean {
 	return typeof window.showDirectoryPicker === 'function';
@@ -73,7 +87,12 @@ async function parseMetadataFast(file: File) {
 	return parseMetadataWithTimeout(file);
 }
 
-export async function createLibrary(mobileFiles?: FileList): Promise<void> {
+export async function createLibrary(mobileFiles?: FileList | File[]): Promise<void> {
+	if ((!mobileFiles || mobileFiles.length === 0) && isIOS()) {
+		iosImportOpen.set(true);
+		return;
+	}
+
 	try {
 		const sampleImage = await fetch('/placeholder.png');
 		const blob = await sampleImage.blob();
