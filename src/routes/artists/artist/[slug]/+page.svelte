@@ -129,6 +129,7 @@
 			initialSortKey="title"
 			align="left"
 			idPrefix="artist-tracks"
+			showSearchFab={false}
 			onChange={handleTrackFiltersChange}
 		/>
 

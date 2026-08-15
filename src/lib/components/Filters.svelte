@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ConnectedButtons, Button } from 'm3-svelte';
+	import { ConnectedButtons, Button, FAB } from 'm3-svelte';
+	import iconSearch from '@ktibow/iconset-material-symbols/search';
 
 	let {
 		items = [],
@@ -8,7 +9,8 @@
 		initialDescending = false,
 		onChange,
 		align = 'center',
-		idPrefix = 'filters'
+		idPrefix = 'filters',
+		showSearchFab = true
 	} = $props<{
 		items?: any[];
 		sortOptions?: { key: string; label: string }[];
@@ -17,6 +19,7 @@
 		onChange?: (payload: { sorted: any[]; sortKey: string; descending: boolean }) => void;
 		align?: 'center' | 'left';
 		idPrefix?: string;
+		showSearchFab?: boolean;
 	}>();
 
 	initialSortKey ??= sortOptions[0]?.key ?? '';
@@ -25,7 +28,8 @@
 	let descending = $state(initialDescending);
 	let searchQuery = $state('');
 	let searchOpen = $state(false);
-	let searchInput: HTMLInputElement;
+	let searchInput: HTMLInputElement | undefined = $state();
+	let mobileSearchInput: HTMLInputElement | undefined = $state();
 
 	let searchableKeys = $derived(sortOptions.map((o: { key: string; label: string }) => o.key));
 
@@ -61,23 +65,53 @@
 		onChange?.({ sorted, sortKey, descending });
 	});
 
+	function openSearch() {
+		searchOpen = true;
+		setTimeout(() => (mobileSearchInput ?? searchInput)?.focus(), 50);
+	}
+
+	function closeSearch() {
+		searchOpen = false;
+		searchQuery = '';
+	}
+
+	function toggleSearch() {
+		if (searchOpen) closeSearch();
+		else openSearch();
+	}
+
 	function handleKeydown(e: KeyboardEvent) {
 		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
 			e.preventDefault();
-			searchOpen = !searchOpen;
-			if (searchOpen) {
-				setTimeout(() => searchInput?.focus(), 50);
-			} else {
-				searchQuery = '';
-			}
+			toggleSearch();
 		}
 	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
+{#if searchOpen}
+	<div class="mt-5 flex w-full items-center gap-2 px-4 md:hidden">
+		<Button iconType="full" square variant="text" onclick={closeSearch} aria-label="Close search">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+				<path
+					fill="currentColor"
+					d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6L17.6 19L12 13.4z"
+				/>
+			</svg>
+		</Button>
+		<input
+			bind:this={mobileSearchInput}
+			type="text"
+			placeholder="Search..."
+			bind:value={searchQuery}
+			class="border-outline/50 bg-surface-container text-on-surface placeholder:text-on-surface-variant/60 h-10 min-w-0 flex-1 rounded-full border px-4 text-sm outline-none"
+		/>
+	</div>
+{/if}
+
 <div
-	class={`mt-5 flex w-full flex-col-reverse items-center gap-4 md:grid md:gap-0 ${align === 'left' ? 'md:grid-cols-[auto_1fr_auto]' : 'md:grid-cols-[1fr_auto_1fr]'}`}
+	class={`mt-5 w-full flex-col-reverse items-center gap-4 md:grid md:gap-0 ${align === 'left' ? 'md:grid-cols-[auto_1fr_auto]' : 'md:grid-cols-[1fr_auto_1fr]'} ${searchOpen ? 'hidden md:grid' : 'flex'}`}
 >
 	<div
 		class={`flex w-full items-center overflow-hidden ${align === 'left' ? 'md:col-start-1 md:justify-start' : 'md:col-start-2 md:justify-center'}`}
@@ -124,7 +158,7 @@
 		</div>
 	</div>
 	<div
-		class={`mr-4 flex w-full items-center justify-end md:mr-10 md:w-auto ${align === 'left' ? 'md:col-start-3' : 'md:col-start-3'}`}
+		class={`mr-4 w-full items-center justify-end md:mr-10 md:w-auto ${align === 'left' ? 'md:col-start-3' : 'md:col-start-3'} ${showSearchFab ? 'hidden md:flex' : 'flex'}`}
 	>
 		<div class="flex items-center">
 			<div
@@ -147,14 +181,7 @@
 				iconType="full"
 				square
 				variant={searchOpen ? 'filled' : 'outlined'}
-				onclick={() => {
-					searchOpen = !searchOpen;
-					if (searchOpen) {
-						setTimeout(() => searchInput?.focus(), 50);
-					} else {
-						searchQuery = '';
-					}
-				}}
+				onclick={toggleSearch}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -173,3 +200,9 @@
 		</div>
 	</div>
 </div>
+
+{#if showSearchFab && !searchOpen}
+	<div class="fixed right-4 bottom-40 z-40 md:hidden">
+		<FAB color="primary" icon={iconSearch} click={openSearch} aria-label="Search" />
+	</div>
+{/if}
