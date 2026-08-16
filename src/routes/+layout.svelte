@@ -73,10 +73,11 @@
 	accept="audio/*,.mp3,.flac,.m4a,.aac,.ogg,.opus,.wav,.wma"
 	class="hidden"
 	onchange={async (e) => {
-		const files = (e.currentTarget as HTMLInputElement).files;
-		if (files && files.length > 0) {
+		const input = e.currentTarget as HTMLInputElement;
+		const files = input.files ? Array.from(input.files) : [];
+		input.value = '';
+		if (files.length > 0) {
 			await createLibrary(files);
-			e.currentTarget.value = '';
 		}
 	}}
 />

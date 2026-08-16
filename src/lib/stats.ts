@@ -62,11 +62,32 @@ const createDefaultStats = (): StatsSnapshot => ({
 	uniqueSongIds: []
 });
 
+export function normalizeStats(partial?: Partial<StatsSnapshot> | null): StatsSnapshot {
+	const defaults = createDefaultStats();
+	if (!partial) return defaults;
+	return {
+		...defaults,
+		...partial,
+		perSongPlayCount: { ...defaults.perSongPlayCount, ...partial.perSongPlayCount },
+		perArtistPlayCount: { ...defaults.perArtistPlayCount, ...partial.perArtistPlayCount },
+		perAlbumPlayCount: { ...defaults.perAlbumPlayCount, ...partial.perAlbumPlayCount },
+		perSourcePlayCount: { ...defaults.perSourcePlayCount, ...partial.perSourcePlayCount },
+		perSongSeconds: { ...defaults.perSongSeconds, ...partial.perSongSeconds },
+		perArtistSeconds: { ...defaults.perArtistSeconds, ...partial.perArtistSeconds },
+		perAlbumSeconds: { ...defaults.perAlbumSeconds, ...partial.perAlbumSeconds },
+		perSourceSeconds: { ...defaults.perSourceSeconds, ...partial.perSourceSeconds },
+		songFirstPlayedAt: { ...defaults.songFirstPlayedAt, ...partial.songFirstPlayedAt },
+		songLastPlayedAt: { ...defaults.songLastPlayedAt, ...partial.songLastPlayedAt },
+		dateAdded: { ...defaults.dateAdded, ...partial.dateAdded },
+		uniqueSongIds: Array.isArray(partial.uniqueSongIds) ? partial.uniqueSongIds : []
+	};
+}
+
 export const stats = writable<StatsSnapshot>(createDefaultStats());
 
 class StatsManager {
 	apply(update: (state: StatsSnapshot) => StatsSnapshot) {
-		stats.update((state) => update({ ...state }));
+		stats.update((state) => update(normalizeStats(state)));
 	}
 
 	recordPlay(song: Song | null, source?: QueueSnapshot['source']) {

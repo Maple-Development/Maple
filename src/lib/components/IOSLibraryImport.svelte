@@ -8,15 +8,17 @@
 	}
 
 	async function handleSelected(files: FileList | File[] | null | undefined) {
-		if (!files || files.length === 0) return;
+		const snapshot = files && files.length > 0 ? Array.from(files) : [];
+		if (snapshot.length === 0) return;
 		close();
-		await createLibrary(files);
+		await createLibrary(snapshot);
 	}
 
 	function onInputChange(e: Event) {
 		const input = e.currentTarget as HTMLInputElement;
-		void handleSelected(input.files);
+		const snapshot = input.files ? Array.from(input.files) : [];
 		input.value = '';
+		void handleSelected(snapshot);
 	}
 
 	function onDragOver(e: DragEvent) {

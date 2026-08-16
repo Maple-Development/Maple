@@ -3,7 +3,7 @@ import { browser } from '$app/environment';
 import { Socket } from 'socket.io-client';
 import { derived, get, writable } from 'svelte/store';
 import type { AddedFriend, PendingRequest, Song, User } from '$lib/types';
-import { stats, statsManager } from './stats';
+import { normalizeStats, stats, statsManager } from './stats';
 export { stats, statsManager };
 import { OPFS } from '$lib/opfs';
 
@@ -216,7 +216,7 @@ const loadStats = async () => {
 	if (!browser) return;
 	const stored = await OPFS.getStats();
 	if (stored) {
-		stats.set(stored);
+		stats.set(normalizeStats(stored));
 	}
 	statsReady = true;
 };

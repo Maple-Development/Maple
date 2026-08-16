@@ -88,7 +88,9 @@ async function parseMetadataFast(file: File) {
 }
 
 export async function createLibrary(mobileFiles?: FileList | File[]): Promise<void> {
-	if ((!mobileFiles || mobileFiles.length === 0) && isIOS()) {
+	const selected = mobileFiles && mobileFiles.length > 0 ? Array.from(mobileFiles) : undefined;
+
+	if (!selected && isIOS()) {
 		iosImportOpen.set(true);
 		return;
 	}
@@ -197,24 +199,19 @@ export async function createLibrary(mobileFiles?: FileList | File[]): Promise<vo
 			OPFS.rememberLibrarySize(tracks.length);
 			if (successCount > 0) {
 				toast.success(`Library added successfully! (${successCount} tracks)`);
-				const persisted = await OPFS.requestPersistentStorage();
-				if (!persisted) {
-					toast.warning(
-						'Tracks saved, but this browser may clear them later if storage is low. Keep Maple installed as an app.'
-					);
-				}
+				await OPFS.requestPersistentStorage();
 			} else {
 				toast.error('No tracks could be processed. Please try again.');
 			}
 		};
 
-		if (mobileFiles) {
-			await handleFiles(mobileFiles);
+		if (selected) {
+			await handleFiles(selected);
 			return;
 		}
 
 		if (input && input.files && input.files.length > 0) {
-			await handleFiles(input.files);
+			await handleFiles(Array.from(input.files));
 			return;
 		}
 
