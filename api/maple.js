@@ -73,7 +73,7 @@ try {
 
 
 	const corsOptions = {
-		origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://play.maple.music'],
+		origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://canary.discord.com', 'https://ptb.discord.com', 'https://play.maple.music'],
 		credentials: true
 	};
 
@@ -82,7 +82,7 @@ try {
 
 	const ioOptions = {
 		cors: {
-			origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://play.maple.music'],
+			origin: ['https://maple.kolf.pro', 'https://api.maple.music', 'https://discord.com', 'https://canary.discord.com', 'https://ptb.discord.com', 'https://play.maple.music'],
 			credentials: true
 		},
 		maxHttpBufferSize: 5e7
