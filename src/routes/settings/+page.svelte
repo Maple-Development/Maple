@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, Button } from 'm3-svelte';
+	import { Card, Button, Dialog } from 'm3-svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import { isLoggedIn, UserInfo, SavedUser, socket } from '$lib/store';
 	import { onMount } from 'svelte';
@@ -15,6 +15,7 @@
 	import { refreshFriends, refreshRequests } from '$lib/refreshFriends';
 	import { OPFS } from '$lib/opfs';
 	import { createLibrary } from '$lib/library';
+	import { refreshLibrary } from '$lib/global.svelte';
 
 	let name = $state('');
 	let initialName = $state('');
@@ -63,6 +64,8 @@
 	let fileInput: HTMLInputElement;
 
 	let trackCount = $state(0);
+	let clearDialogOpen = $state(false);
+	let clearingLibrary = $state(false);
 
 	$effect(() => {
 		name = $SavedUser?.name ?? '';
@@ -210,6 +213,20 @@
 			trackCount = tracks.length;
 		} catch {
 			trackCount = 0;
+		}
+	};
+
+	const confirmClearLibrary = async () => {
+		if (clearingLibrary) return;
+		clearingLibrary = true;
+		clearDialogOpen = false;
+		try {
+			await OPFS.clearLibrary();
+			await OPFS.initializeLibrary();
+			await refreshLibrary();
+			await refreshTrackCount();
+		} finally {
+			clearingLibrary = false;
 		}
 	};
 
@@ -614,6 +631,35 @@
 									</button>
 								</div>
 							</div>
+							<div class="ring-outline/30 border-outline/30 mt-3 border-t pt-4">
+								<div class="flex items-center justify-between gap-4">
+									<div class="flex flex-col gap-1">
+										<p class="text-on-surface-variant text-sm font-semibold">Clear library</p>
+										<p class="text-on-surface-variant text-xs">
+											Permanently delete all tracks, albums, artists, playlists, and artwork stored
+											on this device.
+										</p>
+									</div>
+									<button
+										type="button"
+										onclick={() => (clearDialogOpen = true)}
+										class="bg-error text-on-error hover:bg-error/90 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-md transition"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="18"
+											height="18"
+											viewBox="0 0 24 24"
+										>
+											<path
+												fill="currentColor"
+												d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm2-4h2V8H9zm4 0h2V8h-2z"
+											/>
+										</svg>
+										Clear
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</Card>
@@ -686,3 +732,14 @@
 		</div>
 	</div>
 </div>
+
+<Dialog bind:open={clearDialogOpen} headline="Clear library?">
+	<p>
+		This permanently deletes all music, playlists, and artwork stored on this device. This cannot be
+		undone.
+	</p>
+	{#snippet buttons()}
+		<Button variant="text" onclick={() => (clearDialogOpen = false)}>Cancel</Button>
+		<Button variant="filled" onclick={confirmClearLibrary} disabled={clearingLibrary}>Clear</Button>
+	{/snippet}
+</Dialog>
