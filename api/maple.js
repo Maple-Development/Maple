@@ -96,7 +96,7 @@ try {
 	const friends = require('./user/friends.js');
 
 	app.use(limiter);
-	app.use(slower);
+	//app.use(slower);
 	
 	app.use(cors(corsOptions));
 
