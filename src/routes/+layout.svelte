@@ -20,7 +20,7 @@
 	import { SERVER } from '$lib/api/server';
 	import { Toaster } from 'svelte-sonner';
 	import { createLibrary } from '$lib/library';
-	import IOSLibraryImport from '$lib/components/IOSLibraryImport.svelte';
+	import LibraryImportSheet from '$lib/components/LibraryImportSheet.svelte';
 
 	let { children, data } = $props();
 
@@ -82,7 +82,7 @@
 	}}
 />
 
-<IOSLibraryImport />
+<LibraryImportSheet />
 
 <Toaster position="bottom-right" />
 

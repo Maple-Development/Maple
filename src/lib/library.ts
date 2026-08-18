@@ -30,22 +30,17 @@ export function isIOS(): boolean {
 	return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
 }
 
-function isDirectoryPickerSupported(): boolean {
-	return typeof window.showDirectoryPicker === 'function';
+export function isDirectoryPickerSupported(): boolean {
+	return typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
+}
+
+export function isWebkitDirectorySupported(): boolean {
+	return typeof document !== 'undefined' && 'webkitdirectory' in document.createElement('input');
 }
 
 function isAudioFile(file: File): boolean {
 	if (file.type.startsWith('audio/')) return true;
 	return AUDIO_EXT.test(file.name);
-}
-
-function openLibraryFilePicker(): void {
-	const input = document.getElementById('library-files') as HTMLInputElement | null;
-	if (input) {
-		input.click();
-		return;
-	}
-	toast.error('File picker is not available. Try uploading from Settings.');
 }
 
 function yieldToUI(): Promise<void> {
@@ -88,20 +83,17 @@ async function parseMetadataFast(file: File) {
 }
 
 export async function createLibrary(mobileFiles?: FileList | File[]): Promise<void> {
-	const selected = mobileFiles && mobileFiles.length > 0 ? Array.from(mobileFiles) : undefined;
-
-	if (!selected && isIOS()) {
+	if (mobileFiles === undefined) {
 		iosImportOpen.set(true);
 		return;
 	}
+
+	const selected = Array.from(mobileFiles);
 
 	try {
 		const sampleImage = await fetch('/placeholder.png');
 		const blob = await sampleImage.blob();
 		await OPFS.initializeLibrary();
-
-		const input = (document.getElementById('library-files') ??
-			document.getElementById('files')) as HTMLInputElement | null;
 
 		const handleFiles = async (files: FileList | File[]) => {
 			if (!files || files.length === 0) {
@@ -205,65 +197,7 @@ export async function createLibrary(mobileFiles?: FileList | File[]): Promise<vo
 			}
 		};
 
-		if (selected) {
-			await handleFiles(selected);
-			return;
-		}
-
-		if (input && input.files && input.files.length > 0) {
-			await handleFiles(Array.from(input.files));
-			return;
-		}
-
-		if (isDirectoryPickerSupported()) {
-			try {
-				const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
-				const files: File[] = [];
-
-				if (UserSettings.preferences.jellyfinMode) {
-					for await (const entry of dirHandle.values()) {
-						if (entry.kind === 'directory') {
-							const dir = await dirHandle.getDirectoryHandle(entry.name);
-
-							let isArtistDir = false;
-							for await (const subEntry of dir.values()) {
-								if (subEntry.kind === 'directory') {
-									isArtistDir = true;
-									break;
-								}
-							}
-
-							if (isArtistDir) {
-								for await (const albumEntry of dir.values()) {
-									if (albumEntry.kind === 'directory') {
-										await processAlbumDirectory(dir, albumEntry, files);
-									}
-								}
-							} else {
-								await processAlbumDirectory(dirHandle, entry, files);
-							}
-						}
-					}
-				} else {
-					for await (const entry of dirHandle.values()) {
-						if (entry.kind === 'file') {
-							const file = await entry.getFile();
-							files.push(file);
-						}
-					}
-				}
-
-				await handleFiles(files);
-				return;
-			} catch (error) {
-				if (error instanceof Error && error.name === 'AbortError') {
-					return;
-				}
-				console.error('Directory picker failed, falling back to file input:', error);
-			}
-		}
-
-		openLibraryFilePicker();
+		await handleFiles(selected);
 	} catch (error) {
 		console.error('Error in createLibrary:', error);
 		if (error instanceof Error) {
@@ -274,6 +208,62 @@ export async function createLibrary(mobileFiles?: FileList | File[]): Promise<vo
 		} else {
 			toast.error('Failed to create library. Please try again.');
 		}
+	}
+}
+
+async function collectFilesFromDirectoryHandle(
+	dirHandle: FileSystemDirectoryHandle
+): Promise<File[]> {
+	const files: File[] = [];
+
+	if (UserSettings.preferences.jellyfinMode) {
+		for await (const entry of dirHandle.values()) {
+			if (entry.kind === 'directory') {
+				const dir = await dirHandle.getDirectoryHandle(entry.name);
+
+				let isArtistDir = false;
+				for await (const subEntry of dir.values()) {
+					if (subEntry.kind === 'directory') {
+						isArtistDir = true;
+						break;
+					}
+				}
+
+				if (isArtistDir) {
+					for await (const albumEntry of dir.values()) {
+						if (albumEntry.kind === 'directory') {
+							await processAlbumDirectory(dir, albumEntry, files);
+						}
+					}
+				} else {
+					await processAlbumDirectory(dirHandle, entry, files);
+				}
+			}
+		}
+	} else {
+		for await (const entry of dirHandle.values()) {
+			if (entry.kind === 'file') {
+				const file = await entry.getFile();
+				files.push(file);
+			}
+		}
+	}
+
+	return files;
+}
+
+export async function pickLibraryDirectory(): Promise<File[] | null> {
+	if (!isDirectoryPickerSupported()) return null;
+	try {
+		const dirHandle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
+		return await collectFilesFromDirectoryHandle(dirHandle);
+	} catch (error) {
+		if (error instanceof Error && error.name === 'AbortError') {
+			return null;
+		}
+		console.error('Directory picker failed:', error);
+		toast.error('Could not open the folder picker. Try selecting files instead.');
+		return null;
 	}
 }
 
