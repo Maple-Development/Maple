@@ -24,8 +24,6 @@
 
 	let artwork = $state(null as string | null);
 	let progress = $state(0);
-	let volume = $state(100);
-	let lastVolume = $state(100);
 	let duration = $state(0);
 	let paused = $state(true);
 	let fillPercent = $state(0);
@@ -67,17 +65,6 @@
 
 	$effect(() => {
 		fillPercent = duration > 0 ? Math.min(100, Math.max(0, (progress / duration) * 100)) : 0;
-	});
-
-	$effect(() => {
-		volume = $audioPlayer.volume ?? volume;
-	});
-
-	$effect(() => {
-		if (!browser) return;
-		if (volume === lastVolume) return;
-		lastVolume = volume;
-		setVolumeLevel(volume);
 	});
 
 	function formatTime(seconds: number) {
@@ -273,7 +260,7 @@
 					<Slider
 						min={0}
 						max={100}
-						bind:value={volume}
+						bind:value={() => $audioPlayer.volume ?? 100, (v) => setVolumeLevel(v)}
 						step={1}
 						showValue
 						format={(n) => `${n}%`}

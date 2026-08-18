@@ -23,6 +23,34 @@ import { UserManager } from './api/UserManager';
 import { SERVER } from '$lib/api/server';
 
 let mediaSessionInitialized = false;
+let currentAudioUrl: string | null = null;
+
+const AUDIO_MIME: Record<string, string> = {
+	mp3: 'audio/mpeg',
+	mpeg: 'audio/mpeg',
+	mpga: 'audio/mpeg',
+	m4a: 'audio/mp4',
+	mp4: 'audio/mp4',
+	aac: 'audio/aac',
+	wav: 'audio/wav',
+	wave: 'audio/wav',
+	flac: 'audio/flac',
+	ogg: 'audio/ogg',
+	oga: 'audio/ogg',
+	opus: 'audio/ogg',
+	webm: 'audio/webm'
+};
+
+function audioMimeType(ext: string) {
+	const key = ext.toLowerCase().replace(/^\./, '');
+	return AUDIO_MIME[key] ?? `audio/${key}`;
+}
+
+function revokeCurrentAudioUrl() {
+	if (!currentAudioUrl) return;
+	URL.revokeObjectURL(currentAudioUrl);
+	currentAudioUrl = null;
+}
 
 function initMediaSession() {
 	if (!browser || mediaSessionInitialized || !('mediaSession' in navigator)) return;
@@ -239,15 +267,17 @@ async function playAtIndex(index: number) {
 	const buffer = await OPFS.getSong(song);
 	if (!buffer) return;
 	const arrayBuffer = await buffer.arrayBuffer();
-	const blob = new Blob([arrayBuffer], { type: `audio/${song.ext}` });
+	const blob = new Blob([arrayBuffer], { type: audioMimeType(song.ext) });
 	const audioUrl = URL.createObjectURL(blob);
 	curTime.set(0);
 	setCurTime.set(0);
 	audioPlayer.update((value) => {
 		const audio = value.audio ?? (browser ? new Audio() : null);
 		if (audio) {
+			audio.pause();
+			revokeCurrentAudioUrl();
+			currentAudioUrl = audioUrl;
 			audio.src = audioUrl;
-			audio.currentTime = 0;
 			audio.play();
 			audio.addEventListener('loadedmetadata', () => {
 				updateMediaSessionPositionState(audio);

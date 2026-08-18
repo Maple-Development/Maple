@@ -54,11 +54,21 @@ hideTips.subscribe((value) => {
 	}
 });
 export const isSmallDevice = writable(false);
+function storedVolume() {
+	if (!browser) return 100;
+	const parsed = parseInt(localStorage.getItem('volume') ?? '100', 10);
+	return Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : 100;
+}
+const initialVolume = storedVolume();
+const initialAudio = browser ? new Audio() : null;
+if (initialAudio) {
+	initialAudio.volume = initialVolume / 100;
+}
 export const audioPlayer = writable({
-	audio: browser ? new Audio() : null,
+	audio: initialAudio,
 	onEnded: () => {},
 	playing: false,
-	volume: 100,
+	volume: initialVolume,
 	currentTime: 0,
 	changeVolume: false
 });
@@ -88,6 +98,7 @@ export const recentlyPlayedManager = {
 
 let endedHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
 let durationChangeHandler: ((this: HTMLAudioElement, ev: Event) => void) | null = null;
+let listenersBoundTo: HTMLAudioElement | null = null;
 
 export const currentDuration = derived(audioPlayer, ($audioPlayer) => {
 	return $audioPlayer.audio?.duration ?? 0;
@@ -97,71 +108,71 @@ let currentTime = 0;
 let lastListenTime = 0;
 let lastListenSongId = '';
 
-audioPlayer.subscribe((value) => {
-	if (browser) {
-		if (value.audio instanceof HTMLAudioElement) {
-			if (!value.changeVolume) {
-				if (endedHandler) {
-					value.audio.removeEventListener('ended', endedHandler);
-					endedHandler = null;
-				}
+function bindAudioListeners(audio: HTMLAudioElement) {
+	if (listenersBoundTo === audio) return;
 
-				if (value.onEnded) {
-					endedHandler = () => {
-						value.onEnded();
-					};
-					value.audio.addEventListener('ended', endedHandler);
-				}
+	if (listenersBoundTo) {
+		if (endedHandler) {
+			listenersBoundTo.removeEventListener('ended', endedHandler);
+			endedHandler = null;
+		}
+		listenersBoundTo.ontimeupdate = null;
+		if (durationChangeHandler) {
+			listenersBoundTo.removeEventListener('durationchange', durationChangeHandler);
+			durationChangeHandler = null;
+		}
+	}
 
-				value.audio.ontimeupdate = () => {
-					currentTime = value.audio?.currentTime ?? 0;
-					if (value.playing) {
-						curTime.set(value.audio?.currentTime ?? currentTime);
-						setCurTime.set(value.audio?.currentTime ?? currentTime);
-					}
-					const song = get(activeSong);
-					const state = get(queueState);
-					if (value.playing && song?.id) {
-						if (song.id !== lastListenSongId) {
-							lastListenSongId = song.id;
-							lastListenTime = value.audio?.currentTime ?? 0;
-						} else {
-							const nextTime = value.audio?.currentTime ?? 0;
-							const delta = nextTime - lastListenTime;
-							lastListenTime = nextTime;
-							if (delta > 0 && delta <= 2.5) {
-								statsManager.recordListeningSeconds(song, state.source, delta);
-							}
-						}
-					}
-				};
+	listenersBoundTo = audio;
 
-				if (durationChangeHandler) {
-					value.audio.removeEventListener('durationchange', durationChangeHandler);
-					durationChangeHandler = null;
-				}
+	endedHandler = () => {
+		get(audioPlayer).onEnded();
+	};
+	audio.addEventListener('ended', endedHandler);
 
-				durationChangeHandler = () => {
-					audioPlayer.update((state) => ({ ...state }));
-				};
-				value.audio.addEventListener('durationchange', durationChangeHandler);
-
-				if (value.audio instanceof HTMLAudioElement && value.currentTime !== undefined) {
-					value.audio.currentTime = value.currentTime;
-				}
+	audio.ontimeupdate = () => {
+		const player = get(audioPlayer);
+		currentTime = player.audio?.currentTime ?? 0;
+		if (player.playing) {
+			curTime.set(player.audio?.currentTime ?? currentTime);
+			setCurTime.set(player.audio?.currentTime ?? currentTime);
+		}
+		const song = get(activeSong);
+		const state = get(queueState);
+		if (player.playing && song?.id) {
+			if (song.id !== lastListenSongId) {
+				lastListenSongId = song.id;
+				lastListenTime = player.audio?.currentTime ?? 0;
 			} else {
-				if (value.audio instanceof HTMLAudioElement && value.volume !== undefined) {
-					value.audio.volume = value.volume / 100;
-					localStorage.setItem('volume', value.volume.toString());
-					value.changeVolume = false;
-					return;
-				} else {
-					value.changeVolume = false;
-					return;
+				const nextTime = player.audio?.currentTime ?? 0;
+				const delta = nextTime - lastListenTime;
+				lastListenTime = nextTime;
+				if (delta > 0 && delta <= 2.5) {
+					statsManager.recordListeningSeconds(song, state.source, delta);
 				}
 			}
 		}
+	};
+
+	durationChangeHandler = () => {
+		audioPlayer.update((state) => ({ ...state }));
+	};
+	audio.addEventListener('durationchange', durationChangeHandler);
+}
+
+audioPlayer.subscribe((value) => {
+	if (!browser || !(value.audio instanceof HTMLAudioElement)) return;
+
+	if (value.changeVolume) {
+		if (value.volume !== undefined) {
+			value.audio.volume = value.volume / 100;
+			localStorage.setItem('volume', value.volume.toString());
+		}
+		value.changeVolume = false;
+		return;
 	}
+
+	bindAudioListeners(value.audio);
 });
 function createTitle() {
 	const { subscribe, set } = writable('');
