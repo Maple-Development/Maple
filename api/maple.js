@@ -66,7 +66,7 @@ const slower = slowDown({
 
 const limiter = rateLimit({
 	windowMs: 2 * 60 * 1000,
-	limit: 100,
+	limit: 5000,
 })
 
 try {
